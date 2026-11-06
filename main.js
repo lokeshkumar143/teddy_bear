@@ -1,8 +1,8 @@
 /**
  * main.js
  * ============================================================================
- * Application Bootstrap, High-Performance Animation Loop, Resize & Visibility
- * Management, and Subsystem Orchestration.
+ * Application Bootstrap, High-Performance 60 FPS Master Loop, Resize &
+ * Visibility Management, Subsystem Integration.
  * ============================================================================
  */
 
@@ -10,52 +10,88 @@
   "use strict";
 
   // Subsystem instances
+  let canvas = null;
+  let particleWorld = null;
+  let introScene = null;
+  let invitation = null;
+  let personalization = null;
+  let geometry = null;
+  let parts = null;
+  let lighting = null;
   let animation = null;
   let renderer = null;
-  let experience = null;
+  let controller = null;
 
   // Render loop tracking
   let lastTimestamp = 0;
   let isPageVisible = true;
   let rafId = null;
 
-  // Mini bear preview on welcome screen
-  let miniCanvas = null;
-
   function init() {
-    const mainCanvas = document.getElementById("artCanvas");
-    miniCanvas = document.getElementById("miniBearCanvas");
-
-    if (!mainCanvas) {
-      console.error("Art canvas element not found!");
+    canvas = document.getElementById("artCanvas");
+    if (!canvas) {
+      console.error("Master artCanvas element not found!");
       return;
     }
 
-    // 1. Initialize Modular Subsystems
-    const geometry = new TeddyGeometry();
-    const parts = new TeddyCharacterParts();
-    const lighting = new TeddyLighting();
+    // 1. Initialize Particle Universe & Audio Synthesizer
+    particleWorld = new TeddyParticleWorld(canvas);
+
+    // 2. Initialize Geometry, Shading & ASCII Character Ramps
+    geometry = new TeddyGeometry();
+    parts = new TeddyCharacterParts();
+    lighting = new TeddyLighting();
     animation = new TeddyCharacterAnimation();
-    renderer = new TeddyAsciiRenderer(mainCanvas, geometry, parts, lighting, animation);
 
-    // 2. Initialize Experience Controller
-    experience = new TeddyExperience(renderer, animation);
+    // 3. Initialize Full-Screen ASCII Renderer
+    renderer = new TeddyAsciiRenderer(canvas, geometry, parts, lighting, animation);
 
-    // 3. Window & Visibility Event Handlers
+    // 4. Initialize Interactive Personalization & File Picker
+    personalization = new TeddyPersonalization();
+
+    // 5. Initialize Intro & Invitation Scenes
+    introScene = new TeddyIntroScene(canvas, particleWorld, () => {
+      if (controller) controller.startInvitation();
+    });
+
+    invitation = new TeddyInvitation(canvas, () => {
+      if (controller) controller.startNameEntry();
+    });
+
+    // 6. Initialize Master Experience Controller
+    controller = new TeddyExperienceController({
+      canvas: canvas,
+      particleWorld: particleWorld,
+      introScene: introScene,
+      invitation: invitation,
+      personalization: personalization,
+      renderer: renderer,
+      animation: animation,
+      sound: particleWorld.sound
+    });
+
+    // 7. Window Resize & Page Visibility Listeners
     window.addEventListener("resize", onResize, { passive: true });
     document.addEventListener("visibilitychange", onVisibilityChange);
 
-    // 4. Initial layout calculation
+    // Initial resize calculation
     onResize();
 
-    // 5. Start Master Animation Loop
+    // 8. Boot Experience (Starts Scene 1: Cosmic Intro)
+    controller.start();
+
+    // 9. Start Master Animation Loop
     lastTimestamp = performance.now();
     rafId = requestAnimationFrame(loop);
   }
 
   function onResize() {
-    if (!renderer) return;
-    renderer.setupCanvas();
+    if (!canvas) return;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+
+    if (particleWorld) particleWorld.resize();
+    if (renderer) renderer.setupCanvas(w, h);
   }
 
   function onVisibilityChange() {
@@ -74,44 +110,17 @@
   }
 
   /**
-   * Master 60 FPS Animation Loop
+   * Master 60 FPS Animation & Render Loop
    */
   function loop(now) {
     if (!isPageVisible) return;
 
-    const dt = Math.min(0.1, (now - lastTimestamp) / 1000.0);
+    const dt = Math.min(0.08, (now - lastTimestamp) / 1000.0);
     lastTimestamp = now;
 
-    // Always update physics & timers
-    animation.update(dt);
-
-    // Branch behavior according to experience state
-    const currentStep = experience.currentStep;
-
-    if (currentStep === "WELCOME") {
-      // Render cute mini preview bear in the welcome card
-      if (miniCanvas) {
-        renderer.renderMiniBear(miniCanvas, animation.time);
-      }
-    } else if (currentStep === "BLOOMING") {
-      // Advance bloom progress (e.g. over 9 seconds)
-      const bloomRate = 1.0 / animation.bloomDuration;
-      animation.bloomProgress = Math.min(1.0, animation.bloomProgress + dt * bloomRate);
-
-      // Smoothstep easing for blooming characters
-      const u = animation.bloomProgress;
-      const easedBloom = u * u * (3.0 - 2.0 * u);
-
-      // Render full canvas frame
-      renderer.render(easedBloom, false);
-
-      // Check if bloom finished
-      if (animation.bloomProgress >= 1.0) {
-        experience.triggerGreeting();
-      }
-    } else if (currentStep === "GREETING" || currentStep === "PORTAL") {
-      // Fully bloomed interactive state (waving, breathing, heartbeat, mouse reaction)
-      renderer.render(1.0, true);
+    if (controller) {
+      controller.update(dt);
+      controller.render();
     }
 
     rafId = requestAnimationFrame(loop);

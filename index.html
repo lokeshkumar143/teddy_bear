@@ -2,113 +2,217 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>A Special Gift For You ❤️ | Teddy Bear ASCII Experience</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>A Special Teddy Gift For You ❤️ | Full-Screen Cinematic Experience</title>
   
   <!-- Modern Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
   
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="teddyExperience.css?v=6.0">
+  <!-- Stylesheet with Cache-Buster v7.0 -->
+  <link rel="stylesheet" href="teddyExperience.css?v=7.0">
 </head>
 <body>
 
-  <!-- Ambient Cosmic Aura Background -->
-  <div class="bg-cosmic-glow"></div>
-
   <!-- ======================================================================
-       1. INITIAL WELCOME SCREEN
+       FULL-SCREEN CINEMATIC EXPERIENCE VIEWPORT (100vw x 100svh)
        ====================================================================== -->
-  <section id="welcomeScreen" class="welcome-screen" aria-live="polite">
-    <div class="welcome-card">
-      
-      <!-- Mini Animated ASCII Teddy Bear -->
-      <div class="mini-bear-box">
-        <canvas id="miniBearCanvas" width="220" height="170" aria-label="Mini ASCII teddy bear waving"></canvas>
-      </div>
+  <main id="experienceViewport" class="experience-viewport" aria-live="polite">
+    
+    <!-- Full-Screen High-Performance Canvas -->
+    <canvas id="artCanvas"></canvas>
 
-      <!-- Typewriter Message -->
-      <div class="typewriter-box">
-        <p id="typewriterText" class="typewriter-text"></p>
-      </div>
+    <!-- Top Floating Controls: Sound & Theme Selector -->
+    <div id="topControlsBar" class="top-controls-bar">
+      <button id="btnSoundToggle" class="top-pill sound-pill" type="button" aria-label="Toggle Sound Effects" title="Sound Effects">
+        <span id="soundIcon">🔇</span>
+      </button>
 
-      <!-- Personalized Name Input (Fades in) -->
-      <div id="nameInputSection" class="name-input-group hidden">
-        <div class="input-wrapper">
+      <div class="theme-selector-pills">
+        <button class="theme-pill active" data-theme="cyberRose" title="Cyber Rose">💖</button>
+        <button class="theme-pill" data-theme="goldenHoney" title="Golden Honey">🍯</button>
+        <button class="theme-pill" data-theme="cosmicAurora" title="Cosmic Aurora">🌌</button>
+        <button class="theme-pill" data-theme="dreamyLavender" title="Dreamy Lavender">💜</button>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         SCENE ONE & TWO: MYSTERIOUS INTRO OVERLAY
+         ==================================================================== -->
+    <section id="introOverlay" class="scene-overlay intro-overlay">
+      <button id="btnSkipIntro" class="btn-skip-intro" type="button">Skip Intro ➔</button>
+
+      <div id="introCard" class="glass-card intro-card">
+        <div class="magic-sparkle-icon">✧</div>
+        <p id="introNarrationText" class="intro-typewriter-text"></p>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCENE THREE: INVITATION OVERLAY (Ask Before Creating)
+         ==================================================================== -->
+    <section id="invitationContainer" class="scene-overlay invitation-overlay hidden">
+      <div class="glass-card invitation-card">
+        <div class="card-badge">✦ A Special Invitation ✦</div>
+        <h2 id="inviteTitle" class="card-title"></h2>
+        <p id="inviteQuestion" class="card-subtitle"></p>
+
+        <!-- Primary & Secondary Buttons -->
+        <div id="inviteActionGroup" class="btn-action-group">
+          <button id="btnAcceptTeddy" class="btn-primary-glow" type="button">
+            YES! CREATE MY TEDDY ❤️
+          </button>
+          <button id="btnDeclineTeddy" class="btn-secondary-subtle" type="button">
+            MAYBE LATER
+          </button>
+        </div>
+
+        <!-- Reversible Rejection Notice -->
+        <div id="rejectedNotice" class="rejected-box hidden">
+          <button id="btnReadyNow" class="btn-primary-glow" type="button">
+            I'M READY NOW ❤️
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCENE FOUR: NAME ENTRY OVERLAY
+         ==================================================================== -->
+    <section id="sceneNameEntry" class="scene-overlay name-entry-overlay hidden">
+      <div class="glass-card name-card">
+        <div class="card-badge">🧸 Step 1 of 2</div>
+        <h2 id="namePromptTitle" class="card-title"></h2>
+        <p id="namePromptSubtitle" class="card-subtitle"></p>
+
+        <div class="input-container">
           <input 
             type="text" 
-            id="visitorNameInput" 
-            class="name-input" 
-            placeholder="Enter your name here..." 
+            id="personNameInput" 
+            class="glow-input" 
+            placeholder="Enter your name..." 
             maxlength="20" 
             autocomplete="off" 
             spellcheck="false"
             aria-label="Your Name"
           >
-          <p id="inputError" class="input-error hidden"></p>
+          <p id="nameInputError" class="input-error-msg hidden"></p>
         </div>
 
-        <button id="btnCreateTeddy" class="btn-create-teddy" type="button">
-          <span>CREATE MY TEDDY</span>
+        <button id="btnNameContinue" class="btn-primary-glow" type="button">
+          <span>CONTINUE</span>
           <span aria-hidden="true">✨</span>
         </button>
       </div>
+    </section>
 
-    </div>
-  </section>
+    <!-- ====================================================================
+         SCENE FIVE: PHOTO UPLOAD OR SKIP OVERLAY
+         ==================================================================== -->
+    <section id="scenePhotoUpload" class="scene-overlay photo-upload-overlay hidden">
+      <div class="glass-card photo-card">
+        <div class="card-badge">📸 Step 2 of 2 (Optional)</div>
+        <h2 id="photoPromptTitle" class="card-title"></h2>
+        <p id="photoPromptSubtitle" class="card-subtitle"></p>
 
-  <!-- ======================================================================
-       2. FULL 9:16 ASCII EXPERIENCE SCREEN
-       ====================================================================== -->
-  <section id="experienceScreen" class="experience-screen hidden">
-    
-    <div class="canvas-reel-container">
-      <!-- High-Performance Canvas for ASCII Teddy Bear -->
-      <canvas id="artCanvas" width="1080" height="1920"></canvas>
+        <!-- Upload or Skip Choice -->
+        <div id="photoChoiceGroup" class="photo-btn-group">
+          <button id="btnUploadPhoto" class="btn-primary-glow" type="button">
+            <span>UPLOAD PHOTO</span>
+            <span aria-hidden="true">📸</span>
+          </button>
+          <input type="file" id="photoFileInput" accept="image/jpeg,image/png,image/webp" class="hidden">
 
-      <!-- Floating Canvas Top Bar (Themes & Sound Toggle) -->
-      <div class="canvas-top-bar">
-        <button id="btnSoundToggle" class="top-bar-pill sound-pill" type="button" aria-label="Toggle Sound" title="Sound Effects">
-          <span id="soundIcon">🔇</span>
+          <button id="btnSkipPhoto" class="btn-secondary-subtle" type="button">
+            SKIP FOR NOW ➔
+          </button>
+        </div>
+
+        <!-- Polaroid Preview when Photo is Chosen -->
+        <div id="polaroidPreview" class="polaroid-preview hidden">
+          <div class="polaroid-frame">
+            <div class="polaroid-photo-box">
+              <img id="polaroidImg" alt="Your Uploaded Photo" class="polaroid-image">
+            </div>
+            <p id="polaroidCaption" class="polaroid-text">Best Friends Forever ❤️</p>
+          </div>
+
+          <div class="preview-actions">
+            <button id="btnConfirmPhoto" class="btn-primary-glow" type="button">LOOKS PERFECT! ✨</button>
+            <button id="btnChangePhoto" class="btn-secondary-subtle" type="button">Choose Different Photo</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCENE SIX: TEDDY GENERATING PROGRESS OVERLAY
+         ==================================================================== -->
+    <section id="generatingOverlay" class="scene-overlay generating-overlay hidden">
+      <div class="glass-card generating-card">
+        <div class="magic-orbit-spinner">
+          <span class="orbit-sparkle">✦</span>
+          <span class="orbit-heart">💖</span>
+        </div>
+        <h2 class="card-title">Crafting Your Special Teddy...</h2>
+        <p id="generatingStepText" class="generating-step-text">Gathering stardust and sweet dreams...</p>
+        <div class="generating-bar-container">
+          <div class="generating-bar-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         SCENE EIGHT: FLOATING POLAROID FRAME (Beside Teddy)
+         ==================================================================== -->
+    <aside id="floatingPolaroidFrame" class="floating-polaroid-frame hidden" aria-hidden="true">
+      <div class="polaroid-frame">
+        <div class="polaroid-photo-box">
+          <img id="floatingPolaroidImg" alt="Best Friends Memory" class="polaroid-image">
+        </div>
+        <p id="floatingPolaroidCaption" class="polaroid-text">Best Friends Forever ❤️</p>
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         SCENE NINE: FINAL GIFT PRESENTATION CARD
+         ==================================================================== -->
+    <section id="giftRevealDialog" class="gift-reveal-dialog hidden">
+      <h2 id="giftTitle" class="gift-title"></h2>
+      <p id="giftSub1" class="gift-sub"></p>
+      <p id="giftSub2" class="gift-sub-highlight"></p>
+
+      <div id="giftActionGroup" class="gift-action-group hidden">
+        <button id="btnSaveGift" class="btn-primary-glow btn-gift-action" type="button">
+          <span>SAVE MY GIFT</span>
+          <span aria-hidden="true">🎁</span>
         </button>
-
-        <div class="theme-selector-pills">
-          <button class="theme-pill active" data-theme="cyberRose" title="Cyber Rose">💖</button>
-          <button class="theme-pill" data-theme="goldenHoney" title="Golden Honey">🍯</button>
-          <button class="theme-pill" data-theme="cosmicAurora" title="Cosmic Aurora">🌌</button>
-          <button class="theme-pill" data-theme="dreamyLavender" title="Dreamy Lavender">💜</button>
-        </div>
+        <button id="btnGiftWave" class="btn-secondary-glow btn-gift-action" type="button">
+          <span>MAKE TEDDY WAVE</span>
+          <span aria-hidden="true">👋</span>
+        </button>
+        <button id="btnGiftExplore" class="btn-accent-glow btn-gift-action" type="button">
+          <span>EXPLORE MY WORLD</span>
+          <span aria-hidden="true">✨</span>
+        </button>
+        <button id="btnGiftRestart" class="btn-text-subtle" type="button">
+          <span>Watch Again</span>
+          <span aria-hidden="true">↺</span>
+        </button>
       </div>
+    </section>
 
-      <!-- Interactive Waving Feedback Toast -->
-      <div id="waveToast" class="wave-toast hidden" role="status"></div>
+    <!-- Toast Notification for Waves & Saves -->
+    <div id="giftToast" class="gift-toast hidden" role="status"></div>
 
-      <!-- Floating Greeting Dialog Overlay (Revealed after bloom completes) -->
-      <div id="greetingDialog" class="greeting-dialog hidden">
-        <h2 id="greetingLine1" class="greeting-line-title"></h2>
-        <p id="greetingLine2" class="greeting-line-sub"></p>
-        <p id="greetingLine3" class="greeting-line-sub"></p>
-        <p id="greetingQuestion" class="greeting-question"></p>
-
-        <div id="greetingActionGroup" class="greeting-btn-group hidden">
-          <button id="btnExplore" class="btn-explore" type="button">
-            YES, LET'S GO ❤️
-          </button>
-          <button id="btnWave" class="btn-wave" type="button">
-            MAKE MY TEDDY WAVE 👋
-          </button>
-        </div>
-      </div>
-    </div>
-
-  </section>
+  </main>
 
   <!-- ======================================================================
-       3. CREATIVE DEVELOPER PORTFOLIO SCREEN (After Heart Portal Transition)
+       SCENE TEN: CREATIVE DEVELOPER PORTFOLIO SCREEN (After Portal Transition)
        ====================================================================== -->
-  <main id="portfolioScreen" class="portfolio-screen hidden">
+  <article id="portfolioScreen" class="portfolio-screen hidden">
     
     <!-- Floating Return Pill -->
     <div class="floating-return-bar">
@@ -121,12 +225,20 @@
     <!-- Portfolio Hero Header -->
     <header class="portfolio-hero">
       <div class="portfolio-badge">
-        <span>✦</span> Creative Developer & WebGL Specialist
+        <span>✦</span> Creative Developer & Generative Artist
       </div>
-      <h1 id="portfolioGreeting">Welcome to My Creative World ✨</h1>
+      <h1 id="portfolioGreeting">Welcome to Lokesh's Creative World ✨</h1>
       <p>
         Crafting cinematic web interactions, WebGL shaders, procedural ASCII art, and digital experiences that blend mathematics with pure emotion.
       </p>
+      <div class="github-profile-pill">
+        <a href="https://github.com/lokeshkumar143/Teddy_Bear" target="_blank" rel="noopener noreferrer" class="github-link">
+          <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          <span>github.com/lokeshkumar143</span>
+        </a>
+      </div>
     </header>
 
     <!-- Featured Projects Grid -->
@@ -142,51 +254,51 @@
             <div class="project-icon">🧸</div>
             <h3 class="project-title">Procedural ASCII Teddy Bear</h3>
             <p class="project-desc">
-              Mathematical shape simulation in Canvas 2D/WebGL with parametric heart equations, smoothstep bloom reveals, and live personalized letter synthesis.
+              Full-screen cinematic experience with signed distance field geometry, radiant heart illumination, personalized name embroidery, and live photo integration.
             </p>
           </div>
           <div class="project-tags">
             <span class="tag">Canvas 2D</span>
-            <span class="tag">Math Equations</span>
-            <span class="tag">ASCII Bloom</span>
+            <span class="tag">Parametric Math</span>
+            <span class="tag">ASCII Synthesis</span>
           </div>
         </article>
 
         <!-- Project 2 -->
         <article class="project-card">
           <div>
-            <div class="project-icon">🌹</div>
-            <h3 class="project-title">Blooming Rose Reel</h3>
+            <div class="project-icon">🌌</div>
+            <h3 class="project-title">Cosmic Starfield & Energy Portals</h3>
             <p class="project-desc">
-              9:16 vertical terminal reels with animated code streams, glowing color gradients, and real-time audio-visual physics.
+              Multi-layered particle physics, harmonic audio synthesis, shooting stars, and shockwaves with smooth camera transitions.
             </p>
           </div>
           <div class="project-tags">
-            <span class="tag">Creative Coding</span>
-            <span class="tag">Kinetic Typography</span>
-            <span class="tag">60 FPS</span>
+            <span class="tag">Particle Physics</span>
+            <span class="tag">Web Audio API</span>
+            <span class="tag">Parallax</span>
           </div>
         </article>
 
         <!-- Project 3 -->
         <article class="project-card">
           <div>
-            <div class="project-icon">🌌</div>
-            <h3 class="project-title">Cosmic Starfield & Portals</h3>
+            <div class="project-icon">✨</div>
+            <h3 class="project-title">Interactive Digital Gifts</h3>
             <p class="project-desc">
-              Multi-layered particle systems, chromatic aberration shockwaves, and seamless camera warps between dimensional spaces.
+              Storytelling web applications with typewriter narration, user personalization, high-res canvas exports, and responsive glassmorphism.
             </p>
           </div>
           <div class="project-tags">
-            <span class="tag">WebGL</span>
-            <span class="tag">Particle Physics</span>
-            <span class="tag">Shaders</span>
+            <span class="tag">UI / UX</span>
+            <span class="tag">Kinetic Typography</span>
+            <span class="tag">Creative Coding</span>
           </div>
         </article>
       </div>
     </section>
 
-    <!-- Creative Skills & Philosophy -->
+    <!-- Engineering Capabilities -->
     <section class="skills-section">
       <h2 class="projects-section-title">
         <span>⚡</span> Creative Engineering Capabilities
@@ -194,7 +306,7 @@
       <div class="skills-grid">
         <div class="skill-item">
           <span class="skill-bullet"></span>
-          <span>WebGL / Three.js Shaders</span>
+          <span>WebGL & Three.js Shaders</span>
         </div>
         <div class="skill-item">
           <span class="skill-bullet"></span>
@@ -202,37 +314,44 @@
         </div>
         <div class="skill-item">
           <span class="skill-bullet"></span>
-          <span>Interactive Mathematical Art</span>
+          <span>Signed Distance Fields (SDF)</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-bullet"></span>
+          <span>Web Audio API Sound Engines</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-bullet"></span>
+          <span>Responsive Mobile & Desktop Architecture</span>
         </div>
         <div class="skill-item">
           <span class="skill-bullet"></span>
           <span>Smooth 60 FPS Micro-Interactions</span>
-        </div>
-        <div class="skill-item">
-          <span class="skill-bullet"></span>
-          <span>Responsive Touch & Desktop UI</span>
-        </div>
-        <div class="skill-item">
-          <span class="skill-bullet"></span>
-          <span>Accessible Motion Design</span>
         </div>
       </div>
     </section>
 
     <!-- Footer -->
     <footer class="portfolio-footer">
-      <p>Crafted with love, code, and mathematics ❤️ · 2026</p>
+      <p>Crafted with love, code, and mathematics by <strong>lokeshkumar143</strong> ❤️ · 2026</p>
     </footer>
 
-  </main>
+  </article>
 
-  <!-- Modular Architectural Scripts with Cache-Buster v6.0 -->
-  <script src="teddyGeometry.js?v=6.0"></script>
-  <script src="teddyCharacterParts.js?v=6.0"></script>
-  <script src="teddyLighting.js?v=6.0"></script>
-  <script src="teddyCharacterAnimation.js?v=6.0"></script>
-  <script src="teddyAsciiRenderer.js?v=6.0"></script>
-  <script src="teddyExperience.js?v=6.0"></script>
-  <script src="main.js?v=6.0"></script>
+  <!-- ======================================================================
+       MODULAR ARCHITECTURAL SCRIPTS WITH CACHE-BUSTER v7.0
+       ====================================================================== -->
+  <script src="teddyGeometry.js?v=7.0"></script>
+  <script src="teddyCharacterParts.js?v=7.0"></script>
+  <script src="teddyLighting.js?v=7.0"></script>
+  <script src="teddyCharacterAnimation.js?v=7.0"></script>
+  <script src="teddyAsciiRenderer.js?v=7.0"></script>
+  <script src="teddyParticleWorld.js?v=7.0"></script>
+  <script src="teddyIntroScene.js?v=7.0"></script>
+  <script src="teddyInvitation.js?v=7.0"></script>
+  <script src="teddyPersonalization.js?v=7.0"></script>
+  <script src="teddyGiftReveal.js?v=7.0"></script>
+  <script src="teddyExperienceController.js?v=7.0"></script>
+  <script src="main.js?v=7.0"></script>
 </body>
 </html>

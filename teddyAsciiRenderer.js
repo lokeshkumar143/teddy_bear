@@ -2,11 +2,11 @@
  * teddyAsciiRenderer.js
  * ============================================================================
  * Cinematic Cyber-Romantic ASCII Teddy Bear Canvas 2D Pipeline.
- * Orchestrates:
- * 1. TeddyGeometry (SDF mathematical anatomy, curves & signed distance fields)
- * 2. TeddyCharacterParts (density ramps @ # $ % & * + = - : ., regional palettes)
- * 3. TeddyLighting (3D normal mapping, heart point light, ambient & rim highlights)
- * 4. TeddyCharacterAnimation (breathing, 3D tilt, blinking, waving, heartbeat)
+ * Fullscreen Responsive Architecture (100vw x 100svh):
+ * - Zero pillarboxing, zero black margins on any device
+ * - Proportional SDF coordinate scaling for 70x68 character matrix
+ * - Dynamic 3D lighting, radiant chest heart illumination, and fur density maps
+ * - Integrates with multi-layer animation (breathing, blinking, waving, gazing)
  * ============================================================================
  */
 
@@ -19,19 +19,25 @@ class TeddyAsciiRenderer {
     this.lighting = lighting;
     this.anim = animation;
 
-    this.CANVAS_WIDTH = 1080;
-    this.CANVAS_HEIGHT = 1920;
-
-    // Grid configuration matching verified visual anatomy (preview_redesign_2.png)
+    // Grid configuration matching verified visual anatomy
     this.COLS = 70;
     this.ROWS = 68;
+
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+
     this.CELL_W = 14;
     this.CELL_H = 20;
-    this.GRID_X0 = Math.floor((this.CANVAS_WIDTH - this.COLS * this.CELL_W) / 2); // 50px
-    this.GRID_Y0 = 150;
-    this.CENTER_X = 540.0;
-    this.CENTER_Y = 800.0;
-    this.SCENE_SCALE = 1050.0;
+    this.GRID_X0 = 0;
+    this.GRID_Y0 = 0;
+    this.CENTER_X = this.width / 2;
+    this.CENTER_Y = this.height * 0.42;
+    this.SCENE_SCALE = 800;
+
+    // Optional user photo for Polaroid integration
+    this.userPhoto = null;
+    this.userPhotoUrl = null;
 
     // Precomputed canonical cell matrix
     this.canonicalGrid = [];
@@ -45,12 +51,43 @@ class TeddyAsciiRenderer {
     this.anim.onThemeChanged = () => this.precomputeGrid();
 
     this.setupCanvas();
+  }
+
+  setupCanvas(customW = null, customH = null) {
+    this.width = customW || window.innerWidth;
+    this.height = customH || window.innerHeight;
+    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    this.canvas.width = Math.floor(this.width * this.dpr);
+    this.canvas.height = Math.floor(this.height * this.dpr);
+
+    this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+
+    const isLandscape = (this.width > this.height && this.width > 800);
+
+    // Responsive positioning & scaling
+    if (isLandscape) {
+      this.CENTER_X = this.userPhoto ? this.width * 0.42 : this.width * 0.50;
+      this.CENTER_Y = this.height * 0.44;
+      this.SCENE_SCALE = Math.min(this.height * 0.62, this.width * 0.44);
+    } else {
+      this.CENTER_X = this.width * 0.50;
+      this.CENTER_Y = this.height * 0.38;
+      this.SCENE_SCALE = Math.min(this.width * 0.90, this.height * 0.50);
+    }
+
+    this.CELL_W = (this.SCENE_SCALE * 0.92) / this.COLS;
+    this.CELL_H = (this.SCENE_SCALE * 1.32) / this.ROWS;
+    this.GRID_X0 = Math.floor(this.CENTER_X - (this.COLS * this.CELL_W) / 2);
+    this.GRID_Y0 = Math.floor(this.CENTER_Y - (this.ROWS * this.CELL_H) / 2);
+
     this.precomputeGrid();
   }
 
-  setupCanvas() {
-    this.canvas.width = this.CANVAS_WIDTH;
-    this.canvas.height = this.CANVAS_HEIGHT;
+  setPhoto(photoImg, photoUrl) {
+    this.userPhoto = photoImg;
+    this.userPhotoUrl = photoUrl;
+    this.setupCanvas();
   }
 
   /**
@@ -121,57 +158,6 @@ class TeddyAsciiRenderer {
   }
 
   /**
-   * Render Mini ASCII Teddy Bear for Welcome Screen Card
-   */
-  renderMiniBear(targetCanvas, time) {
-    const ctx = targetCanvas.getContext("2d");
-    const W = targetCanvas.width;
-    const H = targetCanvas.height;
-    ctx.clearRect(0, 0, W, H);
-
-    const blink = (Math.sin(time * 2.5) > 0.94);
-    const pulse = 1.0 + 0.16 * Math.sin(time * 5.0);
-    const eyeChar = blink ? "⌒" : "●";
-
-    const miniLines = [
-      "   ₍ᐢ. ̫ .ᐢ₎   ",
-      "  (  (,,)  )  ",
-      `   / ${eyeChar}  ${eyeChar} \\   `,
-      "  (  .꒳.  )  ",
-      "   /╭───╮\\   ",
-      "  ( │ ♥ │ )  ",
-      "   \\╰───╯/   ",
-      "   (,,) (,,)  "
-    ];
-
-    ctx.font = '16px "Fira Code", Menlo, monospace';
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-
-    const startY = 32;
-    const lineH = 22;
-
-    miniLines.forEach((line, idx) => {
-      const y = startY + idx * lineH;
-      if (line.includes("♥")) {
-        ctx.fillStyle = `rgb(255, 45, 95)`;
-        ctx.shadowColor = "rgba(255, 45, 95, 0.9)";
-        ctx.shadowBlur = 14 * pulse;
-      } else if (line.includes(eyeChar)) {
-        ctx.fillStyle = "#ffffff";
-        ctx.shadowColor = "rgba(255, 255, 255, 0.7)";
-        ctx.shadowBlur = 8;
-      } else {
-        ctx.fillStyle = "rgb(255, 125, 155)";
-        ctx.shadowColor = "rgba(255, 110, 140, 0.4)";
-        ctx.shadowBlur = 6;
-      }
-      ctx.fillText(line, W / 2, y);
-    });
-    ctx.shadowBlur = 0;
-  }
-
-  /**
    * Master Fullscreen Render Pipeline
    */
   render(bloomProgress, isBloomed) {
@@ -179,25 +165,31 @@ class TeddyAsciiRenderer {
     const anim = this.anim;
     const t = anim.time;
     const theme = anim.getTheme();
+    const W = this.width;
+    const H = this.height;
 
-    // 1. Deep Space Cosmic Void & Nebula Clouds
-    ctx.fillStyle = "#030308";
-    ctx.fillRect(0, 0, this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
+    // 1. Deep Space Cosmic Void
+    ctx.fillStyle = "#030206";
+    ctx.fillRect(0, 0, W, H);
 
+    // Dynamic Ambient Nebula
     const nebGrad = ctx.createRadialGradient(
-      this.CANVAS_WIDTH / 2, this.CENTER_Y, 80,
-      this.CANVAS_WIDTH / 2, this.CENTER_Y, 750
+      this.CENTER_X, this.CENTER_Y, 40,
+      this.CENTER_X, this.CENTER_Y, Math.max(W, H) * 0.65
     );
-    nebGrad.addColorStop(0, theme.nebula);
-    nebGrad.addColorStop(0.5, "rgba(20, 10, 35, 0.08)");
+    nebGrad.addColorStop(0, theme.nebula || "rgba(255, 45, 95, 0.12)");
+    nebGrad.addColorStop(0.4, "rgba(80, 20, 110, 0.06)");
+    nebGrad.addColorStop(0.8, "rgba(20, 10, 35, 0.03)");
     nebGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
     ctx.fillStyle = nebGrad;
-    ctx.fillRect(0, 0, this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
+    ctx.fillRect(0, 0, W, H);
 
-    // 2. Twinkling Multi-Spectral Cosmic Stars
+    // 2. Twinkling Cosmic Stars
     for (const star of anim.stars) {
+      const sx = (star.xRel !== undefined) ? star.xRel * W : ((star.x / 1080) * W);
+      const sy = (star.yRel !== undefined) ? star.yRel * H : ((star.y / 1920) * H);
       const val = star.baseBrightness * (0.25 + 0.75 * (0.5 + 0.5 * Math.sin(t * star.freq + star.phase)));
-      if (val > 0.18) {
+      if (val > 0.16) {
         if (star.colorType === "rose") {
           ctx.fillStyle = `rgba(255, 180, 210, ${val})`;
         } else if (star.colorType === "gold") {
@@ -205,52 +197,56 @@ class TeddyAsciiRenderer {
         } else {
           ctx.fillStyle = `rgba(180, 215, 255, ${val})`;
         }
-        ctx.fillRect(star.x, star.y, 2, 2);
+        ctx.fillRect(sx, sy, 2, 2);
         if (val > 0.85) {
-          ctx.fillRect(star.x - 1, star.y, 1, 1);
-          ctx.fillRect(star.x + 2, star.y, 1, 1);
+          ctx.fillRect(sx - 1, sy, 1, 1);
+          ctx.fillRect(sx + 2, sy, 1, 1);
         }
       }
     }
 
     // 3. Four-Point Sparkle Diamond Stars
     for (const sp of anim.sparkleStars) {
+      const spx = (sp.x / 1080) * W;
+      const spy = (sp.y / 1920) * H;
       const wave = Math.sin(t * sp.freq + sp.phase);
       const sVal = Math.pow(Math.max(0, wave), 3.0);
       if (sVal > 0.08) {
-        const arm = 4 + 11 * sVal;
+        const arm = 3 + 8 * sVal;
         ctx.strokeStyle = `rgba(255, 255, 255, ${sVal * 0.85})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.moveTo(sp.x - arm, sp.y); ctx.lineTo(sp.x + arm, sp.y);
-        ctx.moveTo(sp.x, sp.y - arm); ctx.lineTo(sp.x, sp.y + arm);
+        ctx.moveTo(spx - arm, spy); ctx.lineTo(spx + arm, spy);
+        ctx.moveTo(spx, spy - arm); ctx.lineTo(spx, spy + arm);
         ctx.stroke();
 
         ctx.fillStyle = `rgba(255, 255, 255, ${sVal})`;
-        ctx.fillRect(sp.x - 1, sp.y - 1, 3, 3);
+        ctx.fillRect(spx - 1, spy - 1, 3, 3);
       }
     }
 
-    // 4. Streaking Shooting Stars / Cosmic Meteors
+    // 4. Cosmic Meteors / Shooting Stars
     for (const ss of anim.shootingStars) {
       ctx.save();
-      const tailX = ss.x - (ss.vx / 750) * ss.len;
-      const tailY = ss.y - (ss.vy / 750) * ss.len;
-      const grad = ctx.createLinearGradient(tailX, tailY, ss.x, ss.y);
+      const ssX = (ss.x / 1080) * W;
+      const ssY = (ss.y / 1920) * H;
+      const tailX = ssX - (ss.vx / 750) * ss.len;
+      const tailY = ssY - (ss.vy / 750) * ss.len;
+      const grad = ctx.createLinearGradient(tailX, tailY, ssX, ssY);
       grad.addColorStop(0, "rgba(255, 255, 255, 0)");
       grad.addColorStop(0.7, `rgba(255, 180, 220, ${ss.alpha * 0.6})`);
       grad.addColorStop(1, `rgba(255, 255, 255, ${ss.alpha})`);
 
       ctx.strokeStyle = grad;
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 2.0;
       ctx.beginPath();
       ctx.moveTo(tailX, tailY);
-      ctx.lineTo(ss.x, ss.y);
+      ctx.lineTo(ssX, ssY);
       ctx.stroke();
 
       ctx.fillStyle = `rgba(255, 255, 255, ${ss.alpha})`;
       ctx.beginPath();
-      ctx.arc(ss.x, ss.y, 2.5, 0, Math.PI * 2);
+      ctx.arc(ssX, ssY, 2.0, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     }
@@ -258,25 +254,28 @@ class TeddyAsciiRenderer {
     // 5. Heartbeat Shockwave Rings
     for (const sw of anim.shockwaves) {
       ctx.save();
+      const scaleFactor = this.SCENE_SCALE / 1050;
       ctx.strokeStyle = sw.color;
       ctx.lineWidth = 2.0;
       ctx.globalAlpha = sw.alpha;
       ctx.beginPath();
-      ctx.arc(sw.cx, sw.cy, sw.r, 0, Math.PI * 2);
+      ctx.arc(this.CENTER_X, this.CENTER_Y + 0.16 * this.SCENE_SCALE, sw.r * scaleFactor, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
     }
 
-    // 6. Ambient Cosmic Dust Particles
+    // 6. Ambient Cosmic Dust
     for (const p of anim.ambientParticles) {
+      const px = (p.x / 1080) * W;
+      const py = (p.y / 1920) * H;
       const pAlpha = p.alpha * (0.6 + 0.4 * Math.sin(t * 3.0 + p.phase));
       ctx.fillStyle = `hsla(${p.hue}, 90%, 65%, ${pAlpha})`;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.arc(px, py, p.size, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // 7. Cursor Fairy Dust Trails
+    // 7. Cursor Dust Trails
     ctx.font = 'bold 14px "Fira Code", monospace';
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -289,10 +288,10 @@ class TeddyAsciiRenderer {
       ctx.restore();
     }
 
-    // 8. Radiant Glowing Heart Aura
+    // 8. Radiant Glowing Chest Heart Aura
     const heartGlowPx = this.CENTER_X;
     const heartGlowPy = this.CENTER_Y + 0.16 * this.SCENE_SCALE;
-    const glowR = 260.0 * anim.heartScale * Math.min(1.0, bloomProgress * 1.3);
+    const glowR = (this.SCENE_SCALE * 0.28) * anim.heartScale * Math.min(1.0, bloomProgress * 1.3);
 
     if (bloomProgress > 0.05) {
       const radGrad = ctx.createRadialGradient(heartGlowPx, heartGlowPy, 0, heartGlowPx, heartGlowPy, glowR);
@@ -307,7 +306,7 @@ class TeddyAsciiRenderer {
       ctx.fill();
     }
 
-    // 9. Floating Mini ASCII Hearts (Ascending embers)
+    // 9. Floating Ascending Mini ASCII Hearts
     if (isBloomed) {
       ctx.font = 'bold 18px "Fira Code", monospace';
       for (const p of anim.floatingHearts) {
@@ -319,7 +318,7 @@ class TeddyAsciiRenderer {
         if (alpha > 0.05) {
           const px = Math.floor(this.CENTER_X + nx * this.SCENE_SCALE);
           const py = Math.floor(this.CENTER_Y + ny * this.SCENE_SCALE);
-          if (px >= 30 && px <= this.CANVAS_WIDTH - 30 && py >= 40 && py <= this.CANVAS_HEIGHT - 30) {
+          if (px >= 20 && px <= W - 20 && py >= 30 && py <= H - 30) {
             ctx.fillStyle = `rgba(${theme.heartHighlight.join(",")}, ${alpha})`;
             ctx.shadowColor = theme.heartGlow;
             ctx.shadowBlur = 10;
@@ -334,12 +333,13 @@ class TeddyAsciiRenderer {
     if (bloomProgress > 0.20) {
       const archAlpha = Math.min(1.0, (bloomProgress - 0.20) * 2.0);
       ctx.save();
-      ctx.font = 'bold 22px "Fira Code", monospace';
+      const headerFontSize = Math.min(22, Math.max(14, Math.floor(W * 0.035)));
+      ctx.font = `bold ${headerFontSize}px "Fira Code", monospace`;
       ctx.textAlign = "center";
       ctx.fillStyle = `rgba(${theme.heartHighlight.join(",")}, ${archAlpha})`;
       ctx.shadowColor = theme.heartGlow;
-      ctx.shadowBlur = 18;
-      ctx.fillText(`✧ SPECIALLY CRAFTED FOR ${anim.name.toUpperCase()} ✧`, this.CANVAS_WIDTH / 2, 100);
+      ctx.shadowBlur = 16;
+      ctx.fillText(`✧ SPECIALLY CRAFTED FOR ${anim.name.toUpperCase()} ✧`, this.CENTER_X, Math.max(45, this.GRID_Y0 - 35));
       ctx.restore();
     }
 
@@ -354,6 +354,9 @@ class TeddyAsciiRenderer {
     const blinkVal = anim.blinkValue;
     const headTilt = anim.headTilt;
     const lookOffset = anim.lookOffset;
+
+    const charFontSize = Math.max(10, Math.floor(this.CELL_H * 0.85));
+    ctx.font = `bold ${charFontSize}px "Fira Code", Menlo, monospace`;
 
     for (let r = 0; r < this.ROWS; r++) {
       const rowCells = this.canonicalGrid[r];
@@ -420,10 +423,9 @@ class TeddyAsciiRenderer {
 
         if (col === "transparent" || ch === " ") continue;
 
-        ctx.font = 'bold 16px "Fira Code", Menlo, monospace';
         if (glow) {
           ctx.shadowColor = glow;
-          ctx.shadowBlur = (cell.part === "badge" || cell.part === "heart") ? 16 : 10;
+          ctx.shadowBlur = (cell.part === "badge" || cell.part === "heart") ? 14 : 8;
         } else {
           ctx.shadowBlur = 0;
         }
@@ -435,10 +437,67 @@ class TeddyAsciiRenderer {
 
     ctx.shadowBlur = 0;
 
-    // 12. Magical Portal Warp Overlay
+    // 12. Floating Polaroid Snapshot on Canvas (Landscape or for snapshot exports)
+    if (this.userPhoto && isBloomed && (W > 850)) {
+      this.drawPolaroidOnCanvas();
+    }
+
+    // 13. Magical Portal Warp Overlay
     if (this.portalActive) {
       this.drawPortalWarp(this.portalProgress);
     }
+  }
+
+  /**
+   * Draw the Polaroid directly on the Canvas when on desktop or during snapshot
+   */
+  drawPolaroidOnCanvas() {
+    if (!this.userPhoto) return;
+    const ctx = this.ctx;
+    const W = this.width;
+    const H = this.height;
+
+    const pw = Math.min(260, Math.floor(W * 0.22));
+    const ph = Math.floor(pw * 1.25);
+    const px = Math.min(W - pw - 60, this.CENTER_X + this.SCENE_SCALE * 0.52);
+    const py = this.CENTER_Y - ph * 0.45;
+
+    ctx.save();
+    ctx.translate(px + pw / 2, py + ph / 2);
+    ctx.rotate(0.04 * Math.sin(this.anim.time * 2.0) + 0.05);
+
+    // Frame shadow
+    ctx.shadowColor = "rgba(0, 0, 0, 0.75)";
+    ctx.shadowBlur = 25;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 12;
+
+    // White paper frame
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(-pw / 2, -ph / 2, pw, ph);
+    ctx.shadowBlur = 0;
+
+    // Photo inside
+    const pad = pw * 0.07;
+    const imgW = pw - pad * 2;
+    const imgH = imgW;
+    const imgX = -pw / 2 + pad;
+    const imgY = -ph / 2 + pad;
+
+    ctx.fillStyle = "#1e293b";
+    ctx.fillRect(imgX, imgY, imgW, imgH);
+
+    try {
+      ctx.drawImage(this.userPhoto, imgX, imgY, imgW, imgH);
+    } catch (e) {}
+
+    // Handwritten caption
+    ctx.font = `italic bold ${Math.max(12, Math.floor(pw * 0.065))}px "Plus Jakarta Sans", sans-serif`;
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#0f172a";
+    ctx.fillText(`Best Friends Forever ❤️ ${this.anim.name}`, 0, ph / 2 - pad * 0.9);
+
+    ctx.restore();
   }
 
   /**
@@ -446,10 +505,9 @@ class TeddyAsciiRenderer {
    */
   drawPortalWarp(progress) {
     const ctx = this.ctx;
-    const cx = this.CANVAS_WIDTH / 2;
-    const cy = this.CANVAS_HEIGHT * 0.45;
-
-    const maxR = 1500;
+    const cx = this.width / 2;
+    const cy = this.height * 0.45;
+    const maxR = Math.max(this.width, this.height) * 1.2;
     const r = progress * maxR;
 
     ctx.save();
@@ -482,11 +540,10 @@ class TeddyAsciiRenderer {
     if (progress > 0.7) {
       const flashAlpha = (progress - 0.7) / 0.3;
       ctx.fillStyle = `rgba(255, 245, 250, ${flashAlpha})`;
-      ctx.fillRect(0, 0, this.CANVAS_WIDTH, this.CANVAS_HEIGHT);
+      ctx.fillRect(0, 0, this.width, this.height);
     }
     ctx.restore();
   }
 }
 
 window.TeddyAsciiRenderer = TeddyAsciiRenderer;
-
