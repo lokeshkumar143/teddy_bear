@@ -10,9 +10,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="teddyExperience.css?v=5.0">
-  <link rel="stylesheet" href="teddyGiftScene.css?v=5.0">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="teddyExperience.css?v=6.0">
 </head>
 <body>
 
@@ -61,72 +60,47 @@
   </section>
 
   <!-- ======================================================================
-       2. PREMIUM 3D MAGICAL TEDDY BEAR GIFT EXPERIENCE
+       2. FULL 9:16 ASCII EXPERIENCE SCREEN
        ====================================================================== -->
   <section id="experienceScreen" class="experience-screen hidden">
     
-    <div class="gift-scene-container" id="giftSceneContainer">
-      <!-- Three.js WebGL 3D Canvas -->
-      <canvas id="threeCanvas"></canvas>
+    <div class="canvas-reel-container">
+      <!-- High-Performance Canvas for ASCII Teddy Bear -->
+      <canvas id="artCanvas" width="1080" height="1920"></canvas>
 
-      <!-- Ambient Atmospheric Nebula Glow -->
-      <div class="ambient-fx-overlay"></div>
-
-      <!-- Floating Glassmorphic Top Controls Bar -->
-      <div class="gift-top-bar">
-        <div class="top-pill-group">
-          <button id="btnSoundToggle" class="top-action-btn" type="button" aria-label="Toggle Sound" title="Sound Effects">
-            <span id="soundIcon">🔇</span>
-          </button>
-          <button id="btnUploadMemory" class="top-action-btn" type="button" title="Add or Change Memory Photo">
-            <span>📸</span>
-            <span style="font-size: 0.85rem; font-weight: 600;">Photo</span>
-          </button>
-        </div>
-
-        <div class="top-pill-group">
-          <button class="theme-pill-btn active" data-theme="cyberRose" title="Cyber Rose">💖</button>
-          <button class="theme-pill-btn" data-theme="goldenHoney" title="Golden Honey">🍯</button>
-          <button class="theme-pill-btn" data-theme="cosmicAurora" title="Cosmic Aurora">🌌</button>
-          <button class="theme-pill-btn" data-theme="dreamyLavender" title="Dreamy Lavender">💜</button>
-        </div>
-      </div>
-
-      <!-- Interactive Toast Notifications -->
-      <div id="giftToast" class="gift-toast" role="status"></div>
-
-      <!-- Floating Minimalist Greeting Dialogue (Section 6) -->
-      <div id="giftGreetingOverlay" class="gift-greeting-overlay">
-        <div id="greetingNameBadge" class="greeting-name-badge">✧ SPECIALLY CRAFTED ✧</div>
-        <h1 id="greetingMainTitle" class="greeting-main-title"></h1>
-        <p id="greetingSubMessage" class="greeting-sub-message"></p>
-        <p id="greetingHighlightLine" class="greeting-highlight-line"></p>
-      </div>
-
-      <!-- Interactive Action Controls (Section 7) -->
-      <div id="giftActionContainer" class="gift-action-container">
-        <button id="btnExploreWorld" class="btn-gift-primary" type="button">
-          <span>OPEN YOUR LITTLE WORLD</span>
-          <span>❤️</span>
+      <!-- Floating Canvas Top Bar (Themes & Sound Toggle) -->
+      <div class="canvas-top-bar">
+        <button id="btnSoundToggle" class="top-bar-pill sound-pill" type="button" aria-label="Toggle Sound" title="Sound Effects">
+          <span id="soundIcon">🔇</span>
         </button>
-        <button id="btnTeddyHug" class="btn-gift-secondary" type="button">
-          <span>🤗</span>
-          <span>MAKE THE TEDDY HUG YOU</span>
-        </button>
-      </div>
 
-      <!-- Secret Heart Badge Note Modal (Section 8) -->
-      <div id="secretBadgeModal" class="secret-modal-backdrop">
-        <div class="secret-modal-card">
-          <div class="secret-icon">💖</div>
-          <h3 class="secret-title">A Little Secret Note ✨</h3>
-          <p class="secret-body">
-            "No matter how big or busy the world feels, you are deeply loved, cherished, and truly special. Keep smiling and shining bright!"
-          </p>
-          <button id="btnCloseSecret" class="btn-close-secret" type="button">I Love You Too ❤️</button>
+        <div class="theme-selector-pills">
+          <button class="theme-pill active" data-theme="cyberRose" title="Cyber Rose">💖</button>
+          <button class="theme-pill" data-theme="goldenHoney" title="Golden Honey">🍯</button>
+          <button class="theme-pill" data-theme="cosmicAurora" title="Cosmic Aurora">🌌</button>
+          <button class="theme-pill" data-theme="dreamyLavender" title="Dreamy Lavender">💜</button>
         </div>
       </div>
 
+      <!-- Interactive Waving Feedback Toast -->
+      <div id="waveToast" class="wave-toast hidden" role="status"></div>
+
+      <!-- Floating Greeting Dialog Overlay (Revealed after bloom completes) -->
+      <div id="greetingDialog" class="greeting-dialog hidden">
+        <h2 id="greetingLine1" class="greeting-line-title"></h2>
+        <p id="greetingLine2" class="greeting-line-sub"></p>
+        <p id="greetingLine3" class="greeting-line-sub"></p>
+        <p id="greetingQuestion" class="greeting-question"></p>
+
+        <div id="greetingActionGroup" class="greeting-btn-group hidden">
+          <button id="btnExplore" class="btn-explore" type="button">
+            YES, LET'S GO ❤️
+          </button>
+          <button id="btnWave" class="btn-wave" type="button">
+            MAKE MY TEDDY WAVE 👋
+          </button>
+        </div>
+      </div>
     </div>
 
   </section>
@@ -252,14 +226,13 @@
 
   </main>
 
-  <!-- Three.js 3D Engine & Modular Components v5.0 -->
-  <script src="three.min.js"></script>
-  <script src="teddyGiftBox.js?v=5.0"></script>
-  <script src="teddy3DCharacter.js?v=5.0"></script>
-  <script src="teddyCharacterAnimation.js?v=5.0"></script>
-  <script src="teddyPhotoFrame.js?v=5.0"></script>
-  <script src="teddyGiftScene.js?v=5.0"></script>
-  <script src="teddyGiftInteractions.js?v=5.0"></script>
-  <script src="main.js?v=5.0"></script>
+  <!-- Modular Architectural Scripts with Cache-Buster v6.0 -->
+  <script src="teddyGeometry.js?v=6.0"></script>
+  <script src="teddyCharacterParts.js?v=6.0"></script>
+  <script src="teddyLighting.js?v=6.0"></script>
+  <script src="teddyCharacterAnimation.js?v=6.0"></script>
+  <script src="teddyAsciiRenderer.js?v=6.0"></script>
+  <script src="teddyExperience.js?v=6.0"></script>
+  <script src="main.js?v=6.0"></script>
 </body>
 </html>
