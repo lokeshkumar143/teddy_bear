@@ -81,9 +81,10 @@ class TeddyAnimation {
         furBase: [255, 115, 145],
         furShadow: [215, 80, 110],
         furGlow: "rgba(255, 75, 125, 0.45)",
-        heartCore: [255, 25, 80],
-        heartHighlight: [255, 130, 175],
-        heartGlow: "rgba(255, 30, 85, 0.9)",
+        heartCore: [255, 12, 65],
+        heartHighlight: [255, 60, 120],
+        heartEdge: [255, 230, 242],
+        heartGlow: "rgba(255, 15, 75, 1.0)",
         bow: [52, 211, 153],
         bowGlow: "rgba(52, 211, 153, 0.85)",
         badge: [255, 255, 255],
@@ -97,9 +98,10 @@ class TeddyAnimation {
         furBase: [245, 175, 80],
         furShadow: [210, 135, 45],
         furGlow: "rgba(245, 170, 70, 0.45)",
-        heartCore: [255, 60, 40],
-        heartHighlight: [255, 180, 90],
-        heartGlow: "rgba(255, 140, 40, 0.9)",
+        heartCore: [255, 25, 25],
+        heartHighlight: [255, 75, 45],
+        heartEdge: [255, 240, 220],
+        heartGlow: "rgba(255, 30, 35, 1.0)",
         bow: [239, 68, 68],
         bowGlow: "rgba(239, 68, 68, 0.85)",
         badge: [255, 255, 255],
@@ -113,9 +115,10 @@ class TeddyAnimation {
         furBase: [130, 175, 255],
         furShadow: [85, 130, 215],
         furGlow: "rgba(100, 160, 255, 0.45)",
-        heartCore: [236, 72, 153],
-        heartHighlight: [56, 189, 248],
-        heartGlow: "rgba(236, 72, 153, 0.9)",
+        heartCore: [255, 15, 125],
+        heartHighlight: [255, 90, 185],
+        heartEdge: [245, 230, 255],
+        heartGlow: "rgba(255, 20, 130, 1.0)",
         bow: [56, 189, 248],
         bowGlow: "rgba(56, 189, 248, 0.85)",
         badge: [255, 255, 255],
@@ -129,9 +132,10 @@ class TeddyAnimation {
         furBase: [195, 145, 245],
         furShadow: [155, 105, 210],
         furGlow: "rgba(180, 130, 240, 0.45)",
-        heartCore: [244, 63, 94],
-        heartHighlight: [232, 121, 249],
-        heartGlow: "rgba(244, 63, 94, 0.9)",
+        heartCore: [255, 15, 90],
+        heartHighlight: [255, 80, 145],
+        heartEdge: [255, 230, 250],
+        heartGlow: "rgba(255, 20, 95, 1.0)",
         bow: [251, 146, 60],
         bowGlow: "rgba(251, 146, 60, 0.85)",
         badge: [255, 255, 255],
@@ -315,10 +319,17 @@ class TeddyAnimation {
     // ------------------------------------------------------------------------
     const hx = nx / (0.24 * heartScale);
     const hy = -(ny - 0.14) / (0.22 * heartScale);
-    const cL = Math.pow(hx + 0.38, 2) + Math.pow(hy - 0.20, 2) <= 0.44 * 0.44;
-    const cR = Math.pow(hx - 0.38, 2) + Math.pow(hy - 0.20, 2) <= 0.44 * 0.44;
+    const distSqL = Math.pow(hx + 0.38, 2) + Math.pow(hy - 0.20, 2);
+    const distSqR = Math.pow(hx - 0.38, 2) + Math.pow(hy - 0.20, 2);
+    const cL = distSqL <= 0.44 * 0.44;
+    const cR = distSqR <= 0.44 * 0.44;
     const inWedge = (hy <= 0.20) && (hy >= 1.15 * Math.abs(hx) - 0.85) && (Math.abs(hx) <= 0.82);
     const isHeart = cL || cR || inWedge;
+
+    const isEdgeL = cL && (distSqL >= 0.35 * 0.35);
+    const isEdgeR = cR && (distSqR >= 0.35 * 0.35);
+    const isEdgeW = inWedge && (Math.abs(hy - (1.15 * Math.abs(hx) - 0.85)) < 0.12 || Math.abs(hx) >= 0.72);
+    const isHeartEdge = isHeart && (isEdgeL || isEdgeR || isEdgeW);
 
     // Single-line clean embroidered badge on heart
     const isBadge = isHeart && isBadgeCol;
@@ -410,8 +421,10 @@ class TeddyAnimation {
     // Priority Layer Order (Front to Back with Creative Cyber-Plush Contrast)
     // ------------------------------------------------------------------------
     if (isBadge) {
-      const isSpace = (badgeChar === " ");
-      return { part: "badge", char: badgeChar, color: isSpace ? "transparent" : `rgb(${theme.badge.join(",")})`, glow: isSpace ? null : theme.badgeGlow };
+      if (badgeChar === " ") {
+        return { part: "badge", char: "♥", color: `rgb(${theme.heartHighlight.join(",")})`, glow: theme.heartGlow };
+      }
+      return { part: "badge", char: badgeChar, color: `rgb(${theme.badge.join(",")})`, glow: theme.badgeGlow };
     }
     if (isEyeHl) {
       return { part: "eye_hl", char: "✦", color: "rgb(255, 255, 255)", glow: "rgba(255, 255, 255, 0.95)" };
@@ -450,9 +463,14 @@ class TeddyAnimation {
       return { part: "paw", char: ch, color: `rgb(${theme.furBase.join(",")})`, glow: null };
     }
     if (isHeart) {
-      const heartChars = ["♥", "★", "✧", "♡", "♥", "1", "0"];
-      const ch = this.safeChar(heartChars, Math.floor(nx * 70 + ny * 70), "♥");
-      const col = hy > 0.15 ? `rgb(${theme.heartHighlight.join(",")})` : `rgb(${theme.heartCore.join(",")})`;
+      const heartChars = ["♥", "❤", "#", "♥", "%", "♥", "@", "♥"];
+      const ch = isHeartEdge ? "█" : this.safeChar(heartChars, Math.floor(nx * 70 + ny * 70), "♥");
+      let col;
+      if (isHeartEdge && theme.heartEdge) {
+        col = `rgb(${theme.heartEdge.join(",")})`;
+      } else {
+        col = hy > 0.15 ? `rgb(${theme.heartHighlight.join(",")})` : `rgb(${theme.heartCore.join(",")})`;
+      }
       return { part: "heart", char: ch, color: col, glow: theme.heartGlow };
     }
     if (isFootPad) {

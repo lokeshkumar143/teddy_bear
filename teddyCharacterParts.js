@@ -12,7 +12,7 @@ class TeddyCharacterParts {
     // Standard ASCII density ramp from densest to lightest:
     this.STANDARD_RAMP = ["@", "%", "#", "$", "&", "*", "+", "=", "-", ":", "."];
     this.SNOUT_RAMP = ["o", "*", "+", "=", "-", ":", "."];
-    this.HEART_RAMP = ["♥", "★", "✧", "♡", "♥", "+", "*"];
+    this.HEART_RAMP = ["♥", "❤", "#", "♥", "%", "♥", "@", "♥"];
     this.PAD_RAMP = ["o", "·", "•"];
 
     // Default theme colors (Cyber Rose)
@@ -20,9 +20,10 @@ class TeddyCharacterParts {
       furBase: [255, 115, 145],
       furShadow: [215, 80, 110],
       furHighlight: [255, 160, 185],
-      heartCore: [255, 25, 80],
-      heartHighlight: [255, 130, 175],
-      heartGlow: "rgba(255, 30, 85, 0.9)",
+      heartCore: [255, 12, 65],
+      heartHighlight: [255, 60, 120],
+      heartEdge: [255, 230, 242],
+      heartGlow: "rgba(255, 15, 75, 1.0)",
       bow: [52, 211, 153],
       bowGlow: "rgba(52, 211, 153, 0.85)",
       badge: [255, 255, 255],
@@ -47,7 +48,10 @@ class TeddyCharacterParts {
   getChar(part, intensity, hash = 0, nameLetters = [], extra = {}) {
     switch (part) {
       case "badge":
-        return extra.badgeChar || " ";
+        if (!extra.badgeChar || extra.badgeChar === " ") {
+          return "♥";
+        }
+        return extra.badgeChar;
 
       case "eye_hl":
         return "✦";
@@ -81,6 +85,9 @@ class TeddyCharacterParts {
         return "o";
 
       case "heart":
+        if (extra.isEdge) {
+          return (Math.abs(hash) % 2 === 0) ? "█" : "♥";
+        }
         const hIdx = Math.abs(hash) % this.HEART_RAMP.length;
         return this.HEART_RAMP[hIdx];
 
@@ -109,9 +116,15 @@ class TeddyCharacterParts {
 
     switch (part) {
       case "badge":
+        if (extra.badgeChar === " ") {
+          return {
+            color: `rgb(${theme.heartHighlight.join(",")})`,
+            glow: theme.heartGlow
+          };
+        }
         return {
-          color: (extra.badgeChar === " ") ? "transparent" : `rgb(${theme.badge.join(",")})`,
-          glow: (extra.badgeChar === " ") ? null : theme.badgeGlow
+          color: `rgb(${theme.badge.join(",")})`,
+          glow: theme.badgeGlow
         };
 
       case "eye_hl":
@@ -145,7 +158,12 @@ class TeddyCharacterParts {
 
       case "heart":
         const isUpper = extra.hy !== undefined ? (extra.hy > 0.15) : (intensity > 0.6);
-        const hCol = isUpper ? theme.heartHighlight : theme.heartCore;
+        let hCol;
+        if (extra.isEdge && theme.heartEdge) {
+          hCol = theme.heartEdge;
+        } else {
+          hCol = isUpper ? theme.heartHighlight : theme.heartCore;
+        }
         return { color: `rgb(${hCol.join(",")})`, glow: theme.heartGlow };
 
       case "head": {

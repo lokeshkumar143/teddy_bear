@@ -72,6 +72,7 @@ class TeddyCharacter {
 
     ctx.save();
     this._drawBodyGradient(ctx, 0, bodyY, bodyW, bodyH);
+    this._drawChestHeart(ctx, 0, bodyY + 14 * s, 22 * s);
     ctx.restore();
 
     // ── 2. Left Arm ───────────────────────────────────────────────────────
@@ -109,6 +110,34 @@ class TeddyCharacter {
     this._drawEar(ctx, s, headY, headR, -1);
     this._drawEar(ctx, s, headY, headR,  1);
 
+    ctx.restore();
+  }
+
+  _drawChestHeart(ctx, cx, cy, size) {
+    ctx.save();
+    ctx.translate(cx, cy);
+    const w = size;
+    const h = size * 0.9;
+    ctx.beginPath();
+    ctx.moveTo(0, -h * 0.2);
+    ctx.bezierCurveTo(-w * 0.25, -h * 0.6, -w * 0.55, -h * 0.35, -w * 0.55, 0);
+    ctx.bezierCurveTo(-w * 0.55, h * 0.35, -w * 0.2, h * 0.65, 0, h * 0.85);
+    ctx.bezierCurveTo(w * 0.2, h * 0.65, w * 0.55, h * 0.35, w * 0.55, 0);
+    ctx.bezierCurveTo(w * 0.55, -h * 0.35, w * 0.25, -h * 0.6, 0, -h * 0.2);
+    ctx.closePath();
+
+    const grad = ctx.createRadialGradient(0, -h * 0.1, 0, 0, 0, w * 0.7);
+    grad.addColorStop(0, '#ff4d79');
+    grad.addColorStop(0.7, '#d61d4e');
+    grad.addColorStop(1, '#9e0d34');
+    ctx.fillStyle = grad;
+    ctx.shadowColor = 'rgba(255, 45, 95, 0.7)';
+    ctx.shadowBlur = 10;
+    ctx.fill();
+
+    ctx.strokeStyle = '#ffe4ec';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
     ctx.restore();
   }
 

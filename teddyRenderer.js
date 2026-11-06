@@ -220,16 +220,45 @@ class TeddyRenderer {
     const glowR = 270.0 * anim.heartScale * Math.min(1.0, bloomProgress * 1.3);
 
     if (bloomProgress > 0.05) {
-      const radGrad = ctx.createRadialGradient(heartGlowPx, heartGlowPy, 0, heartGlowPx, heartGlowPy, glowR);
-      const auraAlpha = 0.65 * (anim.heartScale - 0.65) * Math.min(1.0, bloomProgress * 1.4);
-      radGrad.addColorStop(0, `rgba(${theme.heartCore.join(",")}, ${auraAlpha})`);
-      radGrad.addColorStop(0.35, `rgba(${theme.heartHighlight.join(",")}, ${auraAlpha * 0.55})`);
-      radGrad.addColorStop(0.7, `rgba(${theme.heartHighlight.join(",")}, ${auraAlpha * 0.20})`);
-      radGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
-      ctx.fillStyle = radGrad;
+      ctx.save();
+      const heartPulse = anim.heartScale || 1.0;
+      const hScale = Math.min(1.0, bloomProgress * 1.2) * heartPulse;
+      const hW = anim.SCENE_SCALE * 0.38 * hScale;
+      const hH = anim.SCENE_SCALE * 0.28 * hScale;
+
       ctx.beginPath();
-      ctx.arc(heartGlowPx, heartGlowPy, glowR, 0, Math.PI * 2);
+      const topY = heartGlowPy - hH * 0.42;
+      const bottomY = heartGlowPy + hH * 0.56;
+      const cleftY = heartGlowPy - hH * 0.16;
+      const leftX = heartGlowPx - hW * 0.50;
+      const rightX = heartGlowPx + hW * 0.50;
+
+      ctx.moveTo(heartGlowPx, cleftY);
+      ctx.bezierCurveTo(heartGlowPx - hW * 0.26, topY - hH * 0.14, leftX, topY + hH * 0.08, leftX, heartGlowPy);
+      ctx.bezierCurveTo(leftX, heartGlowPy + hH * 0.28, heartGlowPx - hW * 0.20, bottomY - hH * 0.08, heartGlowPx, bottomY);
+      ctx.bezierCurveTo(heartGlowPx + hW * 0.20, bottomY - hH * 0.08, rightX, heartGlowPy + hH * 0.28, rightX, heartGlowPy);
+      ctx.bezierCurveTo(rightX, topY + hH * 0.08, heartGlowPx + hW * 0.26, topY - hH * 0.14, heartGlowPx, cleftY);
+      ctx.closePath();
+
+      const heartFillGrad = ctx.createRadialGradient(heartGlowPx, heartGlowPy - hH * 0.08, 0, heartGlowPx, heartGlowPy, hW * 0.60);
+      const auraAlpha = Math.min(1.0, bloomProgress * 1.4);
+      heartFillGrad.addColorStop(0, `rgba(${theme.heartHighlight.join(",")}, ${0.60 * auraAlpha})`);
+      heartFillGrad.addColorStop(0.5, `rgba(${theme.heartCore.join(",")}, ${0.45 * auraAlpha})`);
+      heartFillGrad.addColorStop(0.85, `rgba(${theme.heartCore.join(",")}, ${0.28 * auraAlpha})`);
+      heartFillGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = heartFillGrad;
+      ctx.shadowColor = theme.heartGlow;
+      ctx.shadowBlur = 24 * heartPulse;
       ctx.fill();
+
+      const edgeCol = theme.heartEdge ? theme.heartEdge.join(",") : "255,230,240";
+      ctx.strokeStyle = `rgba(${edgeCol}, ${0.80 * auraAlpha})`;
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = theme.heartGlow;
+      ctx.shadowBlur = 18;
+      ctx.stroke();
+
+      ctx.restore();
     }
 
     // 9. Floating Mini ASCII Hearts (Ascending like glowing embers)
@@ -347,10 +376,16 @@ class TeddyRenderer {
           col = `rgb(${theme.furBase.join(",")})`;
         }
 
-        ctx.font = `bold 16px "Fira Code", Menlo, monospace`;
-        if (glow) {
+        ctx.font = `bold 16px "Fira Code", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", Menlo, monospace`;
+        if (cell.part === "heart") {
+          ctx.shadowColor = glow || theme.heartGlow;
+          ctx.shadowBlur = cell.isEdge ? 20 : 15;
+        } else if (cell.part === "badge") {
+          ctx.shadowColor = glow || theme.badgeGlow;
+          ctx.shadowBlur = 16;
+        } else if (glow) {
           ctx.shadowColor = glow;
-          ctx.shadowBlur = (cell.part === "badge" || cell.part === "heart") ? 16 : 10;
+          ctx.shadowBlur = 10;
         } else {
           ctx.shadowBlur = 0;
         }

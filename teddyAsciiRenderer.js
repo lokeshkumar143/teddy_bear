@@ -129,12 +129,14 @@ class TeddyAsciiRenderer {
         // Select glyph from anatomical density ramp
         const ch = this.parts.getChar(evalRes.part, intensity, c * 37 + r * 17, this.anim.nameLetters, {
           badgeChar: evalRes.badgeChar,
+          isEdge: evalRes.isEdge,
           isLeft: nx < 0
         });
 
         // Compute regional color & glow
         const colInfo = this.parts.getColor(evalRes.part, intensity, evalRes.depth, theme, {
           badgeChar: evalRes.badgeChar,
+          isEdge: evalRes.isEdge,
           hy: evalRes.hy
         });
 
@@ -149,6 +151,7 @@ class TeddyAsciiRenderer {
           glow: colInfo.glow,
           z: evalRes.z,
           depth: evalRes.depth,
+          isEdge: !!evalRes.isEdge,
           reveal: rv,
           hash: (c * 37 + r * 17)
         });
@@ -288,22 +291,52 @@ class TeddyAsciiRenderer {
       ctx.restore();
     }
 
-    // 8. Radiant Glowing Chest Heart Aura
-    const heartGlowPx = this.CENTER_X;
-    const heartGlowPy = this.CENTER_Y + 0.16 * this.SCENE_SCALE;
-    const glowR = (this.SCENE_SCALE * 0.28) * anim.heartScale * Math.min(1.0, bloomProgress * 1.3);
-
+    // 8. Radiant Luminous Cardioid Heart Base & Silhouette
     if (bloomProgress > 0.05) {
-      const radGrad = ctx.createRadialGradient(heartGlowPx, heartGlowPy, 0, heartGlowPx, heartGlowPy, glowR);
-      const auraAlpha = 0.65 * (anim.heartScale - 0.70) * Math.min(1.0, bloomProgress * 1.4);
-      radGrad.addColorStop(0, `rgba(${theme.heartCore.join(",")}, ${Math.max(0, auraAlpha)})`);
-      radGrad.addColorStop(0.35, `rgba(${theme.heartHighlight.join(",")}, ${Math.max(0, auraAlpha * 0.55)})`);
-      radGrad.addColorStop(0.7, `rgba(${theme.heartHighlight.join(",")}, ${Math.max(0, auraAlpha * 0.20)})`);
-      radGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
-      ctx.fillStyle = radGrad;
+      ctx.save();
+      const heartPulse = anim.heartScale || 1.0;
+      const hScale = Math.min(1.0, bloomProgress * 1.2) * heartPulse;
+      const hW = this.SCENE_SCALE * 0.38 * hScale;
+      const hH = this.SCENE_SCALE * 0.28 * hScale;
+      const hCx = this.CENTER_X;
+      const hCy = this.CENTER_Y + 0.16 * this.SCENE_SCALE;
+
+      // Cardioid Heart Path
       ctx.beginPath();
-      ctx.arc(heartGlowPx, heartGlowPy, glowR, 0, Math.PI * 2);
+      const topY = hCy - hH * 0.42;
+      const bottomY = hCy + hH * 0.56;
+      const cleftY = hCy - hH * 0.16;
+      const leftX = hCx - hW * 0.50;
+      const rightX = hCx + hW * 0.50;
+
+      ctx.moveTo(hCx, cleftY);
+      ctx.bezierCurveTo(hCx - hW * 0.26, topY - hH * 0.14, leftX, topY + hH * 0.08, leftX, hCy);
+      ctx.bezierCurveTo(leftX, hCy + hH * 0.28, hCx - hW * 0.20, bottomY - hH * 0.08, hCx, bottomY);
+      ctx.bezierCurveTo(hCx + hW * 0.20, bottomY - hH * 0.08, rightX, hCy + hH * 0.28, rightX, hCy);
+      ctx.bezierCurveTo(rightX, topY + hH * 0.08, hCx + hW * 0.26, topY - hH * 0.14, hCx, cleftY);
+      ctx.closePath();
+
+      // Atmospheric radial gradient filling the heart
+      const heartFillGrad = ctx.createRadialGradient(hCx, hCy - hH * 0.08, 0, hCx, hCy, hW * 0.60);
+      const auraAlpha = Math.min(1.0, bloomProgress * 1.4);
+      heartFillGrad.addColorStop(0, `rgba(${theme.heartHighlight.join(",")}, ${0.60 * auraAlpha})`);
+      heartFillGrad.addColorStop(0.5, `rgba(${theme.heartCore.join(",")}, ${0.45 * auraAlpha})`);
+      heartFillGrad.addColorStop(0.85, `rgba(${theme.heartCore.join(",")}, ${0.28 * auraAlpha})`);
+      heartFillGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = heartFillGrad;
+      ctx.shadowColor = theme.heartGlow;
+      ctx.shadowBlur = 24 * heartPulse;
       ctx.fill();
+
+      // Sharp luminous heart contour border
+      const edgeCol = theme.heartEdge ? theme.heartEdge.join(",") : "255,230,240";
+      ctx.strokeStyle = `rgba(${edgeCol}, ${0.80 * auraAlpha})`;
+      ctx.lineWidth = 2.5;
+      ctx.shadowColor = theme.heartGlow;
+      ctx.shadowBlur = 18;
+      ctx.stroke();
+
+      ctx.restore();
     }
 
     // 9. Floating Ascending Mini ASCII Hearts
@@ -356,7 +389,7 @@ class TeddyAsciiRenderer {
     const lookOffset = anim.lookOffset;
 
     const charFontSize = Math.max(10, Math.floor(this.CELL_H * 0.85));
-    ctx.font = `bold ${charFontSize}px "Fira Code", Menlo, monospace`;
+    ctx.font = `bold ${charFontSize}px "Fira Code", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", Menlo, monospace`;
 
     for (let r = 0; r < this.ROWS; r++) {
       const rowCells = this.canonicalGrid[r];
@@ -423,9 +456,15 @@ class TeddyAsciiRenderer {
 
         if (col === "transparent" || ch === " ") continue;
 
-        if (glow) {
+        if (cell.part === "heart") {
+          ctx.shadowColor = glow || theme.heartGlow;
+          ctx.shadowBlur = cell.isEdge ? 20 : 15;
+        } else if (cell.part === "badge") {
+          ctx.shadowColor = glow || theme.badgeGlow;
+          ctx.shadowBlur = 16;
+        } else if (glow) {
           ctx.shadowColor = glow;
-          ctx.shadowBlur = (cell.part === "badge" || cell.part === "heart") ? 14 : 8;
+          ctx.shadowBlur = 8;
         } else {
           ctx.shadowBlur = 0;
         }

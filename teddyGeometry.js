@@ -29,10 +29,18 @@ class TeddyGeometry {
     // ------------------------------------------------------------------------
     const hx = nx / (0.22 * heartScale);
     const hy = -(ny - 0.16) / (0.20 * heartScale); // Positive upwards
-    const cL = Math.pow(hx + 0.38, 2) + Math.pow(hy - 0.20, 2) <= 0.44 * 0.44;
-    const cR = Math.pow(hx - 0.38, 2) + Math.pow(hy - 0.20, 2) <= 0.44 * 0.44;
+    const distSqL = Math.pow(hx + 0.38, 2) + Math.pow(hy - 0.20, 2);
+    const distSqR = Math.pow(hx - 0.38, 2) + Math.pow(hy - 0.20, 2);
+    const cL = distSqL <= 0.44 * 0.44;
+    const cR = distSqR <= 0.44 * 0.44;
     const inWedge = (hy <= 0.20) && (hy >= 1.15 * Math.abs(hx) - 0.85) && (Math.abs(hx) <= 0.82);
     const isHeart = cL || cR || inWedge;
+
+    // Edge detection for crisp luminous heart contour
+    const isEdgeL = cL && (distSqL >= 0.35 * 0.35);
+    const isEdgeR = cR && (distSqR >= 0.35 * 0.35);
+    const isEdgeW = inWedge && (Math.abs(hy - (1.15 * Math.abs(hx) - 0.85)) < 0.12 || Math.abs(hx) >= 0.72);
+    const isHeartEdge = isHeart && (isEdgeL || isEdgeR || isEdgeW);
 
     // Single-line clean embroidered badge across center of heart (Row 40)
     let isBadge = isHeart && isBadgeCol;
@@ -199,7 +207,7 @@ class TeddyGeometry {
     }
     if (isHeart) {
       const z = Math.sqrt(Math.max(0, 1.0 - (hx * hx + hy * hy) / 2.0));
-      return { part: "heart", z: z, depth: z, isBadge: false, hy: hy };
+      return { part: "heart", z: z, depth: z, isBadge: false, isEdge: isHeartEdge, hy: hy };
     }
     if (isFoot) {
       const z = Math.sqrt(Math.max(0, 1.0 - Math.min(footL, footR)));
@@ -234,10 +242,9 @@ class TeddyGeometry {
 
   formatBadgeText(name) {
     const clean = (name || "").toUpperCase().replace(/[^A-Z0-9\s]/g, "").trim();
-    if (!clean) return "✧ ♥ ✧";
-    if (clean.length <= 6) return `✧  ${clean.split("").join(" ")}  ✧`;
-    if (clean.length <= 10) return `✧ ${clean} ✧`;
-    if (clean.length <= 16) return `♥ ${clean} ♥`;
+    if (!clean) return "♥ ♥ ♥";
+    if (clean.length <= 6) return `♥  ${clean.split("").join(" ")}  ♥`;
+    if (clean.length <= 10) return `♥ ${clean} ♥`;
     return clean.slice(0, 18);
   }
 
