@@ -38,6 +38,7 @@ class TeddyAsciiRenderer {
     // Optional user photo for Polaroid integration
     this.userPhoto = null;
     this.userPhotoUrl = null;
+    this.renderPolaroidToCanvas = false;
 
     // Precomputed canonical cell matrix
     this.canonicalGrid = [];
@@ -63,17 +64,18 @@ class TeddyAsciiRenderer {
 
     this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
 
-    const isLandscape = (this.width > this.height && this.width > 800);
+    const isLandscape = (this.width > this.height && this.width > 768);
 
     // Responsive positioning & scaling
     if (isLandscape) {
-      this.CENTER_X = this.userPhoto ? this.width * 0.42 : this.width * 0.50;
+      this.CENTER_X = this.userPhoto ? this.width * 0.36 : this.width * 0.50;
       this.CENTER_Y = this.height * 0.44;
-      this.SCENE_SCALE = Math.min(this.height * 0.62, this.width * 0.44);
+      this.SCENE_SCALE = Math.min(this.height * 0.68, this.width * 0.44);
     } else {
       this.CENTER_X = this.width * 0.50;
-      this.CENTER_Y = this.height * 0.38;
-      this.SCENE_SCALE = Math.min(this.width * 0.90, this.height * 0.50);
+      // In portrait, position teddy in upper-middle to leave room for polaroid & bottom card
+      this.CENTER_Y = this.userPhoto ? this.height * 0.32 : this.height * 0.36;
+      this.SCENE_SCALE = Math.min(this.width * 0.78, this.height * 0.38);
     }
 
     this.CELL_W = (this.SCENE_SCALE * 0.92) / this.COLS;
@@ -366,13 +368,23 @@ class TeddyAsciiRenderer {
     if (bloomProgress > 0.20) {
       const archAlpha = Math.min(1.0, (bloomProgress - 0.20) * 2.0);
       ctx.save();
-      const headerFontSize = Math.min(22, Math.max(14, Math.floor(W * 0.035)));
+      const isNarrow = (W < 520);
+      const headerFontSize = isNarrow 
+        ? Math.min(14, Math.max(10, Math.floor(W * 0.032)))
+        : Math.min(22, Math.max(13, Math.floor(W * 0.035)));
+      const archText = isNarrow 
+        ? `✧ FOR ${anim.name.toUpperCase()} ✧` 
+        : `✧ SPECIALLY CRAFTED FOR ${anim.name.toUpperCase()} ✧`;
+      const archY = isNarrow 
+        ? Math.max(76, this.GRID_Y0 - 18) 
+        : Math.max(50, this.GRID_Y0 - 28);
+
       ctx.font = `bold ${headerFontSize}px "Fira Code", monospace`;
       ctx.textAlign = "center";
       ctx.fillStyle = `rgba(${theme.heartHighlight.join(",")}, ${archAlpha})`;
       ctx.shadowColor = theme.heartGlow;
       ctx.shadowBlur = 16;
-      ctx.fillText(`✧ SPECIALLY CRAFTED FOR ${anim.name.toUpperCase()} ✧`, this.CENTER_X, Math.max(45, this.GRID_Y0 - 35));
+      ctx.fillText(archText, this.CENTER_X, archY);
       ctx.restore();
     }
 
@@ -388,7 +400,7 @@ class TeddyAsciiRenderer {
     const headTilt = anim.headTilt;
     const lookOffset = anim.lookOffset;
 
-    const charFontSize = Math.max(10, Math.floor(this.CELL_H * 0.85));
+    const charFontSize = Math.max(6, Math.floor(Math.min(this.CELL_H * 0.95, this.CELL_W * 1.6)));
     ctx.font = `bold ${charFontSize}px "Fira Code", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", Menlo, monospace`;
 
     for (let r = 0; r < this.ROWS; r++) {
@@ -476,8 +488,10 @@ class TeddyAsciiRenderer {
 
     ctx.shadowBlur = 0;
 
-    // 12. Floating Polaroid Snapshot on Canvas (Landscape or for snapshot exports)
-    if (this.userPhoto && isBloomed && (W > 850)) {
+    // 12. Floating Polaroid Snapshot on Canvas (Rendered during snapshot export or when DOM frame is not present)
+    const domFrame = document.getElementById("floatingPolaroidFrame");
+    const shouldDrawOnCanvas = this.renderPolaroidToCanvas || (!domFrame || domFrame.classList.contains("hidden"));
+    if (this.userPhoto && isBloomed && (this.renderPolaroidToCanvas || shouldDrawOnCanvas)) {
       this.drawPolaroidOnCanvas();
     }
 
@@ -488,36 +502,45 @@ class TeddyAsciiRenderer {
   }
 
   /**
-   * Draw the Polaroid directly on the Canvas when on desktop or during snapshot
+   * Draw the Polaroid on Canvas (responsive for both desktop and mobile exports)
    */
   drawPolaroidOnCanvas() {
     if (!this.userPhoto) return;
     const ctx = this.ctx;
     const W = this.width;
     const H = this.height;
+    const isLandscape = (W > H && W > 768);
 
-    const pw = Math.min(260, Math.floor(W * 0.22));
-    const ph = Math.floor(pw * 1.25);
-    const px = Math.min(W - pw - 60, this.CENTER_X + this.SCENE_SCALE * 0.52);
-    const py = this.CENTER_Y - ph * 0.45;
+    let pw, ph, px, py;
+    if (isLandscape) {
+      pw = Math.min(260, Math.floor(W * 0.22));
+      ph = Math.floor(pw * 1.25);
+      px = Math.min(W - pw - 40, this.CENTER_X + this.SCENE_SCALE * 0.52);
+      py = this.CENTER_Y - ph * 0.45;
+    } else {
+      pw = Math.min(200, Math.floor(W * 0.42));
+      ph = Math.floor(pw * 1.25);
+      px = Math.floor(this.CENTER_X - pw / 2);
+      py = Math.floor(this.CENTER_Y + this.SCENE_SCALE * 0.44);
+    }
 
     ctx.save();
     ctx.translate(px + pw / 2, py + ph / 2);
-    ctx.rotate(0.04 * Math.sin(this.anim.time * 2.0) + 0.05);
+    ctx.rotate(0.04 * Math.sin(this.anim.time * 2.0) + (isLandscape ? 0.05 : 0.02));
 
     // Frame shadow
     ctx.shadowColor = "rgba(0, 0, 0, 0.75)";
-    ctx.shadowBlur = 25;
+    ctx.shadowBlur = 24;
     ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 12;
+    ctx.shadowOffsetY = 10;
 
     // White paper frame
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(-pw / 2, -ph / 2, pw, ph);
     ctx.shadowBlur = 0;
 
-    // Photo inside
-    const pad = pw * 0.07;
+    // Photo inside (with face-preserving cover crop)
+    const pad = Math.floor(pw * 0.07);
     const imgW = pw - pad * 2;
     const imgH = imgW;
     const imgX = -pw / 2 + pad;
@@ -527,14 +550,36 @@ class TeddyAsciiRenderer {
     ctx.fillRect(imgX, imgY, imgW, imgH);
 
     try {
-      ctx.drawImage(this.userPhoto, imgX, imgY, imgW, imgH);
+      if (this.userPhoto.naturalWidth && this.userPhoto.naturalHeight) {
+        const nw = this.userPhoto.naturalWidth;
+        const nh = this.userPhoto.naturalHeight;
+        const aspect = nw / nh;
+        let sx, sy, sw, sh;
+        if (aspect > 1) {
+          sh = nh;
+          sw = nh;
+          sx = (nw - sw) / 2;
+          sy = 0;
+        } else {
+          sw = nw;
+          sh = nw;
+          sx = 0;
+          // Upper-center bias to protect faces in portrait shots
+          sy = Math.max(0, (nh - sh) * 0.22);
+        }
+        ctx.drawImage(this.userPhoto, sx, sy, sw, sh, imgX, imgY, imgW, imgH);
+      } else {
+        ctx.drawImage(this.userPhoto, imgX, imgY, imgW, imgH);
+      }
     } catch (e) {}
 
-    // Handwritten caption
-    ctx.font = `italic bold ${Math.max(12, Math.floor(pw * 0.065))}px "Plus Jakarta Sans", sans-serif`;
+    // Handwritten caption with Caveat font
+    const captionFontSize = Math.max(13, Math.floor(pw * 0.08));
+    ctx.font = `italic bold ${captionFontSize}px "Caveat", "Plus Jakarta Sans", cursive, sans-serif`;
     ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
     ctx.fillStyle = "#0f172a";
-    ctx.fillText(`Best Friends Forever ❤️ ${this.anim.name}`, 0, ph / 2 - pad * 0.9);
+    ctx.fillText(`Best Friends Forever ❤️ ${this.anim.name}`, 0, ph / 2 - pad * 1.1);
 
     ctx.restore();
   }

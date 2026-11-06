@@ -82,6 +82,12 @@ class TeddyGiftReveal {
         if (this.onExplore) this.onExplore();
       });
     }
+
+    if (this.floatingPolaroid) {
+      this.floatingPolaroid.addEventListener("click", () => {
+        this.floatingPolaroid.classList.toggle("enlarged");
+      });
+    }
   }
 
   start(name, photo = null, photoUrl = null) {
@@ -152,10 +158,23 @@ class TeddyGiftReveal {
 
     setTimeout(() => {
       try {
+        // Ensure canvas renders the polaroid into the downloaded snapshot image
+        if (this.renderer && this.userPhoto) {
+          this.renderer.renderPolaroidToCanvas = true;
+          this.renderer.render(1.0, true);
+        }
+
+        const dataUrl = this.canvas.toDataURL("image/png");
+
+        if (this.renderer && this.userPhoto) {
+          this.renderer.renderPolaroidToCanvas = false;
+          this.renderer.render(1.0, true);
+        }
+
         const link = document.createElement("a");
         const safeName = this.visitorName.toLowerCase().replace(/[^a-z0-9]/g, "_") || "friend";
         link.download = `teddy_gift_for_${safeName}.png`;
-        link.href = this.canvas.toDataURL("image/png");
+        link.href = dataUrl;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

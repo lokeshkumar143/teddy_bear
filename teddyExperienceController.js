@@ -165,6 +165,18 @@ class TeddyExperienceController {
    * Boot the experience with Scene 1: Cosmic Intro
    */
   start() {
+    // Check for testing / deep link fast-forward URL parameters
+    const urlParams = (typeof window !== "undefined" && window.location) ? new URLSearchParams(window.location.search) : null;
+    if (urlParams && urlParams.get("testScene") === "reveal") {
+      const testName = urlParams.get("name") || "Loki";
+      const withPhoto = urlParams.get("photo") !== "0";
+      this.fastForwardToReveal(testName, withPhoto);
+      return;
+    } else if (urlParams && urlParams.get("testScene") === "portfolio") {
+      this.fastForwardToPortfolio();
+      return;
+    }
+
     this.state = "INTRO";
     this.anim.bloomProgress = 0.0;
     this.anim.isBloomed = false;
@@ -173,6 +185,56 @@ class TeddyExperienceController {
     if (this.topControls) this.topControls.classList.remove("hidden");
 
     this.introScene.start();
+  }
+
+  fastForwardToReveal(name = "Loki", withPhoto = true) {
+    this.visitorName = name;
+    this.anim.setName(name);
+    this.anim.bloomProgress = 1.0;
+    this.anim.isBloomed = true;
+
+    if (this.introOverlay) this.introOverlay.classList.add("hidden");
+    if (this.invitation && this.invitation.container) this.invitation.container.classList.add("hidden");
+    if (this.personalization && this.personalization.nameSection) this.personalization.nameSection.classList.add("hidden");
+    if (this.personalization && this.personalization.photoSection) this.personalization.photoSection.classList.add("hidden");
+    if (this.generatingOverlay) this.generatingOverlay.classList.add("hidden");
+    if (this.topControls) this.topControls.classList.remove("hidden");
+
+    if (withPhoto) {
+      const c = document.createElement("canvas");
+      c.width = 240;
+      c.height = 240;
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#ff4d79";
+      ctx.fillRect(0, 0, 240, 240);
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 28px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(name.toUpperCase() + " ✨", 120, 120);
+      const samplePhotoUrl = c.toDataURL("image/png");
+      const sampleImg = new Image();
+      sampleImg.src = samplePhotoUrl;
+      this.userPhoto = sampleImg;
+      this.userPhotoUrl = samplePhotoUrl;
+      this.renderer.setPhoto(sampleImg, samplePhotoUrl);
+    } else {
+      this.userPhoto = null;
+      this.userPhotoUrl = null;
+      this.renderer.setPhoto(null, null);
+    }
+
+    this.state = "FINAL_GIFT";
+    this.renderer.setupCanvas();
+    this.giftReveal.start(this.visitorName, this.userPhoto, this.userPhotoUrl);
+  }
+
+  fastForwardToPortfolio() {
+    this.state = "PORTFOLIO";
+    if (this.viewport) this.viewport.classList.add("hidden");
+    if (this.portfolioScreen) {
+      this.portfolioScreen.classList.remove("hidden");
+    }
   }
 
   /**

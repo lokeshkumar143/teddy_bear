@@ -126,16 +126,18 @@ class TeddyParticleWorld {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.canvas.width = Math.floor(this.width * dpr);
     this.canvas.height = Math.floor(this.height * dpr);
-    this.ctx.scale(dpr, dpr);
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   initSystems() {
     let s = 1337;
     const rnd = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+    const isMobile = (window.innerWidth < 768);
 
-    // 1. Fullscreen Starfield (400 stars)
+    // 1. Fullscreen Starfield (scaled for performance on mobile devices)
     this.stars = [];
-    for (let i = 0; i < 400; i++) {
+    const starCount = isMobile ? 180 : 380;
+    for (let i = 0; i < starCount; i++) {
       this.stars.push({
         xRel: rnd(),
         yRel: rnd(),
@@ -148,10 +150,11 @@ class TeddyParticleWorld {
       });
     }
 
-    // 2. Pink, Rose-Red & Violet Cosmic Particles (75 particles)
+    // 2. Pink, Rose-Red & Violet Cosmic Particles
     this.particles = [];
+    const particleCount = isMobile ? 36 : 72;
     const colors = ["#ff4d79", "#ff7597", "#b5179e", "#7209b7", "#f72585", "#ff007f"];
-    for (let i = 0; i < 75; i++) {
+    for (let i = 0; i < particleCount; i++) {
       this.particles.push({
         x: rnd() * this.width,
         y: rnd() * this.height,
@@ -167,8 +170,9 @@ class TeddyParticleWorld {
 
     // 3. Floating Embers Hearts
     this.floatingHearts = [];
+    const heartCount = isMobile ? 12 : 24;
     const glyphs = ["♥", "♡", "✧", "★", "°"];
-    for (let i = 0; i < 24; i++) {
+    for (let i = 0; i < heartCount; i++) {
       this.floatingHearts.push({
         x: rnd() * this.width,
         y: this.height + rnd() * 200,
