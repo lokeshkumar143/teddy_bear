@@ -23,22 +23,22 @@
 
 class UniverseController {
   constructor(options = {}) {
-    this.canvas = options.canvas || document.getElementById('universeCanvas');
+    this.canvas = options.canvas || document.getElementById('universeCanvas') || document.getElementById('artCanvas');
     this.ctx = this.canvas.getContext('2d');
 
     // ── State ─────────────────────────────────────────────────────────────
     this.STATE = {
-      UNIVERSE_INTRO:       'UNIVERSE_INTRO',
-      CONSTELLATION:        'CONSTELLATION',
-      INVITATION:           'INVITATION',
-      NAME_ENTRY:           'NAME_ENTRY',
-      NAME_ANIMATION:       'NAME_ANIMATION',
-      TEDDY_BIRTH:          'TEDDY_BIRTH',
-      TEDDY_INTERACTION:    'TEDDY_INTERACTION',
+      UNIVERSE_INTRO: 'UNIVERSE_INTRO',
+      CONSTELLATION: 'CONSTELLATION',
+      INVITATION: 'INVITATION',
+      NAME_ENTRY: 'NAME_ENTRY',
+      NAME_ANIMATION: 'NAME_ANIMATION',
+      TEDDY_BIRTH: 'TEDDY_BIRTH',
+      TEDDY_INTERACTION: 'TEDDY_INTERACTION',
       PHOTO_UPLOAD_OR_SKIP: 'PHOTO_UPLOAD_OR_SKIP',
-      PHOTO_GENERATION:     'PHOTO_GENERATION',
-      FINAL_REVEAL:         'FINAL_REVEAL',
-      PORTFOLIO:            'PORTFOLIO'
+      PHOTO_GENERATION: 'PHOTO_GENERATION',
+      FINAL_REVEAL: 'FINAL_REVEAL',
+      PORTFOLIO: 'PORTFOLIO'
     };
 
     this.currentState = this.STATE.UNIVERSE_INTRO;
@@ -55,7 +55,7 @@ class UniverseController {
 
     // ── Narration ────────────────────────────────────────────────────────
     this.narrationLines = [
-      { text: 'Somewhere between the stars…', delay: 0,   duration: 2.5 },
+      { text: 'Somewhere between the stars…', delay: 0, duration: 2.5 },
       { text: 'a little universe is waking up.', delay: 2.5, duration: 2.5 },
       { text: 'It has been waiting for someone special.', delay: 5.0, duration: 3.0 }
     ];
@@ -65,28 +65,28 @@ class UniverseController {
     this.narrationText = '';
 
     // ── Subsystems (created in start()) ───────────────────────────────────
-    this.universeScene     = null;
-    this.particles         = null;
-    this.constellation     = null;
+    this.universeScene = null;
+    this.particles = null;
+    this.constellation = null;
     this.nameConstellation = null;
-    this.teddyBirth        = null;
-    this.teddyFinalReveal  = null;
-    this.photoUpload       = null;
-    this.aiService         = null;
+    this.teddyBirth = null;
+    this.teddyFinalReveal = null;
+    this.photoUpload = null;
+    this.aiService = null;
 
     // ── DOM References ────────────────────────────────────────────────────
-    this.domNarration     = document.getElementById('narrationText');
-    this.domSceneIntro    = document.getElementById('sceneIntro');
-    this.domSceneConst    = document.getElementById('sceneConstellation');
+    this.domNarration = document.getElementById('narrationText');
+    this.domSceneIntro = document.getElementById('sceneIntro');
+    this.domSceneConst = document.getElementById('sceneConstellation');
     this.domConstellationMsg = document.getElementById('constellationMsg');
-    this.domBtnCreate     = document.getElementById('btnCreateSomething');
+    this.domBtnCreate = document.getElementById('btnCreateSomething');
     this.domSceneNameEntry = document.getElementById('sceneNameEntry');
-    this.domScenePhoto    = document.getElementById('scenePhotoUpload');
-    this.domSceneFinal    = document.getElementById('sceneFinalReveal');
-    this.domTopBar        = document.getElementById('topBar');
-    this.domBtnSound      = document.getElementById('btnSound');
-    this.domPortfolio     = document.getElementById('portfolioScreen');
-    this.domBtnBackTeddy  = document.getElementById('btnBackToTeddy');
+    this.domScenePhoto = document.getElementById('scenePhotoUpload');
+    this.domSceneFinal = document.getElementById('sceneFinalReveal');
+    this.domTopBar = document.getElementById('topBar');
+    this.domBtnSound = document.getElementById('btnSound');
+    this.domPortfolio = document.getElementById('portfolioScreen');
+    this.domBtnBackTeddy = document.getElementById('btnBackToTeddy');
 
     // Skip button (we add it ourselves if not present)
     this._ensureSkipButton();
@@ -114,8 +114,16 @@ class UniverseController {
 
     // 3. Constellation interaction
     this.constellation = new ConstellationInteraction(canvas, this.particles);
-    this.constellation.onConnectionMade = (count) => this._onConstellationConnection(count);
-    this.constellation.onReady = () => this._onConstellationReady();
+    this.constellation.onConnectionMade = (count) => {
+      this._onConstellationConnection(count);
+      const notes = [523.25, 587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 1046.50];
+      const note = notes[(count - 1) % notes.length];
+      this._playCelestialTone(note, 0.45, 'sine', 0.08);
+    };
+    this.constellation.onReady = () => {
+      this._playCelestialTone(1046.5, 0.8, 'sine', 0.1);
+      this._onConstellationReady();
+    };
     this.constellation.onIntensityChange = (val) => {
       if (this.universeScene) this.universeScene.setIntensity(val);
     };
@@ -146,7 +154,7 @@ class UniverseController {
     if (this.domBtnCreate) {
       this.domBtnCreate.addEventListener('click', () => {
         if (this.currentState === this.STATE.INVITATION ||
-            this.currentState === this.STATE.CONSTELLATION) {
+          this.currentState === this.STATE.CONSTELLATION) {
           this._transitionTo(this.STATE.NAME_ENTRY);
         }
       });
@@ -158,11 +166,51 @@ class UniverseController {
       });
     }
 
+    this._initAudio();
+
     if (this.domBtnSound) {
       this.domBtnSound.addEventListener('click', () => {
-        this.domBtnSound.textContent = this.domBtnSound.textContent === '🔇' ? '🔊' : '🔇';
+        this._toggleSound();
       });
     }
+  }
+
+  _initAudio() {
+    this.soundMuted = true;
+    this.audioCtx = null;
+  }
+
+  _toggleSound() {
+    if (!this.audioCtx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) this.audioCtx = new AudioCtx();
+    }
+    if (this.audioCtx && this.audioCtx.state === 'suspended') {
+      this.audioCtx.resume();
+    }
+    this.soundMuted = !this.soundMuted;
+    if (this.domBtnSound) {
+      this.domBtnSound.textContent = this.soundMuted ? '🔇' : '🔊';
+    }
+    if (!this.soundMuted) {
+      this._playCelestialTone(523.25, 0.4, 'sine', 0.08);
+    }
+  }
+
+  _playCelestialTone(freq = 440, duration = 0.5, type = 'sine', gainVal = 0.08) {
+    if (this.soundMuted || !this.audioCtx) return;
+    try {
+      const osc = this.audioCtx.createOscillator();
+      const gain = this.audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
+      gain.gain.setValueAtTime(gainVal, this.audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(this.audioCtx.destination);
+      osc.start();
+      osc.stop(this.audioCtx.currentTime + duration);
+    } catch (e) { }
   }
 
   _ensureSkipButton() {
@@ -230,7 +278,9 @@ class UniverseController {
         if (this.domConstellationMsg) {
           this.domConstellationMsg.textContent = 'Every little world needs someone special.';
         }
-        this.domBtnCreate.classList.remove('hidden');
+        if (this.domBtnCreate) {
+          this.domBtnCreate.classList.remove('hidden');
+        }
         break;
 
       case this.STATE.NAME_ENTRY:
@@ -309,6 +359,7 @@ class UniverseController {
 
   _onNameReady(name) {
     this.visitorName = name;
+    this._playCelestialTone(659.25, 0.6, 'sine', 0.08);
     this._transitionTo(this.STATE.NAME_ANIMATION);
     // After name animation (~3.5s), begin teddy birth
     setTimeout(() => {
@@ -317,6 +368,7 @@ class UniverseController {
   }
 
   _onBirthComplete() {
+    this._playCelestialTone(880.00, 1.2, 'sine', 0.1);
     this._transitionTo(this.STATE.TEDDY_INTERACTION);
   }
 
@@ -658,8 +710,8 @@ class UniverseController {
       }
 
       if (state === this.STATE.TEDDY_BIRTH &&
-          this.teddyBirth &&
-          (this.teddyBirth.phase === 'approach' || this.teddyBirth.phase === 'crack' || this.teddyBirth.phase === 'burst')) {
+        this.teddyBirth &&
+        (this.teddyBirth.phase === 'approach' || this.teddyBirth.phase === 'crack' || this.teddyBirth.phase === 'burst')) {
         this.teddyBirth.render();
       }
     }
@@ -680,21 +732,21 @@ class UniverseController {
     const W = window.innerWidth;
     const H = window.innerHeight;
 
-    this.canvas.width  = Math.floor(W * dpr);
+    this.canvas.width = Math.floor(W * dpr);
     this.canvas.height = Math.floor(H * dpr);
-    this.canvas.style.width  = W + 'px';
+    this.canvas.style.width = W + 'px';
     this.canvas.style.height = H + 'px';
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     // Notify subsystems
-    if (this.universeScene)     this.universeScene.resize(W, H);
-    if (this.particles)         this.particles.resize(W, H);
-    if (this.constellation)     this.constellation.resize(W, H);
+    if (this.universeScene) this.universeScene.resize(W, H);
+    if (this.particles) this.particles.resize(W, H);
+    if (this.constellation) this.constellation.resize(W, H);
     if (this.nameConstellation) this.nameConstellation.resize(W, H);
     if (this.teddyBirth) {
       this.teddyBirth.resize(W, H);
     }
-    if (this.teddyFinalReveal)  this.teddyFinalReveal.resize(W, H);
+    if (this.teddyFinalReveal) this.teddyFinalReveal.resize(W, H);
   }
 
   _bindGlobalEvents() {

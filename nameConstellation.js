@@ -201,8 +201,8 @@ class NameConstellation {
         ls.x = ls.x + (ls.targetX - ls.x) * Math.min(1, dt * 4 * ease);
         ls.y = ls.y + (ls.targetY - ls.y) * Math.min(1, dt * 4 * ease);
 
-        // Mark as placed when close enough
-        if (!ls.placed && Math.abs(ls.x - ls.targetX) < 2 && Math.abs(ls.y - ls.targetY) < 2) {
+        // Mark as placed when close enough or time elapsed
+        if (!ls.placed && (t >= 0.95 || (Math.abs(ls.x - ls.targetX) < 5 && Math.abs(ls.y - ls.targetY) < 5))) {
           ls.placed = true;
           ls.x = ls.targetX;
           ls.y = ls.targetY;

@@ -82,6 +82,7 @@ html, body {
   z-index: 10;
 }
 
+#universeCanvas,
 #artCanvas {
   position: absolute;
   inset: 0;
@@ -942,3 +943,369 @@ html, body {
   font-size: 14px;
   color: var(--text-muted);
 }
+
+/* ============================================================================
+   11. UNIVERSE & CONSTELLATION CINEMATIC STYLES
+   ============================================================================ */
+
+.top-bar {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.top-bar button,
+.top-bar .cosmos-brand-pill {
+  pointer-events: auto;
+}
+
+.cosmos-brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(14, 16, 26, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+  font-family: 'Fira Code', monospace;
+  font-size: 12px;
+  color: rgba(220, 200, 255, 0.95);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.sparkle-icon {
+  color: #ff7597;
+  font-size: 14px;
+}
+
+/* Intro Narration Overlay */
+.intro-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.narration-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  padding: 0 24px;
+}
+
+.narration-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(20px, 3.2vw, 36px);
+  color: rgba(240, 230, 255, 0.96);
+  text-align: center;
+  text-shadow: 0 0 30px rgba(180, 140, 255, 0.75), 0 0 60px rgba(255, 117, 151, 0.4);
+  line-height: 1.5;
+  letter-spacing: 0.5px;
+  max-width: 760px;
+  transition: opacity 0.3s ease;
+}
+
+/* Universe Buttons */
+.btn-universe-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 30px;
+  background: linear-gradient(135deg, #ff4d79, #9d4edd);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255, 77, 121, 0.4);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.btn-universe-primary:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(255, 77, 121, 0.6);
+}
+
+.btn-universe-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 26px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(230, 220, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+.btn-universe-secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+.btn-universe-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 26px;
+  background: linear-gradient(135deg, #38bdf8, #6366f1);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(56, 189, 248, 0.35);
+  transition: all 0.3s ease;
+}
+
+.btn-universe-accent:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 28px rgba(56, 189, 248, 0.55);
+}
+
+/* Constellation Invitation Overlay */
+.constellation-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 25;
+  background: transparent;
+}
+
+.constellation-msg {
+  font-family: 'Caveat', cursive, serif;
+  font-size: clamp(24px, 4vw, 36px);
+  color: rgba(240, 225, 255, 0.95);
+  margin-bottom: 24px;
+  text-shadow: 0 0 20px rgba(180, 140, 255, 0.8);
+}
+
+/* Photo Upload Inner */
+.photo-upload-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: rgba(14, 16, 26, 0.78);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 28px;
+  padding: clamp(24px, 5vw, 40px);
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 40px rgba(255, 77, 121, 0.15);
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.photo-ask-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(16px, 2.4vw, 20px);
+  font-weight: 600;
+  color: rgba(240, 225, 255, 0.95);
+  margin-bottom: 24px;
+  text-shadow: 0 0 15px rgba(200, 150, 255, 0.5);
+  line-height: 1.4;
+}
+
+.photo-preview-area {
+  margin-bottom: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.camera-icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 150px;
+  border-radius: 24px;
+  border: 2px dashed rgba(200, 160, 255, 0.4);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.camera-icon-wrapper:hover {
+  border-color: var(--primary-pink);
+  background: rgba(255, 77, 121, 0.08);
+  transform: scale(1.04);
+  box-shadow: 0 0 25px rgba(255, 77, 121, 0.3);
+}
+
+.camera-icon {
+  font-size: 42px;
+  margin-bottom: 8px;
+}
+
+.camera-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.photo-preview-frame {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 77, 121, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.photo-preview-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.btn-replace-photo {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(14, 16, 26, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.btn-replace-photo:hover {
+  background: var(--primary-pink);
+  border-color: var(--primary-pink);
+}
+
+.photo-consent-row {
+  margin-bottom: 20px;
+}
+
+.consent-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.consent-check {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-pink);
+  cursor: pointer;
+}
+
+.photo-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.photo-privacy-note {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+}
+
+/* Final Reveal Overlay */
+.final-reveal-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: clamp(30px, 6vh, 60px);
+  z-index: 30;
+  pointer-events: none;
+}
+
+.final-reveal-text {
+  text-align: center;
+  margin-bottom: 24px;
+  pointer-events: none;
+}
+
+.reveal-line-1 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(24px, 4vw, 42px);
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 0 25px rgba(255, 117, 151, 0.8), 0 0 50px rgba(255, 77, 121, 0.4);
+  margin-bottom: 8px;
+}
+
+.reveal-name {
+  color: #ff7597;
+  text-shadow: 0 0 25px rgba(255, 117, 151, 0.9);
+}
+
+.reveal-line-2 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(15px, 2.2vw, 20px);
+  font-style: italic;
+  color: rgba(220, 200, 255, 0.9);
+  text-shadow: 0 0 15px rgba(180, 150, 255, 0.6);
+}
+
+.final-actions-group {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+/* Cosmic Animations */
+@keyframes cosmicPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
