@@ -1,215 +1,120 @@
 /**
  * main.js
  * ============================================================================
- * Application Bootstrap, Welcome Sequencer, and 3D Gift Scene Orchestration.
+ * Application Bootstrap, High-Performance Animation Loop, Resize & Visibility
+ * Management, and Subsystem Orchestration.
  * ============================================================================
  */
 
 (function () {
   "use strict";
 
-  let giftScene = null;
-  let photoFrame = null;
-  let giftInteractions = null;
+  // Subsystem instances
+  let animation = null;
+  let renderer = null;
+  let experience = null;
 
-  // DOM Elements
-  const welcomeScreen = document.getElementById("welcomeScreen");
-  const typewriterText = document.getElementById("typewriterText");
-  const nameInputSection = document.getElementById("nameInputSection");
-  const visitorNameInput = document.getElementById("visitorNameInput");
-  const btnCreateTeddy = document.getElementById("btnCreateTeddy");
-  const inputError = document.getElementById("inputError");
-  const miniBearCanvas = document.getElementById("miniBearCanvas");
-  const experienceScreen = document.getElementById("experienceScreen");
-  const threeCanvas = document.getElementById("threeCanvas");
-  const giftSceneContainer = document.getElementById("giftSceneContainer");
-  const btnUploadMemory = document.getElementById("btnUploadMemory");
+  // Render loop tracking
+  let lastTimestamp = 0;
+  let isPageVisible = true;
+  let rafId = null;
 
-  let miniRafId = null;
+  // Mini bear preview on welcome screen
+  let miniCanvas = null;
 
   function init() {
-    // 1. Start Mini Bear Animation on Welcome Screen
-    if (miniBearCanvas) {
-      animateMiniBear();
+    const mainCanvas = document.getElementById("artCanvas");
+    miniCanvas = document.getElementById("miniBearCanvas");
+
+    if (!mainCanvas) {
+      console.error("Art canvas element not found!");
+      return;
     }
 
-    // 2. Start Welcome Typewriter Sequence
-    startWelcomeTypewriter();
+    // 1. Initialize Modular Subsystems
+    const geometry = new TeddyGeometry();
+    const parts = new TeddyCharacterParts();
+    const lighting = new TeddyLighting();
+    animation = new TeddyCharacterAnimation();
+    renderer = new TeddyAsciiRenderer(mainCanvas, geometry, parts, lighting, animation);
 
-    // 3. Name Input Event Listeners
-    if (visitorNameInput) {
-      visitorNameInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") submitName();
-      });
-    }
+    // 2. Initialize Experience Controller
+    experience = new TeddyExperience(renderer, animation);
 
-    if (btnCreateTeddy) {
-      btnCreateTeddy.addEventListener("click", submitName);
+    // 3. Window & Visibility Event Handlers
+    window.addEventListener("resize", onResize, { passive: true });
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    // 4. Initial layout calculation
+    onResize();
+
+    // 5. Start Master Animation Loop
+    lastTimestamp = performance.now();
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function onResize() {
+    if (!renderer) return;
+    renderer.setupCanvas();
+  }
+
+  function onVisibilityChange() {
+    isPageVisible = !document.hidden;
+    if (isPageVisible) {
+      lastTimestamp = performance.now();
+      if (!rafId) {
+        rafId = requestAnimationFrame(loop);
+      }
+    } else {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
     }
   }
 
   /**
-   * Mini Kawaii Bear Preview on Welcome Card
+   * Master 60 FPS Animation Loop
    */
-  function animateMiniBear() {
-    const ctx = miniBearCanvas.getContext("2d");
-    const W = miniBearCanvas.width;
-    const H = miniBearCanvas.height;
+  function loop(now) {
+    if (!isPageVisible) return;
 
-    function renderFrame(time) {
-      const t = time / 1000.0;
-      ctx.clearRect(0, 0, W, H);
+    const dt = Math.min(0.1, (now - lastTimestamp) / 1000.0);
+    lastTimestamp = now;
 
-      const blink = (Math.sin(t * 2.5) > 0.94);
-      const pulse = 1.0 + 0.16 * Math.sin(t * 5.0);
-      const eyeChar = blink ? "⌒" : "●";
+    // Always update physics & timers
+    animation.update(dt);
 
-      const miniLines = [
-        "   ₍ᐢ. ̫ .ᐢ₎   ",
-        "  (  (,,)  )  ",
-        `   / ${eyeChar}  ${eyeChar} \\   `,
-        "  (  .꒳.  )  ",
-        "   /╭───╮\\   ",
-        "  ( │ ♥ │ )  ",
-        "   \\╰───╯/   ",
-        "   (,,) (,,)  "
-      ];
+    // Branch behavior according to experience state
+    const currentStep = experience.currentStep;
 
-      ctx.font = '16px "Fira Code", Menlo, monospace';
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      const startY = 32;
-      const lineH = 22;
-
-      miniLines.forEach((line, idx) => {
-        const y = startY + idx * lineH;
-        if (line.includes("♥")) {
-          ctx.fillStyle = "rgb(255, 45, 95)";
-          ctx.shadowColor = "rgba(255, 45, 95, 0.9)";
-          ctx.shadowBlur = 14 * pulse;
-        } else if (line.includes(eyeChar)) {
-          ctx.fillStyle = "#ffffff";
-          ctx.shadowColor = "rgba(255, 255, 255, 0.7)";
-          ctx.shadowBlur = 8;
-        } else {
-          ctx.fillStyle = "rgb(255, 125, 155)";
-          ctx.shadowColor = "rgba(255, 110, 140, 0.4)";
-          ctx.shadowBlur = 6;
-        }
-        ctx.fillText(line, W / 2, y);
-      });
-      ctx.shadowBlur = 0;
-
-      miniRafId = requestAnimationFrame(renderFrame);
-    }
-
-    miniRafId = requestAnimationFrame(renderFrame);
-  }
-
-  async function startWelcomeTypewriter() {
-    await delay(350);
-    await typeWriter("Hey! Someone special just arrived...", typewriterText, 40);
-    await delay(1100);
-
-    typewriterText.textContent = "";
-    await typeWriter("Before I create something special, may I know your name?", typewriterText, 35);
-
-    if (nameInputSection) {
-      nameInputSection.classList.remove("hidden");
-      nameInputSection.classList.add("fade-in");
-      if (visitorNameInput) {
-        visitorNameInput.focus();
+    if (currentStep === "WELCOME") {
+      // Render cute mini preview bear in the welcome card
+      if (miniCanvas) {
+        renderer.renderMiniBear(miniCanvas, animation.time);
       }
-    }
-  }
+    } else if (currentStep === "BLOOMING") {
+      // Advance bloom progress (e.g. over 9 seconds)
+      const bloomRate = 1.0 / animation.bloomDuration;
+      animation.bloomProgress = Math.min(1.0, animation.bloomProgress + dt * bloomRate);
 
-  function submitName() {
-    const rawVal = visitorNameInput.value.trim();
-    if (!rawVal) {
-      showError("Please enter your name to begin ✨");
-      return;
-    }
-    if (rawVal.length < 2) {
-      showError("Please enter at least 2 letters ✨");
-      return;
-    }
+      // Smoothstep easing for blooming characters
+      const u = animation.bloomProgress;
+      const easedBloom = u * u * (3.0 - 2.0 * u);
 
-    if (inputError) inputError.classList.add("hidden");
-    const visitorName = rawVal;
+      // Render full canvas frame
+      renderer.render(easedBloom, false);
 
-    // Launch 3D Experience
-    launch3DExperience(visitorName);
-  }
-
-  function showError(msg) {
-    if (!inputError || !visitorNameInput) return;
-    inputError.textContent = msg;
-    inputError.classList.remove("hidden");
-    visitorNameInput.classList.add("shake-error");
-    setTimeout(() => visitorNameInput.classList.remove("shake-error"), 500);
-  }
-
-  async function launch3DExperience(name) {
-    // 1. Cancel mini bear loop
-    if (miniRafId) {
-      cancelAnimationFrame(miniRafId);
-      miniRafId = null;
-    }
-
-    // 2. Fade out Welcome Screen
-    welcomeScreen.classList.add("fade-out");
-    await delay(500);
-    welcomeScreen.classList.add("hidden");
-
-    // 3. Show Experience Screen
-    experienceScreen.classList.remove("hidden");
-    experienceScreen.classList.add("fade-in");
-
-    // 4. Initialize Three.js 3D Gift Scene
-    if (!giftScene) {
-      giftScene = new TeddyGiftScene(threeCanvas, name);
-      photoFrame = new TeddyPhotoFrame(giftSceneContainer);
-      giftInteractions = new TeddyGiftInteractions(giftScene, photoFrame, name);
-
-      if (btnUploadMemory) {
-        btnUploadMemory.addEventListener("click", () => {
-          photoFrame.triggerUploadDialog();
-        });
+      // Check if bloom finished
+      if (animation.bloomProgress >= 1.0) {
+        experience.triggerGreeting();
       }
-    } else {
-      giftScene.setName(name);
-      giftInteractions.name = name;
+    } else if (currentStep === "GREETING" || currentStep === "PORTAL") {
+      // Fully bloomed interactive state (waving, breathing, heartbeat, mouse reaction)
+      renderer.render(1.0, true);
     }
 
-    // 5. Trigger Cinematic Gift Box & Greeting Sequence
-    giftInteractions.startGreetingSequence();
-  }
-
-  function typeWriter(text, element, speed = 35) {
-    if (!element) return Promise.resolve();
-    return new Promise((resolve) => {
-      element.textContent = "";
-      let idx = 0;
-      const cursorSpan = document.createElement("span");
-      cursorSpan.className = "typewriter-cursor";
-      element.appendChild(cursorSpan);
-
-      const interval = setInterval(() => {
-        if (idx < text.length) {
-          element.insertBefore(document.createTextNode(text.charAt(idx)), cursorSpan);
-          idx++;
-        } else {
-          clearInterval(interval);
-          cursorSpan.remove();
-          resolve();
-        }
-      }, speed);
-    });
-  }
-
-  function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+    rafId = requestAnimationFrame(loop);
   }
 
   // Boot on DOM ready

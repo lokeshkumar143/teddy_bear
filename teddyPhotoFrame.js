@@ -128,3 +128,4 @@ class TeddyPhotoFrame {
 }
 
 window.TeddyPhotoFrame = TeddyPhotoFrame;
+

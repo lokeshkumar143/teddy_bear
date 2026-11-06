@@ -462,3 +462,4 @@ class TeddyGiftScene {
 }
 
 window.TeddyGiftScene = TeddyGiftScene;
+

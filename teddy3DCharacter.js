@@ -650,3 +650,4 @@ class Teddy3DCharacter {
 }
 
 window.Teddy3DCharacter = Teddy3DCharacter;
+
