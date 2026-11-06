@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>A Special Gift For You ❤️ | Teddy Bear ASCII Experience</title>
+  
+  <!-- Modern Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="teddyExperience.css?v=4.0">
+</head>
+<body>
+
+  <!-- Ambient Cosmic Aura Background -->
+  <div class="bg-cosmic-glow"></div>
+
+  <!-- ======================================================================
+       1. INITIAL WELCOME SCREEN
+       ====================================================================== -->
+  <section id="welcomeScreen" class="welcome-screen" aria-live="polite">
+    <div class="welcome-card">
+      
+      <!-- Mini Animated ASCII Teddy Bear -->
+      <div class="mini-bear-box">
+        <canvas id="miniBearCanvas" width="220" height="170" aria-label="Mini ASCII teddy bear waving"></canvas>
+      </div>
+
+      <!-- Typewriter Message -->
+      <div class="typewriter-box">
+        <p id="typewriterText" class="typewriter-text"></p>
+      </div>
+
+      <!-- Personalized Name Input (Fades in) -->
+      <div id="nameInputSection" class="name-input-group hidden">
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            id="visitorNameInput" 
+            class="name-input" 
+            placeholder="Enter your name here..." 
+            maxlength="20" 
+            autocomplete="off" 
+            spellcheck="false"
+            aria-label="Your Name"
+          >
+          <p id="inputError" class="input-error hidden"></p>
+        </div>
+
+        <button id="btnCreateTeddy" class="btn-create-teddy" type="button">
+          <span>CREATE MY TEDDY</span>
+          <span aria-hidden="true">✨</span>
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       2. FULL 9:16 ASCII EXPERIENCE SCREEN
+       ====================================================================== -->
+  <section id="experienceScreen" class="experience-screen hidden">
+    
+    <div class="canvas-reel-container">
+      <!-- High-Performance Canvas for ASCII Teddy Bear -->
+      <canvas id="artCanvas" width="1080" height="1920"></canvas>
+
+      <!-- Floating Canvas Top Bar (Themes & Sound Toggle) -->
+      <div class="canvas-top-bar">
+        <button id="btnSoundToggle" class="top-bar-pill sound-pill" type="button" aria-label="Toggle Sound" title="Sound Effects">
+          <span id="soundIcon">🔇</span>
+        </button>
+
+        <div class="theme-selector-pills">
+          <button class="theme-pill active" data-theme="cyberRose" title="Cyber Rose">💖</button>
+          <button class="theme-pill" data-theme="goldenHoney" title="Golden Honey">🍯</button>
+          <button class="theme-pill" data-theme="cosmicAurora" title="Cosmic Aurora">🌌</button>
+          <button class="theme-pill" data-theme="dreamyLavender" title="Dreamy Lavender">💜</button>
+        </div>
+      </div>
+
+      <!-- Interactive Waving Feedback Toast -->
+      <div id="waveToast" class="wave-toast hidden" role="status"></div>
+
+      <!-- Floating Greeting Dialog Overlay (Revealed after bloom completes) -->
+      <div id="greetingDialog" class="greeting-dialog hidden">
+        <h2 id="greetingLine1" class="greeting-line-title"></h2>
+        <p id="greetingLine2" class="greeting-line-sub"></p>
+        <p id="greetingLine3" class="greeting-line-sub"></p>
+        <p id="greetingQuestion" class="greeting-question"></p>
+
+        <div id="greetingActionGroup" class="greeting-btn-group hidden">
+          <button id="btnExplore" class="btn-explore" type="button">
+            YES, LET'S GO ❤️
+          </button>
+          <button id="btnWave" class="btn-wave" type="button">
+            MAKE MY TEDDY WAVE 👋
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ======================================================================
+       3. CREATIVE DEVELOPER PORTFOLIO SCREEN (After Heart Portal Transition)
+       ====================================================================== -->
+  <main id="portfolioScreen" class="portfolio-screen hidden">
+    
+    <!-- Floating Return Pill -->
+    <div class="floating-return-bar">
+      <button id="btnBackToTeddy" class="btn-back-teddy" type="button">
+        <span>🧸</span>
+        <span>Revisit Your Teddy</span>
+      </button>
+    </div>
+
+    <!-- Portfolio Hero Header -->
+    <header class="portfolio-hero">
+      <div class="portfolio-badge">
+        <span>✦</span> Creative Developer & WebGL Specialist
+      </div>
+      <h1 id="portfolioGreeting">Welcome to My Creative World ✨</h1>
+      <p>
+        Crafting cinematic web interactions, WebGL shaders, procedural ASCII art, and digital experiences that blend mathematics with pure emotion.
+      </p>
+    </header>
+
+    <!-- Featured Projects Grid -->
+    <section>
+      <h2 class="projects-section-title">
+        <span>🎨</span> Featured Interactive Works
+      </h2>
+
+      <div class="projects-grid">
+        <!-- Project 1 -->
+        <article class="project-card">
+          <div>
+            <div class="project-icon">🧸</div>
+            <h3 class="project-title">Procedural ASCII Teddy Bear</h3>
+            <p class="project-desc">
+              Mathematical shape simulation in Canvas 2D/WebGL with parametric heart equations, smoothstep bloom reveals, and live personalized letter synthesis.
+            </p>
+          </div>
+          <div class="project-tags">
+            <span class="tag">Canvas 2D</span>
+            <span class="tag">Math Equations</span>
+            <span class="tag">ASCII Bloom</span>
+          </div>
+        </article>
+
+        <!-- Project 2 -->
+        <article class="project-card">
+          <div>
+            <div class="project-icon">🌹</div>
+            <h3 class="project-title">Blooming Rose Reel</h3>
+            <p class="project-desc">
+              9:16 vertical terminal reels with animated code streams, glowing color gradients, and real-time audio-visual physics.
+            </p>
+          </div>
+          <div class="project-tags">
+            <span class="tag">Creative Coding</span>
+            <span class="tag">Kinetic Typography</span>
+            <span class="tag">60 FPS</span>
+          </div>
+        </article>
+
+        <!-- Project 3 -->
+        <article class="project-card">
+          <div>
+            <div class="project-icon">🌌</div>
+            <h3 class="project-title">Cosmic Starfield & Portals</h3>
+            <p class="project-desc">
+              Multi-layered particle systems, chromatic aberration shockwaves, and seamless camera warps between dimensional spaces.
+            </p>
+          </div>
+          <div class="project-tags">
+            <span class="tag">WebGL</span>
+            <span class="tag">Particle Physics</span>
+            <span class="tag">Shaders</span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Creative Skills & Philosophy -->
+    <section class="skills-section">
+      <h2 class="projects-section-title">
+        <span>⚡</span> Creative Engineering Capabilities
+      </h2>
+      <div class="skills-grid">
+        <div class="skill-item">
+          <span class="skill-bullet"></span>
+          <span>WebGL / Three.js Shaders</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-bullet"></span>
+          <span>Procedural ASCII Synthesis</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-bullet"></span>
+          <span>Interactive Mathematical Art</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-bullet"></span>
+          <span>Smooth 60 FPS Micro-Interactions</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-bullet"></span>
+          <span>Responsive Touch & Desktop UI</span>
+        </div>
+        <div class="skill-item">
+          <span class="skill-bullet"></span>
+          <span>Accessible Motion Design</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="portfolio-footer">
+      <p>Crafted with love, code, and mathematics ❤️ · 2026</p>
+    </footer>
+
+  </main>
+
+  <!-- Modular Architectural Scripts with Cache-Buster v4.0 -->
+  <script src="teddyGeometry.js?v=4.0"></script>
+  <script src="teddyCharacterParts.js?v=4.0"></script>
+  <script src="teddyLighting.js?v=4.0"></script>
+  <script src="teddyCharacterAnimation.js?v=4.0"></script>
+  <script src="teddyAsciiRenderer.js?v=4.0"></script>
+  <script src="teddyExperience.js?v=4.0"></script>
+  <script src="main.js?v=4.0"></script>
+</body>
+</html>
