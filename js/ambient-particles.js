@@ -1,8 +1,7 @@
 /**
- * Ambient Botanical ASCII Petal & Stardust Field
- * Fills the desktop flanks with drifting rose petals and luminous stardust.
- * Keeps the center clear for the hand and rose while framing the stage with
- * living romantic atmosphere. Responds gently to cursor/touch breeze.
+ * Ambient Celestial ASCII Stardust & Gentle Hearts Universe
+ * Fills the screen with drifting cosmic stars, glowing stardust motes,
+ * and soft rising mini hearts that float like gentle embers in the night sky.
  */
 
 export class AmbientParticles {
@@ -16,18 +15,21 @@ export class AmbientParticles {
     this.windX = 0;
     this.targetWindX = 0;
 
-    this.glyphs = ['·', '*', '°', '❀', '✦', '✧', '•', '·', '✿'];
+    // Romantic celestial glyphs
+    this.glyphs = ['✦', '✧', '♥', '♡', '·', '⋆', '•', '✨', '°'];
+    
+    // Rich romantic stardust palette
     this.colors = [
-      'rgba(230, 26, 68, ',   // Crimson
-      'rgba(255, 64, 105, ',  // Soft Rose
-      'rgba(180, 15, 45, ',   // Deep Ruby
-      'rgba(255, 140, 160, ', // Petal Pink
-      'rgba(255, 200, 150, '  // Rose Gold
+      'rgba(255, 225, 120, ',  // Golden Starlight
+      'rgba(255, 65, 115, ',   // Soft Glowing Rose
+      'rgba(255, 150, 180, ',  // Petal Pink
+      'rgba(190, 140, 255, ',  // Celestial Violet
+      'rgba(240, 245, 255, '   // Diamond Silver
     ];
 
     this.dpr = typeof window !== 'undefined' ? (window.devicePixelRatio || 1) : 1;
     this.resize();
-    this.initParticles(85);
+    this.initParticles(95);
     this.initEvents();
   }
 
@@ -53,113 +55,96 @@ export class AmbientParticles {
   }
 
   createParticle(randomY = false) {
-    // Distribute 80% on the left & right flanks to elegantly fill empty margins
-    const isFlank = Math.random() < 0.82;
+    // Distribute nicely across margins while leaving center open
+    const isFlank = Math.random() < 0.75;
     let x;
     if (isFlank) {
       if (Math.random() < 0.5) {
-        // Left flank (0% to 32% of screen)
         x = Math.random() * (this.width * 0.32);
       } else {
-        // Right flank (68% to 100% of screen)
         x = this.width * 0.68 + Math.random() * (this.width * 0.32);
       }
     } else {
-      // Occasional gentle center drift
       x = Math.random() * this.width;
     }
 
-    const y = randomY ? Math.random() * this.height : -20;
-    const glyph = this.glyphs[Math.floor(Math.random() * this.glyphs.length)];
-    const colorBase = this.colors[Math.floor(Math.random() * this.colors.length)];
-    const speed = 12 + Math.random() * 26; // pixels per second
-    const size = glyph === '❀' || glyph === '✿' ? 14 + Math.random() * 6 : 9 + Math.random() * 7;
-    const baseAlpha = 0.18 + Math.random() * 0.42;
-    const swayAmp = 12 + Math.random() * 28;
-    const swayFreq = 0.6 + Math.random() * 1.4;
-    const swayPhase = Math.random() * Math.PI * 2;
+    const y = randomY ? Math.random() * this.height : this.height + 15;
+    const isHeart = Math.random() < 0.28;
+    const glyph = isHeart 
+      ? (Math.random() < 0.6 ? '♥' : '♡') 
+      : this.glyphs[Math.floor(Math.random() * this.glyphs.length)];
 
     return {
       x,
-      baseX: x,
       y,
+      baseX: x,
       glyph,
-      colorBase,
-      speed,
-      size,
-      baseAlpha,
-      swayAmp,
-      swayFreq,
-      swayPhase,
-      shimmerSpeed: 1.5 + Math.random() * 3
+      size: isHeart ? (10 + Math.random() * 8) : (8 + Math.random() * 7),
+      vy: isHeart ? (-12 - Math.random() * 22) : (-6 - Math.random() * 16), // Gently rises upward
+      vx: (Math.random() - 0.5) * 8,
+      wobbleSpeed: 0.8 + Math.random() * 1.6,
+      wobbleAmp: 12 + Math.random() * 24,
+      wobbleOffset: Math.random() * Math.PI * 2,
+      opacity: 0.25 + Math.random() * 0.55,
+      fadeSpeed: 0.25 + Math.random() * 0.45,
+      colorPrefix: this.colors[Math.floor(Math.random() * this.colors.length)],
+      life: 0,
+      maxLife: 6 + Math.random() * 10
     };
   }
 
   initEvents() {
     window.addEventListener('resize', () => this.resize());
-
     window.addEventListener('mousemove', (e) => {
-      // Gentle breeze influenced by cursor velocity
-      const centerDist = (e.clientX - this.width / 2) / (this.width / 2);
-      this.targetWindX = centerDist * 18;
+      const normX = (e.clientX / this.width) - 0.5;
+      this.targetWindX = normX * 35;
     });
-
     window.addEventListener('touchmove', (e) => {
       if (e.touches.length > 0) {
-        const touch = e.touches[0];
-        const centerDist = (touch.clientX - this.width / 2) / (this.width / 2);
-        this.targetWindX = centerDist * 18;
+        const normX = (e.touches[0].clientX / this.width) - 0.5;
+        this.targetWindX = normX * 35;
       }
     }, { passive: true });
   }
 
-  update(dt = 0.016) {
+  update(dt) {
     this.time += dt;
-
-    // Smooth wind easing
-    this.windX += (this.targetWindX - this.windX) * dt * 2.5;
-    this.targetWindX *= 0.96; // Ease back to gentle ambient air
+    this.windX += (this.targetWindX - this.windX) * 0.04;
 
     for (let i = 0; i < this.particles.length; i++) {
       const p = this.particles[i];
+      p.life += dt;
 
-      // Downward drift + wind
-      p.y += p.speed * dt;
-      const sway = Math.sin(this.time * p.swayFreq + p.swayPhase) * p.swayAmp;
-      p.x = p.baseX + sway + this.windX * (p.speed / 25);
+      // Gentle floating ascent
+      p.y += p.vy * dt;
+      p.x = p.baseX + Math.sin(this.time * p.wobbleSpeed + p.wobbleOffset) * p.wobbleAmp + this.windX;
 
-      // Recycle particle when it falls below bottom
-      if (p.y > this.height + 25) {
+      if (p.y < -30 || p.life > p.maxLife) {
         this.particles[i] = this.createParticle(false);
       }
     }
   }
 
   render() {
-    const ctx = this.ctx;
-    ctx.clearRect(0, 0, this.width, this.height);
+    this.ctx.clearRect(0, 0, this.width, this.height);
+    this.ctx.textAlign = 'center';
+    this.ctx.textBaseline = 'middle';
 
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    for (let i = 0; i < this.particles.length; i++) {
-      const p = this.particles[i];
-      const shimmer = 0.75 + 0.25 * Math.sin(this.time * p.shimmerSpeed + p.x);
-      const alpha = p.baseAlpha * shimmer;
-
-      ctx.save();
-      ctx.font = `${p.size}px "JetBrains Mono", monospace`;
-      ctx.fillStyle = `${p.colorBase}${alpha})`;
-
-      // Soft blooming glow for rose petals
-      if (p.glyph === '❀' || p.glyph === '✿' || p.glyph === '✦') {
-        ctx.shadowColor = 'rgba(230, 26, 68, 0.45)';
-        ctx.shadowBlur = 8;
+    for (const p of this.particles) {
+      const lifeRatio = p.life / p.maxLife;
+      let alpha = p.opacity;
+      if (lifeRatio < 0.15) {
+        alpha *= (lifeRatio / 0.15);
+      } else if (lifeRatio > 0.85) {
+        alpha *= ((1 - lifeRatio) / 0.15);
       }
 
-      ctx.fillText(p.glyph, p.x, p.y);
-      ctx.restore();
+      this.ctx.font = `${Math.round(p.size)}px "JetBrains Mono", Menlo, monospace`;
+      this.ctx.shadowColor = p.colorPrefix + '0.6)';
+      this.ctx.shadowBlur = 4;
+      this.ctx.fillStyle = p.colorPrefix + `${Math.max(0, Math.min(1, alpha))})`;
+      this.ctx.fillText(p.glyph, p.x, p.y);
     }
+    this.ctx.shadowBlur = 0;
   }
 }
-

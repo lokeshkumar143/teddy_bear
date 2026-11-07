@@ -3,27 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>A Special Teddy Delivery For You 💌🧸</title>
-  <meta name="description" content="A carrier pigeon arrives with a sealed letter, revealing a magical living ASCII Teddy Bear universe crafted with love.">
-  <meta name="theme-color" content="#000000">
+  <title>A Celestial Delivery For You 💌🧸</title>
+  <meta name="description" content="A carrier pigeon arrives with a sealed letter, revealing an enchanting living ASCII Teddy Bear universe crafted with love.">
+  <meta name="theme-color" content="#070816">
 
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Homemade+Apple&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=3.0">
+  <link rel="stylesheet" href="css/style.css?v=5.0">
 </head>
-<body class="pure-black">
+<body class="theme-aurora">
 
-  <!-- Ambient Golden Stardust & Floating Mini Hearts Field -->
+  <!-- Ambient Celestial ASCII Stardust & Rising Hearts Canvas -->
   <canvas id="ambient-canvas"></canvas>
 
-  <!-- Top Floating Music Pill -->
+  <!-- Top Floating Controls: Theme Switcher & Music -->
   <div class="top-nav-bar">
-    <button id="sound-toggle-btn" class="sound-toggle-btn" type="button" aria-label="Toggle Sound Effects" title="Music & Sound Effects">
-      <span aria-hidden="true">🔇</span>
-      <span>Music</span>
+    <button id="theme-toggle-btn" class="top-pill-btn" type="button" aria-label="Switch Theme Atmosphere" title="Switch Theme Atmosphere">
+      <span id="theme-icon" aria-hidden="true">🌌</span>
+      <span id="theme-label">Aurora</span>
+    </button>
+
+    <button id="sound-toggle-btn" class="top-pill-btn sound-toggle-btn" type="button" aria-label="Toggle Sound Effects" title="Music & Sound Effects">
+      <span id="sound-icon" aria-hidden="true">🔇</span>
+      <span id="sound-label">Music</span>
     </button>
   </div>
 
@@ -41,8 +46,11 @@
       <p class="whisper-hint" id="envelope-hint">touch the letter to open 💌</p>
     </div>
 
-    <!-- Screen 2: Living ASCII Teddy Bear Universe with Up-Side Selector -->
+    <!-- Screen 2: Living ASCII Teddy Bear Universe with Up-Side Selector & Rich UI -->
     <div id="teddy-screen" class="scene teddy-screen">
+
+      <!-- Header Title Badge -->
+      <div class="experience-header-badge">✦ &nbsp;SPECIALLY CRAFTED FOR LOKI &nbsp;✦</div>
 
       <!-- 1. Up-Side (Top) Multi-Teddy Selector Bar -->
       <div id="teddy-selector-bar" class="teddy-selector-bar" role="tablist" aria-label="Choose Teddy Bear">
@@ -69,23 +77,56 @@
         <canvas id="teddy-canvas" width="800" height="800" aria-label="Living ASCII Teddy Bear"></canvas>
       </div>
 
-      <!-- 3. Minimal, Compact Romantic Love Note Card -->
-      <div id="cloud-note" class="minimal-note">
-        <div class="note-pill">✦ &nbsp;SPECIALLY CRAFTED WITH LOVE &nbsp;✦</div>
-        
-        <p class="note-quote">
-          &ldquo;In a world of fleeting moments, you bring warmth and endless comfort.<br>
-          Sending you love, peace, and eternal happiness.&rdquo;
-        </p>
-
-        <p class="note-subtext">
-          Every quiet thought finds its way to you &mdash; today, tomorrow, always.
-        </p>
-
-        <button id="btn-replay" class="note-replay" title="Send another letter">send pigeon again 🕊️</button>
+      <!-- 3. Floating Polaroid Photo of Loki -->
+      <div id="floating-polaroid" class="floating-polaroid" title="Click to view photo">
+        <div class="polaroid-tape"></div>
+        <div class="polaroid-inner">
+          <img id="polaroid-img" src="assets/loki-portrait.jpg" alt="Loki Portrait">
+          <label for="photo-upload-input" class="btn-change-photo" title="Upload custom photo" aria-label="Upload custom photo">
+            <span>📷</span>
+          </label>
+          <input type="file" id="photo-upload-input" accept="image/*" class="sr-only">
+        </div>
+        <p id="polaroid-caption" class="polaroid-caption">Best Friends Forever ❤️ loki</p>
       </div>
 
-      <!-- 4. Pure ASCII Key Design Signature of Lokesh Kumar -->
+      <!-- 4. Interactive Frosted Glass Action Card -->
+      <div id="gift-action-card" class="gift-action-card">
+        <div class="card-sparkle-pill">✦ &nbsp;HEARTFELT DEDICATION &nbsp;✦</div>
+        
+        <h2 id="gift-card-title" class="gift-card-title">Hey, loki! ✨</h2>
+        
+        <p id="gift-card-sub1" class="gift-card-sub">This little teddy was made just for you.</p>
+        <p id="gift-card-sub2" class="gift-card-sub highlight">Sending you warmth, comfort, and happiness. ❤️</p>
+
+        <!-- Interactive Action Buttons -->
+        <div class="gift-action-group">
+          <button id="btn-save-gift" class="act-btn act-btn-save" type="button" title="Save downloadable gift snapshot">
+            <span class="btn-text">SAVE MY GIFT</span>
+            <span class="btn-icon">🎁</span>
+          </button>
+
+          <button id="btn-make-wave" class="act-btn act-btn-wave" type="button" title="Make teddy wave at you">
+            <span class="btn-text">MAKE TEDDY WAVE</span>
+            <span class="btn-icon">👋</span>
+          </button>
+
+          <button id="btn-pulse-heart" class="act-btn act-btn-heart" type="button" title="Make teddy's glowing heart pulse">
+            <span class="btn-text">PULSE HEART</span>
+            <span class="btn-icon">💖</span>
+          </button>
+
+          <button id="btn-explore-world" class="act-btn act-btn-explore" type="button" title="Explore Developer Portfolio">
+            <span class="btn-text">EXPLORE MY WORLD</span>
+            <span class="btn-icon">✨</span>
+          </button>
+        </div>
+
+        <!-- Replay Action -->
+        <button id="btn-replay" class="note-replay" type="button">Watch Again ↺</button>
+      </div>
+
+      <!-- 5. Pure ASCII Key Design Signature of Lokesh Kumar -->
       <div id="corner-signature" class="corner-signature" aria-label="ASCII Key Signature of Lokesh Kumar">
         <div class="ascii-sig-box">
           <div class="ascii-sig-head">
@@ -118,6 +159,53 @@
 
   </main>
 
-  <script type="module" src="js/app.js?v=3.0"></script>
+  <!-- Interactive Creative Portfolio Modal ("Explore My World") -->
+  <div id="world-modal" class="world-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="world-modal-backdrop"></div>
+    <div class="world-modal-content">
+      <button id="btn-close-world" class="btn-close-modal" aria-label="Close modal">&times;</button>
+      
+      <div class="world-badge">🌌 &nbsp;CREATIVE DEVELOPER PORTFOLIO &nbsp;🌌</div>
+      <h2 class="world-title">Welcome to My Universe ✨</h2>
+      <p class="world-subtitle">Crafted with mathematics, passion, and creative code by <strong>Lokesh Kumar</strong>.</p>
+
+      <div class="world-cards-grid">
+        <div class="world-card">
+          <div class="world-card-icon">🧸</div>
+          <h3>Procedural Living ASCII</h3>
+          <p>Real-time 60 FPS rasterization of transparent watercolors into glowing 24-bit RGB ASCII characters with physical breathing and wave kinematics.</p>
+        </div>
+
+        <div class="world-card">
+          <div class="world-card-icon">🕊️</div>
+          <h3>Carrier Pigeon Dove Physics</h3>
+          <p>Kinematic sine-wave wing flapping (13 Hz) with cubic Bezier trajectory descent and feather stardust particle dissipation.</p>
+        </div>
+
+        <div class="world-card">
+          <div class="world-card-icon">✨</div>
+          <h3>Synthesized Web Audio</h3>
+          <p>Zero external MP3 dependencies. 100% procedurally synthesized music box chimes, love chords, and tactile acoustic clicks.</p>
+        </div>
+
+        <div class="world-card">
+          <div class="world-card-icon">🌌</div>
+          <h3>Multi-Theme Starlight Engine</h3>
+          <p>Seamless real-time switching between Cosmic Aurora, Cyber Rose, Golden Honey, and Dreamy Lavender atmospheres.</p>
+        </div>
+      </div>
+
+      <div class="world-modal-footer">
+        <a href="https://github.com/lokeshkumar143" target="_blank" rel="noopener noreferrer" class="world-github-btn">
+          <span>View on GitHub ↗</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Feedback -->
+  <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
+
+  <script type="module" src="js/app.js?v=5.0"></script>
 </body>
 </html>

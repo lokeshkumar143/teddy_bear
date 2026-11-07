@@ -9,9 +9,8 @@
  *   4. Love Balloon: Joyful watercolor teddy bear holding a grand "Love" heart balloon.
  * - Solid 24-Bit True-Color Glowing Colored ASCII Rasterization at 60 FPS (zero holes or missing rows).
  * - Organic Emergence & Breathing Physics (slow upward reveal from bottom floor).
- * - Multi-Teddy Switching with instant response and zero asset reload latency.
- * - Floating Golden Stardust Fireflies & Crimson Heart Sparks.
- * - Responsive: dynamic uniform density across desktop, tablet, and mobile.
+ * - Interactive Waves, Heart Pulses, and Multi-Teddy Switching.
+ * - Responsive: Dual-stage composition on desktop, beautifully centered on mobile.
  */
 
 export class AsciiTeddy {
@@ -26,35 +25,31 @@ export class AsciiTeddy {
     this.t0 = undefined;
     this.lastDraw = -1e9;
 
+    // Interactive action triggers
+    this.waveTime = -1e9;
+    this.heartPulseTime = -1e9;
+
     // Multi-Teddy Gallery Configuration
     this.teddyAssets = [
       {
         id: 'hugging-heart',
         title: 'Hugging Heart',
-        src: 'assets/teddy-1-clean.png',
-        aspect: 570 / 570,
-        balloon: false
+        src: 'assets/teddy-1-clean.png'
       },
       {
         id: 'sweet-dreams',
         title: 'Sweet Dreams',
-        src: 'assets/teddy-2-clean.png',
-        aspect: 500 / 500,
-        balloon: false
+        src: 'assets/teddy-2-clean.png'
       },
       {
         id: 'heart-balloon',
         title: 'Heart Balloon',
-        src: 'assets/teddy-3-clean.png',
-        aspect: 529 / 378,
-        balloon: true
+        src: 'assets/teddy-3-clean.png'
       },
       {
         id: 'love-balloon',
         title: 'Love Balloon',
-        src: 'assets/teddy-4-clean.png',
-        aspect: 800 / 800,
-        balloon: true
+        src: 'assets/teddy-4-clean.png'
       }
     ];
 
@@ -113,10 +108,10 @@ export class AsciiTeddy {
     }
 
     this.isPortrait = cssH > cssW;
-    this.charAspect = 0.54;
+    this.charAspect = 0.55;
 
-    // Crisp uniform cell height (~7.2 - 8.2 CSS pixels)
-    const targetCellH = Math.max(7.2, Math.min(8.2, cssH / 115));
+    // Crisp uniform cell height (~7.0 - 8.2 CSS pixels)
+    const targetCellH = Math.max(7.0, Math.min(8.2, cssH / 115));
     this.rows = Math.max(85, Math.min(135, Math.round(cssH / targetCellH)));
     this.columns = Math.round(this.rows * (w / h) / this.charAspect);
 
@@ -140,6 +135,14 @@ export class AsciiTeddy {
     this.hasTriggeredReveal = false;
     this.switchStartTime = performance.now();
     this.isSwitching = true;
+  }
+
+  triggerWave() {
+    this.waveTime = performance.now();
+  }
+
+  triggerHeartPulse() {
+    this.heartPulseTime = performance.now();
   }
 
   nextTeddy() {
@@ -171,11 +174,23 @@ export class AsciiTeddy {
     const emerge = this.smoothstep(0.0, 3.5, t);
     const isFullyRevealed = t >= 3.5;
 
-    // Living organic breathing (gentle 1.8% pulse)
-    const breath = isFullyRevealed ? 1.0 + 0.018 * Math.sin(t * 1.8) : 1.0;
+    // Living organic breathing
+    const breath = isFullyRevealed ? 1.0 + 0.016 * Math.sin(t * 1.8) : 1.0;
+
+    // Interactive waving motion (if triggered in last 2.5s)
+    const waveElapsed = (now - this.waveTime) / 1000;
+    const isWaving = waveElapsed >= 0 && waveElapsed < 2.5;
+    const waveAngle = isWaving ? Math.sin(waveElapsed * 10) * 0.08 * (1 - waveElapsed / 2.5) : 0;
+
+    // Interactive heart pulse (if triggered or automatic rhythm)
+    const pulseElapsed = (now - this.heartPulseTime) / 1000;
+    const isPulsing = (pulseElapsed >= 0 && pulseElapsed < 1.6);
+    const pulseIntensity = isPulsing 
+      ? Math.sin(pulseElapsed * 8) * (1 - pulseElapsed / 1.6) 
+      : 0.25 * Math.max(0, Math.sin(t * 2.8));
 
     // Multi-harmonic gentle breeze sway
-    const windSway = Math.sin(t * 0.9) * 2.2 + Math.sin(t * 1.5) * 1.0;
+    const windSway = Math.sin(t * 0.9) * 1.8 + Math.sin(t * 1.4) * 0.8;
 
     // Trigger reveal callback once fully emerged
     if (t >= 3.5 && !this.hasTriggeredReveal) {
@@ -198,9 +213,10 @@ export class AsciiTeddy {
       const sH = this.stageCanvas.height;
       this.stageCtx.clearRect(0, 0, sW, sH);
 
-      // Draw active teddy centered on stage canvas with breathing scale
+      // Draw active teddy centered on stage canvas with breathing and wave physics
       this.stageCtx.save();
       this.stageCtx.translate(sW * 0.5, sH * 0.5);
+      this.stageCtx.rotate(waveAngle);
       this.stageCtx.scale(breath, breath);
       this.stageCtx.translate(-sW * 0.5, -sH * 0.5);
 
@@ -228,19 +244,29 @@ export class AsciiTeddy {
 
       this.stageCtx.restore();
 
-      // Draw stage onto simulation grid
+      // Dual-stage layout: on desktop, teddy sits comfortably on the center-left
+      // On mobile / portrait, teddy is centered in the upper viewport
+      const winW = window.innerWidth || 800;
       const winH = window.innerHeight || 800;
-      const isShort = winH < 720;
-      const targetHeightRatio = isPortrait ? 0.64 : (isShort ? 0.58 : 0.64);
-      const maxH = rows * targetHeightRatio;
-      const maxW = cols * (isPortrait ? 0.88 : 0.48);
+      const isDualStage = !isPortrait && winW > 920;
 
-      const teddyRatio = (sH / sW) * this.charAspect;
-      const drawW = Math.min(maxW, maxH / teddyRatio);
-      const drawH = drawW * teddyRatio;
-      const drawX = (cols - drawW) / 2;
-      // Position teddy comfortably in upper-to-mid viewport so top bar and note card sit cleanly
-      const drawY = rows * (isShort ? 0.04 : (isPortrait ? 0.06 : 0.07));
+      const targetHeightRatio = isDualStage ? 0.70 : (isPortrait ? 0.58 : 0.65);
+      const maxH = rows * targetHeightRatio;
+      const maxW = cols * (isDualStage ? 0.44 : (isPortrait ? 0.86 : 0.52));
+
+      // Compensate for character font aspect ratio (0.55) so teddy retains 1:1 geometry
+      const stageAspect = (drawImgH / drawImgW);
+      const cellAspectCorrection = this.charAspect; 
+      const drawW = Math.min(maxW, maxH / (stageAspect * cellAspectCorrection));
+      const drawH = drawW * stageAspect * cellAspectCorrection;
+
+      const drawX = isDualStage 
+        ? Math.round(cols * 0.26 - drawW * 0.5) 
+        : Math.round((cols - drawW) * 0.5);
+
+      const drawY = isDualStage
+        ? Math.round((rows - drawH) * 0.46)
+        : Math.round(rows * (winH < 650 ? 0.04 : 0.08));
 
       // Sinuous gentle sway anchored at feet base
       const anchorScreenX = drawX + drawW * 0.5;
@@ -251,7 +277,7 @@ export class AsciiTeddy {
       this.simCtx.rotate(windSway * 0.002);
       this.simCtx.translate(-anchorScreenX, -anchorScreenY);
 
-      this.simCtx.drawImage(this.stageCanvas, drawX, drawY, drawW, drawH);
+      this.simCtx.drawImage(this.stageCanvas, imgX, imgY, drawImgW, drawImgH, drawX, drawY, drawW, drawH);
       this.simCtx.restore();
     }
 
@@ -295,7 +321,7 @@ export class AsciiTeddy {
         let isStardust = false;
         if (alpha < 0.08 && pv > 0) {
           const hash = Math.sin(c * 17.1 + (r + stardustTime) * 31.7) * 43758.5453;
-          if ((hash - Math.floor(hash)) < 0.006) {
+          if ((hash - Math.floor(hash)) < 0.005) {
             isStardust = true;
             red = 255;
             grn = 220;
@@ -308,58 +334,50 @@ export class AsciiTeddy {
         const maxC = Math.max(red, grn, blu);
         let lum = (0.55 * (maxC / 255) + 0.45 * (0.299 * red + 0.587 * grn + 0.114 * blu) / 255);
 
-        let char;
-        let finalCol;
+        let char = '#';
+        let finalCol = 'rgb(200, 150, 100)';
         let isHeart = false;
+
+        // Accurate Heart vs Plush Fur classification (Prevents brown fur from turning red)
+        const isHeartColor = (red - grn > 40) && (red - blu > 40) && (red > 120);
+        const isDarkEyes = (red < 65) && (grn < 65) && (blu < 65);
+        const isMuzzleHighlight = !isHeartColor && !isDarkEyes && (red > 220) && (grn > 195) && (blu > 170);
 
         if (isStardust) {
           char = '✦';
           finalCol = `rgba(255, 225, 130, ${0.7 + 0.3 * Math.sin(t * 4 + r)})`;
-        } else if (red > grn * 1.22 && red > blu * 1.15) {
-          // ==================================================================
+        } else if (isHeartColor) {
           // Radiant Glowing Velvet Crimson Red Heart & Balloons
-          // ZERO HOLES: Use dense heart glyphs and high-brightness stars
-          // ==================================================================
           isHeart = true;
-          const rBoost = Math.min(255, Math.floor(red * 1.20 + 25));
-          const gDrop = Math.floor(grn * 0.78);
-          const bDrop = Math.floor(blu * 0.78);
+          const rBoost = Math.min(255, Math.floor(red * 1.15 + 25 + pulseIntensity * 40));
+          const gDrop = Math.floor(grn * 0.70);
+          const bDrop = Math.floor(blu * 0.70);
           finalCol = `rgb(${rBoost}, ${gDrop}, ${bDrop})`;
-          char = lum > 0.65 ? '♥' : '♦';
-        } else if (red < 65 && grn < 65 && blu < 65) {
-          // ==================================================================
-          // Expressive Eyes, Nose & Snout Details (Dark Chocolate)
-          // NEVER SKIP: Render with solid chocolate characters
-          // ==================================================================
-          finalCol = 'rgb(40, 22, 12)';
+          char = (lum > 0.60 || isPulsing) ? '♥' : '♦';
+        } else if (isDarkEyes) {
+          // Expressive eyes, nose & snout contours (Dark Chocolate)
+          finalCol = 'rgb(30, 14, 6)';
           char = '@';
-        } else if (red > 215 && grn > 185 && blu > 155) {
-          // ==================================================================
-          // Snout, Muzzle Highlights & Soft Cheeks (Warm Cream / Peach)
-          // NEVER DELETE: Render as bright glowing cream characters
-          // ==================================================================
-          const rCol = Math.min(255, Math.floor(red * 1.05));
-          const gCol = Math.min(255, Math.floor(grn * 1.02));
-          const bCol = Math.min(255, Math.floor(blu * 0.95));
-          finalCol = `rgb(${rCol}, ${gCol}, ${bCol})`;
+        } else if (isMuzzleHighlight) {
+          // Soft warm cream muzzle, snout & cheek highlights
+          finalCol = 'rgb(248, 230, 205)';
           char = '%';
         } else {
-          // ==================================================================
-          // Warm Plush Teddy Bear Fur (Honey Gold, Amber & Cinnamon)
-          // Solid dense character selection: + * # % @ $ &
-          // ==================================================================
-          const rBoost = Math.min(255, Math.floor(red * 1.14 + 10));
-          const gBoost = Math.min(255, Math.floor(grn * 1.05 + 5));
-          const bVal = Math.floor(blu * 0.95);
-          finalCol = `rgb(${rBoost}, ${gBoost}, ${bVal})`;
+          // Warm Plush Honey-Amber Fur (Rich golden caramel & cinnamon brown)
+          const rFur = Math.min(255, Math.floor(red * 1.04 + 8));
+          const gFur = Math.min(240, Math.floor(grn * 0.94));
+          const bFur = Math.max(0, Math.floor(blu * 0.82 - 8));
+          finalCol = `rgb(${rFur}, ${gFur}, ${bFur})`;
+
           const charIdx = Math.min(this.bodyChars.length - 1, Math.floor(lum * this.bodyChars.length));
           char = this.bodyChars[charIdx] || '#';
         }
 
         // Luminous glowing character rendering with highlight glow
         if (isHeart || lum > 0.65 || isStardust) {
-          ctx.shadowColor = isHeart ? 'rgba(255, 30, 80, 0.85)' : finalCol;
-          ctx.shadowBlur = dpr > 1 ? 5 : 3;
+          const glowRadius = isHeart ? (isPulsing ? 14 : 7) : (dpr > 1 ? 5 : 3);
+          ctx.shadowColor = isHeart ? 'rgba(255, 40, 90, 0.95)' : finalCol;
+          ctx.shadowBlur = glowRadius;
         } else {
           ctx.shadowBlur = 0;
         }
