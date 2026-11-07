@@ -2,13 +2,12 @@
  * teddyGeometry.js
  * ============================================================================
  * Mathematical Anatomy, Parametric Curves & Signed Distance Fields (SDF)
- * for the Professional Chibi Teddy Bear Character.
+ * for the Adorable Chibi Plush Teddy Bear holding a Glowing Heart.
  * ============================================================================
  */
 
 class TeddyGeometry {
   constructor() {
-    // Coordinate space mapping (Hero center in 1080x1920)
     this.CENTER_X = 540.0;
     this.CENTER_Y = 800.0;
     this.SCENE_SCALE = 1050.0;
@@ -16,7 +15,7 @@ class TeddyGeometry {
 
   /**
    * Evaluates the anatomical shapes at normalized scene coordinate (nx, ny).
-   * Returns: { part, z, depth, isBadge, badgeChar, localU, localV }
+   * Returns: { part, z, depth, isBadge, badgeChar, isEdge, hy }
    */
   evalPoint(nx, ny, animState, nameStr = "", isBadgeCol = false, bChar = "") {
     const heartScale = animState ? animState.heartScale : 1.0;
@@ -24,213 +23,171 @@ class TeddyGeometry {
     const waveProgress = animState ? animState.waveTimer : 0.0;
     const blinkValue = animState ? animState.blinkValue : 0.0;
 
-    // ------------------------------------------------------------------------
-    // 1. Radiant Cardioid Heart (held against chest)
-    // ------------------------------------------------------------------------
-    const hx = nx / (0.22 * heartScale);
-    const hy = -(ny - 0.16) / (0.20 * heartScale); // Positive upwards
-    const distSqL = Math.pow(hx + 0.38, 2) + Math.pow(hy - 0.20, 2);
-    const distSqR = Math.pow(hx - 0.38, 2) + Math.pow(hy - 0.20, 2);
-    const cL = distSqL <= 0.44 * 0.44;
-    const cR = distSqR <= 0.44 * 0.44;
-    const inWedge = (hy <= 0.20) && (hy >= 1.15 * Math.abs(hx) - 0.85) && (Math.abs(hx) <= 0.82);
-    const isHeart = cL || cR || inWedge;
+    // Normalization mapping to fit comfortably inside the 70x68 grid
+    const nxN = nx * 0.95;
+    const nyN = ny * 1.25 + 0.02;
 
-    // Edge detection for crisp luminous heart contour
-    const isEdgeL = cL && (distSqL >= 0.35 * 0.35);
-    const isEdgeR = cR && (distSqR >= 0.35 * 0.35);
-    const isEdgeW = inWedge && (Math.abs(hy - (1.15 * Math.abs(hx) - 0.85)) < 0.12 || Math.abs(hx) >= 0.72);
-    const isHeartEdge = isHeart && (isEdgeL || isEdgeR || isEdgeW);
+    // ------------------------------------------------------------------------
+    // 1. Radiant Algebraic Cardioid Heart (nestled in center of chest)
+    // ------------------------------------------------------------------------
+    const hx = nxN / (0.19 * heartScale);
+    const hy = -(nyN - 0.17) / (0.16 * heartScale); // Positive upwards
+    const hEq = Math.pow(hx * hx + hy * hy - 1.0, 3) - (hx * hx) * Math.pow(hy, 3);
+    const isHeart = (hEq <= 0.0);
+    const isHeartEdge = isHeart && (hEq >= -0.28);
 
-    // Single-line clean embroidered badge across center of heart (Row 40)
+    // Single-line clean embroidered badge across center of heart (Row 42)
     let isBadge = isHeart && isBadgeCol;
     let badgeChar = isBadge ? bChar : "";
 
     // ------------------------------------------------------------------------
-    // 2. Ears (Round puffy spheres with inner cavity)
+    // 2. Paws Holding the Heart (Left and Right)
     // ------------------------------------------------------------------------
-    const earL = Math.pow((nx + 0.25) / 0.098, 2) + Math.pow((ny + 0.38) / 0.082, 2) <= 1.0;
-    const earR = Math.pow((nx - 0.25) / 0.098, 2) + Math.pow((ny + 0.38) / 0.082, 2) <= 1.0;
-    const isEar = earL || earR;
+    let rpawX = 0.17;
+    let rpawY = 0.17;
+    if (isWaving) {
+      rpawX = 0.28 + Math.sin(waveProgress * 8.0) * 0.04;
+      rpawY = -0.05 + Math.cos(waveProgress * 8.0) * 0.02;
+    }
 
-    const earInL = Math.pow((nx + 0.25) / 0.055, 2) + Math.pow((ny + 0.38) / 0.048, 2) <= 1.0;
-    const earInR = Math.pow((nx - 0.25) / 0.055, 2) + Math.pow((ny + 0.38) / 0.048, 2) <= 1.0;
-    const isEarIn = earInL || earInR;
-
-    // ------------------------------------------------------------------------
-    // 3. Head & Cheeks (Rounded dome with chubby cheeks)
-    // ------------------------------------------------------------------------
-    const headD = Math.pow(nx / 0.28, 2) + Math.pow((ny + 0.18) / 0.22, 2);
-    const isHead = headD <= 1.0;
+    const lpawD = Math.pow((nxN + 0.17) / 0.080, 2) + Math.pow((nyN - 0.17) / 0.060, 2);
+    const rpawD = Math.pow((nxN - rpawX) / 0.080, 2) + Math.pow((nyN - rpawY) / 0.060, 2);
+    const isPaw = (lpawD <= 1.0) || (rpawD <= 1.0);
+    const isPawPad = (lpawD <= 0.35) || (rpawD <= 0.35);
 
     // ------------------------------------------------------------------------
-    // 4. Snout (Distinct forward muzzle)
+    // 3. Silk Ribbon Bow on collar (under chin, above heart)
     // ------------------------------------------------------------------------
-    const snoutD = Math.pow(nx / 0.115, 2) + Math.pow((ny + 0.10) / 0.068, 2);
-    const isSnout = snoutD <= 1.0;
+    const bowKnot = Math.pow(nxN / 0.030, 2) + Math.pow((nyN + 0.01) / 0.024, 2) <= 1.0;
+    const bowL = Math.pow((nxN + 0.062) / 0.050, 2) + Math.pow((nyN + 0.01) / 0.032, 2) <= 1.0;
+    const bowR = Math.pow((nxN - 0.062) / 0.050, 2) + Math.pow((nyN + 0.01) / 0.032, 2) <= 1.0;
+    const isBow = bowKnot || bowL || bowR;
 
     // ------------------------------------------------------------------------
-    // 5. Nose & Sweet Smile
+    // 4. Large Sparkling Eyes & Specular Highlights
     // ------------------------------------------------------------------------
-    const noseD = Math.pow(nx / 0.035, 2) + Math.pow((ny + 0.125) / 0.022, 2);
-    const isNose = noseD <= 1.0;
-
-    const isMouth = (Math.abs(nx) < 0.038) && (-0.095 <= ny && ny <= -0.072);
-
-    // ------------------------------------------------------------------------
-    // 6. Eyes & Highlights (Large glossy anime kawaii eyes)
-    // ------------------------------------------------------------------------
-    const eyeH = 0.040 * Math.max(0.15, 1.0 - blinkValue * 0.85);
-    const eyeL = Math.pow((nx + 0.11) / 0.032, 2) + Math.pow((ny + 0.20) / eyeH, 2) <= 1.0;
-    const eyeR = Math.pow((nx - 0.11) / 0.032, 2) + Math.pow((ny + 0.20) / eyeH, 2) <= 1.0;
+    const eyeH = 0.038 * Math.max(0.15, 1.0 - blinkValue * 0.85);
+    const eyeL = Math.pow((nxN + 0.115) / 0.030, 2) + Math.pow((nyN + 0.26) / eyeH, 2) <= 1.0;
+    const eyeR = Math.pow((nxN - 0.115) / 0.030, 2) + Math.pow((nyN + 0.26) / eyeH, 2) <= 1.0;
     const isEye = eyeL || eyeR;
 
-    const eyeHlL = Math.pow((nx + 0.118) / 0.012, 2) + Math.pow((ny + 0.215) / 0.014, 2) <= 1.0;
-    const eyeHlR = Math.pow((nx - 0.098) / 0.012, 2) + Math.pow((ny + 0.215) / 0.014, 2) <= 1.0;
+    const eyeHlL = Math.pow((nxN + 0.12) / 0.012, 2) + Math.pow((nyN + 0.27) / 0.015, 2) <= 1.0;
+    const eyeHlR = Math.pow((nxN - 0.10) / 0.012, 2) + Math.pow((nyN + 0.27) / 0.015, 2) <= 1.0;
     const isEyeHl = (blinkValue < 0.5) && (eyeHlL || eyeHlR);
 
     // ------------------------------------------------------------------------
-    // 7. Rosy Cheeks Blush
+    // 5. Cute Button Nose & Sweet Smile
     // ------------------------------------------------------------------------
-    const blushL = Math.pow((nx + 0.185) / 0.045, 2) + Math.pow((ny + 0.12) / 0.030, 2) <= 1.0;
-    const blushR = Math.pow((nx - 0.185) / 0.045, 2) + Math.pow((ny + 0.12) / 0.030, 2) <= 1.0;
+    const noseD = Math.pow(nxN / 0.038, 2) + Math.pow((nyN + 0.19) / 0.024, 2);
+    const isNose = (noseD <= 1.0);
+
+    const isMouth = (Math.abs(nxN) < 0.012 && -0.17 <= nyN && nyN <= -0.13) ||
+                    ((nxN * nxN + Math.pow(nyN + 0.13, 2) <= 0.032 * 0.032) && nyN >= -0.13 && Math.abs(nxN) < 0.040);
+
+    // ------------------------------------------------------------------------
+    // 6. Snout (Muzzle) & Soft Rosy Cheek Blush
+    // ------------------------------------------------------------------------
+    const snoutD = Math.pow(nxN / 0.13, 2) + Math.pow((nyN + 0.16) / 0.08, 2);
+    const isSnout = (snoutD <= 1.0);
+
+    const blushL = Math.pow((nxN + 0.18) / 0.032, 2) + Math.pow((nyN + 0.18) / 0.020, 2) <= 1.0;
+    const blushR = Math.pow((nxN - 0.18) / 0.032, 2) + Math.pow((nyN + 0.18) / 0.020, 2) <= 1.0;
     const isBlush = blushL || blushR;
 
     // ------------------------------------------------------------------------
-    // 8. Silk Bowtie under chin
+    // 7. Ears (Round puffy outer ears + softer inner cavity)
     // ------------------------------------------------------------------------
-    const bowKnot = Math.pow(nx / 0.026, 2) + Math.pow((ny + 0.015) / 0.020, 2) <= 1.0;
-    const bowL = Math.pow((nx + 0.058) / 0.040, 2) + Math.pow((ny + 0.015) / 0.025, 2) <= 1.0;
-    const bowR = Math.pow((nx - 0.058) / 0.040, 2) + Math.pow((ny + 0.015) / 0.025, 2) <= 1.0;
-    const isBow = bowL || bowR;
+    const earL_out = Math.pow((nxN + 0.26) / 0.130, 2) + Math.pow((nyN + 0.44) / 0.130, 2) <= 1.0;
+    const earR_out = Math.pow((nxN - 0.26) / 0.130, 2) + Math.pow((nyN + 0.44) / 0.130, 2) <= 1.0;
+    const isEar = earL_out || earR_out;
+
+    const earL_in = Math.pow((nxN + 0.26) / 0.075, 2) + Math.pow((nyN + 0.44) / 0.075, 2) <= 1.0;
+    const earR_in = Math.pow((nxN - 0.26) / 0.075, 2) + Math.pow((nyN + 0.44) / 0.075, 2) <= 1.0;
+    const isEarIn = earL_in || earR_in;
 
     // ------------------------------------------------------------------------
-    // 9. Arms & Paws Hugging Heart
+    // 8. Head (Round plush dome with gentle chubby cheeks)
     // ------------------------------------------------------------------------
-    // Dynamic right arm during wave:
-    let rpawX = 0.17;
-    let rpawY = 0.14;
-    let rarmX = 0.20;
-    let rarmY = 0.07;
-    if (isWaving) {
-      rpawX = 0.28 + Math.sin(waveProgress * 8.0) * 0.04;
-      rpawY = -0.04 + Math.cos(waveProgress * 8.0) * 0.02;
-      rarmX = 0.24 + Math.sin(waveProgress * 8.0) * 0.02;
-      rarmY = 0.02;
-    }
-
-    const pawL = Math.pow((nx + 0.17) / 0.065, 2) + Math.pow((ny - 0.14) / 0.055, 2) <= 1.0;
-    const pawR = Math.pow((nx - rpawX) / 0.065, 2) + Math.pow((ny - rpawY) / 0.055, 2) <= 1.0;
-    const isPaw = pawL || pawR;
-
-    const pawPadL = Math.pow((nx + 0.17) / 0.035, 2) + Math.pow((ny - 0.14) / 0.028, 2) <= 1.0;
-    const pawPadR = Math.pow((nx - rpawX) / 0.035, 2) + Math.pow((ny - rpawY) / 0.028, 2) <= 1.0;
-    const isPawPad = pawPadL || pawPadR;
-
-    const armL = Math.pow((nx + 0.20) / 0.065, 2) + Math.pow((ny - 0.07) / 0.065, 2) <= 1.0;
-    const armR = Math.pow((nx - rarmX) / 0.065, 2) + Math.pow((ny - rarmY) / 0.065, 2) <= 1.0;
-    const isArm = armL || armR;
+    const headD = Math.pow(nxN / 0.31, 2) + Math.pow((nyN + 0.23) / 0.24, 2);
+    const isHead = (headD <= 1.0);
 
     // ------------------------------------------------------------------------
-    // 10. Torso / Body (Plush pear shape)
+    // 9. Sitting Feet & Forward-Facing Foot Pads
     // ------------------------------------------------------------------------
-    const bw = 0.25 * (1.0 + 0.18 * (ny - 0.02));
-    const bodyD = Math.pow(nx / bw, 2) + Math.pow((ny - 0.18) / 0.20, 2);
-    const isBody = (bodyD <= 1.0) && (ny <= 0.34);
-
-    // ------------------------------------------------------------------------
-    // 11. Legs, Feet & Toe Beans
-    // ------------------------------------------------------------------------
-    const legL = Math.pow((nx + 0.18) / 0.08, 2) + Math.pow((ny - 0.32) / 0.06, 2) <= 1.0;
-    const legR = Math.pow((nx - 0.18) / 0.08, 2) + Math.pow((ny - 0.32) / 0.06, 2) <= 1.0;
-    const isLeg = legL || legR;
-
-    const footL = Math.pow((nx + 0.22) / 0.095, 2) + Math.pow((ny - 0.38) / 0.068, 2) <= 1.0;
-    const footR = Math.pow((nx - 0.22) / 0.095, 2) + Math.pow((ny - 0.38) / 0.068, 2) <= 1.0;
+    const footL = Math.pow((nxN + 0.22) / 0.11, 2) + Math.pow((nyN - 0.42) / 0.085, 2) <= 1.0;
+    const footR = Math.pow((nxN - 0.22) / 0.11, 2) + Math.pow((nyN - 0.42) / 0.085, 2) <= 1.0;
     const isFoot = footL || footR;
 
-    const footPadL = Math.pow((nx + 0.22) / 0.055, 2) + Math.pow((ny - 0.38) / 0.042, 2) <= 1.0;
-    const footPadR = Math.pow((nx - 0.22) / 0.055, 2) + Math.pow((ny - 0.38) / 0.042, 2) <= 1.0;
+    const footPadL = Math.pow((nxN + 0.22) / 0.070, 2) + Math.pow((nyN - 0.42) / 0.055, 2) <= 1.0;
+    const footPadR = Math.pow((nxN - 0.22) / 0.070, 2) + Math.pow((nyN - 0.42) / 0.055, 2) <= 1.0;
     const isFootPad = footPadL || footPadR;
 
-    const toe_l1 = Math.pow((nx + 0.25) / 0.016, 2) + Math.pow((ny - 0.33) / 0.014, 2) <= 1.0;
-    const toe_l2 = Math.pow((nx + 0.22) / 0.016, 2) + Math.pow((ny - 0.325) / 0.014, 2) <= 1.0;
-    const toe_l3 = Math.pow((nx + 0.19) / 0.016, 2) + Math.pow((ny - 0.33) / 0.014, 2) <= 1.0;
-    const toe_r1 = Math.pow((nx - 0.19) / 0.016, 2) + Math.pow((ny - 0.33) / 0.014, 2) <= 1.0;
-    const toe_r2 = Math.pow((nx - 0.22) / 0.016, 2) + Math.pow((ny - 0.325) / 0.014, 2) <= 1.0;
-    const toe_r3 = Math.pow((nx - 0.25) / 0.016, 2) + Math.pow((ny - 0.33) / 0.014, 2) <= 1.0;
-    const isToe = toe_l1 || toe_l2 || toe_l3 || toe_r1 || toe_r2 || toe_r3;
+    // ------------------------------------------------------------------------
+    // 10. Torso / Body (Chubby cuddly pear shape)
+    // ------------------------------------------------------------------------
+    const bw = 0.33 * (1.0 + 0.22 * (nyN - 0.05));
+    const bodyD = Math.pow(nxN / bw, 2) + Math.pow((nyN - 0.18) / 0.30, 2);
+    const isBody = (bodyD <= 1.0) && (nyN <= 0.48);
 
     // ------------------------------------------------------------------------
-    // Layer Priority Selection
+    // Layer Priority Selection (Front to Back)
     // ------------------------------------------------------------------------
     if (isBadge) {
-      return { part: "badge", z: 1.2, depth: 1.0, badgeChar: badgeChar, isBadge: true };
+      return { part: "badge", z: 1.25, depth: 1.0, badgeChar: badgeChar, isBadge: true, isEdge: false };
+    }
+    if (isPawPad) {
+      return { part: "paw_pad", z: 1.15, depth: 0.95, isBadge: false };
+    }
+    if (isPaw) {
+      const z = Math.sqrt(Math.max(0, 1.0 - Math.min(lpawD, rpawD)));
+      return { part: "paw", z: z, depth: z, isBadge: false };
+    }
+    if (bowKnot) {
+      return { part: "bow_knot", z: 1.10, depth: 1.0, isBadge: false };
+    }
+    if (isBow) {
+      return { part: "bow", z: 1.05, depth: 1.0, isBadge: false, isLeft: nxN < 0 };
     }
     if (isEyeHl) {
-      return { part: "eye_hl", z: 1.0, depth: 1.0, isBadge: false };
+      return { part: "eye_hl", z: 1.00, depth: 1.0, isBadge: false };
+    }
+    if (isNose) {
+      return { part: "nose", z: 1.10, depth: 1.0, isBadge: false };
     }
     if (isEye) {
       return { part: "eye", z: 0.95, depth: 1.0, isBadge: false };
     }
-    if (isNose) {
-      return { part: "nose", z: 1.1, depth: 1.0, isBadge: false };
-    }
     if (isMouth) {
-      return { part: "mouth", z: 1.0, depth: 1.0, isBadge: false };
-    }
-    if (bowKnot) {
-      return { part: "bow_knot", z: 1.0, depth: 1.0, isBadge: false };
-    }
-    if (isBow) {
-      return { part: "bow", z: 0.95, depth: 1.0, isBadge: false, isLeft: nx < 0 };
+      return { part: "mouth", z: 1.00, depth: 1.0, isBadge: false };
     }
     if (isBlush) {
-      return { part: "blush", z: 0.85, depth: 1.0, isBadge: false };
+      return { part: "blush", z: 0.88, depth: 1.0, isBadge: false };
     }
     if (isSnout) {
       const z = Math.sqrt(Math.max(0, 1.0 - snoutD));
       return { part: "snout", z: z, depth: z, isBadge: false };
     }
-    if (isToe) {
-      return { part: "toe", z: 0.85, depth: 0.85, isBadge: false };
-    }
     if (isFootPad) {
-      return { part: "foot_pad", z: 0.8, depth: 0.8, isBadge: false };
-    }
-    if (isPawPad) {
-      return { part: "paw_pad", z: 0.9, depth: 0.9, isBadge: false };
-    }
-    if (isPaw) {
-      const z = Math.sqrt(Math.max(0, 1.0 - Math.min(pawL, pawR)));
-      return { part: "paw", z: z, depth: z, isBadge: false };
-    }
-    if (isHeart) {
-      const z = Math.sqrt(Math.max(0, 1.0 - (hx * hx + hy * hy) / 2.0));
-      return { part: "heart", z: z, depth: z, isBadge: false, isEdge: isHeartEdge, hy: hy };
+      return { part: "foot_pad", z: 0.90, depth: 0.90, isBadge: false };
     }
     if (isFoot) {
       const z = Math.sqrt(Math.max(0, 1.0 - Math.min(footL, footR)));
       return { part: "foot", z: z, depth: z, isBadge: false };
     }
-    if (isArm) {
-      const z = Math.sqrt(Math.max(0, 1.0 - Math.min(armL, armR)));
-      return { part: "arm", z: z, depth: z, isBadge: false };
+    if (isHeart) {
+      const z = Math.sqrt(Math.max(0, 1.0 - (hx * hx + hy * hy) / 2.0));
+      return { part: "heart", z: z, depth: z, isBadge: false, isEdge: isHeartEdge, hy: hy };
     }
     if (isHead) {
       const z = Math.sqrt(Math.max(0, 1.0 - headD));
       return { part: "head", z: z, depth: z, isBadge: false };
     }
     if (isEarIn) {
-      return { part: "ear_in", z: 0.4, depth: 0.4, isBadge: false };
+      return { part: "ear_in", z: 0.65, depth: 0.65, isBadge: false };
     }
     if (isEar) {
-      const z = Math.sqrt(Math.max(0, 1.0 - Math.min(earL, earR)));
+      const z = Math.sqrt(Math.max(0, 1.0 - Math.min(earL_out, earR_out)));
       return { part: "ear_out", z: z, depth: z, isBadge: false };
-    }
-    if (isLeg) {
-      const z = Math.sqrt(Math.max(0, 1.0 - Math.min(legL, legR)));
-      return { part: "leg", z: z, depth: z, isBadge: false };
     }
     if (isBody) {
       const z = Math.sqrt(Math.max(0, 1.0 - bodyD));
@@ -253,31 +210,37 @@ class TeddyGeometry {
     const jitter = (seed / 100.0 - 0.5) * 0.024;
 
     if (part === "heart" || part === "badge") {
-      const hx = nx / 0.22;
-      const hy = -(ny - 0.16) / 0.20;
+      const hx = nx / 0.20;
+      const hy = -(ny - 0.17) / 0.16;
       const d = Math.sqrt(hx * hx + hy * hy);
-      return Math.min(0.22, Math.max(0.0, 0.18 * d)) + jitter;
+      return Math.min(0.24, Math.max(0.0, 0.20 * d)) + jitter;
     }
     if (part === "paw" || part === "paw_pad") {
-      return 0.22 + 0.10 * Math.min(1.0, Math.abs(nx) / 0.20) + jitter;
+      return 0.24 + 0.10 * Math.min(1.0, Math.abs(nx) / 0.22) + jitter;
     }
-    if (part === "body" || part === "arm") {
-      const d = Math.sqrt(Math.pow(nx / 0.26, 2) + Math.pow((ny - 0.18) / 0.20, 2));
-      return 0.32 + 0.16 * Math.min(1.0, d) + jitter;
+    if (part === "body") {
+      const d = Math.sqrt(Math.pow(nx / 0.33, 2) + Math.pow((ny - 0.18) / 0.30, 2));
+      return 0.30 + 0.18 * Math.min(1.0, d) + jitter;
     }
-    if (part === "leg" || part === "foot" || part === "foot_pad" || part === "toe") {
-      return 0.48 + 0.10 * Math.min(1.0, Math.abs(nx) / 0.25) + jitter;
+    if (part === "foot" || part === "foot_pad") {
+      return 0.48 + 0.10 * Math.min(1.0, Math.abs(nx) / 0.22) + jitter;
     }
     if (part === "head") {
-      const p = (-0.02 - ny) / 0.36;
-      return 0.58 + 0.16 * Math.min(1.0, Math.max(0.0, p)) + jitter;
+      const p = (-0.02 - ny) / 0.40;
+      return 0.54 + 0.18 * Math.min(1.0, Math.max(0.0, p)) + jitter;
     }
     if (part === "ear_out" || part === "ear_in") {
-      const p = (-0.22 - ny) / 0.20;
-      return 0.74 + 0.12 * Math.min(1.0, Math.max(0.0, p)) + jitter;
+      const p = (-0.25 - ny) / 0.25;
+      return 0.70 + 0.14 * Math.min(1.0, Math.max(0.0, p)) + jitter;
     }
-    if (part === "snout" || part === "nose" || part === "mouth" || part === "eye" || part === "eye_hl" || part === "blush" || part === "bow" || part === "bow_knot") {
-      return 0.86 + 0.12 * (seed / 100.0);
+    if (part === "snout" || part === "blush") {
+      return 0.82 + 0.06 * Math.min(1.0, Math.abs(nx) / 0.18) + jitter;
+    }
+    if (part === "nose" || part === "mouth" || part === "eye") {
+      return 0.88 + 0.06 * Math.min(1.0, Math.max(0.0, (ny + 0.25) / 0.20)) + jitter;
+    }
+    if (part === "eye_hl" || part === "bow" || part === "bow_knot") {
+      return 0.94 + 0.05 * Math.min(1.0, Math.abs(nx) / 0.12) + jitter;
     }
     return 0.5;
   }

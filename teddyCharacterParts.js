@@ -9,8 +9,8 @@
 
 class TeddyCharacterParts {
   constructor() {
-    // Standard ASCII density ramp from densest to lightest:
-    this.STANDARD_RAMP = ["@", "%", "#", "$", "&", "*", "+", "=", "-", ":", "."];
+    // Plush ASCII fur density ramp from densest to softest:
+    this.STANDARD_RAMP = ["@", "$", "&", "%", "8", "#", "x", "e", "a", "o", "*", "+"];
     this.SNOUT_RAMP = ["o", "*", "+", "=", "-", ":", "."];
     // Pure, unmistakable luminous heart glyphs:
     this.HEART_RAMP = ["♥", "❤", "♥", "💖", "♥", "✦", "♥", "❤"];
@@ -73,7 +73,7 @@ class TeddyCharacterParts {
         return extra.isLeft ? "◄" : "►";
 
       case "blush":
-        return "♥";
+        return "·";
 
       case "snout":
         return this.getCharFromRamp(this.SNOUT_RAMP, intensity);

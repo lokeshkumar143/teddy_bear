@@ -106,7 +106,7 @@ class TeddyAsciiRenderer {
     this.canonicalGrid = [];
     const badgeText = this.geo.formatBadgeText(this.anim.name);
     const badgeStartC = Math.floor((this.COLS - badgeText.length) / 2);
-    const BADGE_ROW = 40; // Aligns with radiant heart center on chest
+    const BADGE_ROW = 42; // Aligns with radiant heart center on chest
     const theme = this.anim.getTheme();
 
     for (let r = 0; r < this.ROWS; r++) {
@@ -304,10 +304,10 @@ class TeddyAsciiRenderer {
       ctx.save();
       const heartPulse = anim.heartScale || 1.0;
       const hScale = Math.min(1.0, bloomProgress * 1.2) * heartPulse;
-      const hW = this.SCENE_SCALE * 0.40 * hScale;
-      const hH = this.SCENE_SCALE * 0.30 * hScale;
+      const hW = this.SCENE_SCALE * 0.32 * hScale;
+      const hH = this.SCENE_SCALE * 0.25 * hScale;
       const hCx = this.CENTER_X;
-      const hCy = this.CENTER_Y + 0.16 * this.SCENE_SCALE;
+      const hCy = this.CENTER_Y + 0.12 * this.SCENE_SCALE;
 
       // Cardioid Heart Path
       ctx.beginPath();
@@ -380,14 +380,14 @@ class TeddyAsciiRenderer {
       const archAlpha = Math.min(1.0, (bloomProgress - 0.20) * 2.0);
       ctx.save();
       const isNarrow = (W < 520);
-      const headerFontSize = isNarrow
+      const headerFontSize = isNarrow 
         ? Math.min(14, Math.max(10, Math.floor(W * 0.032)))
         : Math.min(22, Math.max(13, Math.floor(W * 0.035)));
-      const archText = isNarrow
-        ? `✧ FOR ${anim.name.toUpperCase()} ✧`
+      const archText = isNarrow 
+        ? `✧ FOR ${anim.name.toUpperCase()} ✧` 
         : `✧ SPECIALLY CRAFTED FOR ${anim.name.toUpperCase()} ✧`;
-      const archY = isNarrow
-        ? Math.max(76, this.GRID_Y0 - 18)
+      const archY = isNarrow 
+        ? Math.max(76, this.GRID_Y0 - 18) 
         : Math.max(50, this.GRID_Y0 - 28);
 
       ctx.font = `bold ${headerFontSize}px "Fira Code", monospace`;
@@ -429,9 +429,9 @@ class TeddyAsciiRenderer {
         // Transform A: Heart pulsing
         if (cell.part === "heart" || cell.part === "badge") {
           const dx = nx - 0.0;
-          const dy = ny - 0.16;
+          const dy = ny - 0.12;
           nx = 0.0 + dx * anim.heartScale;
-          ny = 0.16 + dy * anim.heartScale;
+          ny = 0.12 + dy * anim.heartScale;
         }
 
         // Transform B: Right paw waving
@@ -626,8 +626,8 @@ class TeddyAsciiRenderer {
       const y2 = cy + Math.sin(angle) * outerDist;
 
       const streakAlpha = (1.0 - progress * 0.35) * (0.35 + 0.65 * Math.sin(i * 7 + progress * 4.0));
-      ctx.strokeStyle = i % 2 === 0
-        ? `rgba(255, 120, 180, ${streakAlpha})`
+      ctx.strokeStyle = i % 2 === 0 
+        ? `rgba(255, 120, 180, ${streakAlpha})` 
         : `rgba(180, 230, 255, ${streakAlpha})`;
       ctx.lineWidth = 1.8 + progress * 3.5;
       ctx.beginPath();
