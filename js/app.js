@@ -413,6 +413,7 @@ class PigeonTeddyApp {
 
     setTimeout(() => {
       if (this.giftBoxController) this.giftBoxController.stop();
+      if (this.giftScreen) this.giftScreen.style.display = 'none';
 
       // 2. Fade in teddy screen
       if (this.teddyScreen) {
@@ -472,6 +473,7 @@ class PigeonTeddyApp {
       }
 
       if (this.giftScreen) {
+        this.giftScreen.style.display = '';
         this.giftScreen.classList.add('active');
       }
 
@@ -483,7 +485,10 @@ class PigeonTeddyApp {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('scene') === 'teddy') {
       this.currentScreen = 'teddy';
-      if (this.giftScreen) this.giftScreen.classList.remove('active');
+      if (this.giftScreen) {
+        this.giftScreen.classList.remove('active');
+        this.giftScreen.style.display = 'none';
+      }
       if (this.teddyScreen) {
         this.teddyScreen.classList.add('active');
         this.teddyScreen.style.transition = 'none';
