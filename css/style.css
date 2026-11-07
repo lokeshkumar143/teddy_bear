@@ -204,9 +204,9 @@ body {
 }
 
 /* ==========================================================================
-   Screen 1: Carrier Pigeon & Centered Sealed Letter
+   Screen 1: Enchanted Celestial Surprise Gift Box
    ========================================================================== */
-#pigeon-canvas {
+#gift-sparkle-canvas {
   position: fixed;
   inset: 0;
   width: 100vw;
@@ -214,100 +214,426 @@ body {
   display: block;
   background: transparent;
   pointer-events: none;
-  z-index: 4;
+  z-index: 3;
 }
 
-#envelope-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  display: block;
-  background: transparent;
-  cursor: pointer;
+.gift-showcase-container {
+  position: relative;
   z-index: 5;
-}
-
-#delivery-screen:not(.active) .unseal-cta-wrapper {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-.unseal-cta-wrapper {
-  position: fixed;
-  bottom: 12%;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+
+.gift-floating-badge {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: #fffaf0;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 215, 120, 0.35);
+  padding: 8px 18px;
+  border-radius: 999px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 16px rgba(255, 215, 0, 0.2);
+  margin-bottom: 35px;
+  animation: badgeBreathe 3.5s infinite alternate ease-in-out;
+}
+
+@keyframes badgeBreathe {
+  0% { transform: translateY(0); box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 12px rgba(255,215,0,0.15); }
+  100% { transform: translateY(-4px); box-shadow: 0 6px 26px rgba(0,0,0,0.6), 0 0 24px rgba(255,70,120,0.35); }
+}
+
+/* 3D Floating Gift Box Container */
+.surprise-gift-box {
+  position: relative;
+  width: 230px;
+  height: 220px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  transition: transform 0.25s ease-out;
+  margin-bottom: 38px;
+}
+
+.surprise-gift-box:focus {
+  outline: none;
+}
+
+.surprise-gift-box:hover .gift-aura {
+  opacity: 0.95;
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.surprise-gift-box:hover .gift-tag {
+  transform: rotate(18deg) scale(1.05);
+}
+
+/* Radiant Cosmic Aura behind the Box */
+.gift-aura {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 380px;
+  height: 380px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255, 75, 130, 0.32) 0%, rgba(255, 215, 80, 0.18) 35%, rgba(140, 50, 220, 0.08) 60%, transparent 75%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.75;
+  transition: all 0.5s ease;
+  animation: auraPulse 4s infinite alternate ease-in-out;
+}
+
+@keyframes auraPulse {
+  0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.65; }
+  100% { transform: translate(-50%, -50%) scale(1.08); opacity: 0.88; }
+}
+
+/* Box Body */
+.gift-body {
+  position: absolute;
+  bottom: 0;
+  left: 15px;
+  width: 200px;
+  height: 165px;
+  background: linear-gradient(145deg, #c9184a 0%, #a4133c 45%, #800f2f 75%, #590d22 100%);
+  border-radius: 14px;
+  box-shadow: 
+    0 22px 50px rgba(0, 0, 0, 0.75),
+    inset 0 2px 6px rgba(255, 255, 255, 0.3),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.4);
+  z-index: 2;
+  overflow: visible;
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+/* Satin Ribbons on Box Body */
+.body-ribbon-v {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 36px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #d4af37 0%, #fff0a6 30%, #ffd700 50%, #e6a817 70%, #996515 100%);
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.4), inset 0 0 6px rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+}
+
+.body-ribbon-h {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 36px;
+  transform: translateY(-50%);
+  background: linear-gradient(180deg, #d4af37 0%, #fff0a6 30%, #ffd700 50%, #e6a817 70%, #996515 100%);
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.4), inset 0 0 6px rgba(255, 255, 255, 0.5);
+  border-radius: 2px;
+}
+
+/* Box Lid Wrapper */
+.gift-lid-wrapper {
+  position: absolute;
+  top: 25px;
+  left: 0;
+  width: 230px;
+  height: 60px;
+  z-index: 4;
+  transform-origin: top center;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+}
+
+.gift-lid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #d91c52 0%, #b51743 45%, #8c1033 100%);
+  border-radius: 12px;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.65),
+    inset 0 3px 6px rgba(255, 255, 255, 0.4),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.35);
+}
+
+.lid-ribbon-h {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 36px;
+  transform: translateY(-50%);
+  background: linear-gradient(180deg, #d4af37 0%, #fff0a6 30%, #ffd700 50%, #e6a817 70%, #996515 100%);
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.4);
+}
+
+.lid-ribbon-v {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 36px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #d4af37 0%, #fff0a6 30%, #ffd700 50%, #e6a817 70%, #996515 100%);
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.4);
+}
+
+/* Golden Ribbon Bow */
+.golden-bow {
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 50px;
+  z-index: 5;
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.bow-loop {
+  position: absolute;
+  top: 4px;
+  width: 44px;
+  height: 34px;
+  background: linear-gradient(135deg, #fff0a6 0%, #ffd700 45%, #d4af37 80%, #996515 100%);
+  border-radius: 50% 50% 20% 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35), inset 0 2px 5px rgba(255, 255, 255, 0.6);
+}
+
+.bow-loop-left {
+  left: 4px;
+  transform: rotate(-25deg);
+}
+
+.bow-loop-right {
+  right: 4px;
+  transform: rotate(25deg) scaleX(-1);
+}
+
+.bow-knot {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 26px;
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ffd700 50%, #b8860b 100%);
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 12px rgba(255, 215, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c9184a;
+  font-size: 13px;
+  font-weight: 900;
+  z-index: 6;
+}
+
+.bow-tail {
+  position: absolute;
+  top: 26px;
+  width: 14px;
+  height: 38px;
+  background: linear-gradient(180deg, #ffd700 0%, #d4af37 70%, #996515 100%);
+  border-radius: 2px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.bow-tail-left {
+  left: 24px;
+  transform: rotate(24deg);
+}
+
+.bow-tail-right {
+  right: 24px;
+  transform: rotate(-24deg);
+}
+
+/* Hanging Personalized Gift Tag */
+.gift-tag {
+  position: absolute;
+  top: 35px;
+  right: -24px;
   z-index: 10;
+  transform: rotate(14deg);
+  transform-origin: top left;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.tag-string {
+  width: 2px;
+  height: 22px;
+  background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%);
+  margin-left: 26px;
+  box-shadow: 0 0 4px rgba(255, 215, 0, 0.5);
+}
+
+.tag-card {
+  background: #fffcf4;
+  border: 1px solid #dfc79b;
+  border-radius: 6px;
+  padding: 8px 12px 10px;
+  width: 125px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+}
+
+.tag-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 8.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #996515;
+}
+
+.tag-name {
+  font-family: 'Caveat', cursive;
+  font-size: 21px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.tag-note {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 11.5px;
+  font-style: italic;
+  color: #7a5830;
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+/* Radiant Light Beams (Erupt on Unbox) */
+.gift-light-beams {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  transform: translateX(-50%);
+  background: #fffdf5;
+  border-radius: 50%;
+  box-shadow: 
+    0 0 60px 40px rgba(255, 235, 140, 0.8),
+    0 0 120px 80px rgba(255, 100, 160, 0.6);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.8s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.4s ease, transform 0.6s ease;
+  z-index: 1;
 }
 
-.unseal-cta-wrapper.visible {
+/* =========================================================================
+   Unboxing State Transitions
+   ========================================================================= */
+.surprise-gift-box.opening .golden-bow {
+  transform: translateX(-50%) translateY(-35px) scale(1.4);
+  opacity: 0;
+}
+
+.surprise-gift-box.opening .gift-lid-wrapper {
+  transform: translateY(-95px) rotateX(-55deg) rotateZ(12deg) scale(0.92);
+  opacity: 0;
+}
+
+.surprise-gift-box.opening .gift-light-beams {
   opacity: 1;
-  pointer-events: auto;
-  animation: ctaFloat 3.2s infinite ease-in-out;
+  transform: translateX(-50%) scale(2.8);
 }
 
-.unseal-cta-btn {
-  background: linear-gradient(135deg, rgba(255, 60, 110, 0.25), rgba(255, 180, 50, 0.20));
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1.5px solid rgba(255, 215, 120, 0.55);
+.surprise-gift-box.opening .gift-body {
+  transform: scale(0.94);
+  opacity: 0.6;
+}
+
+/* Call-To-Action Button */
+.gift-cta-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+}
+
+.gift-open-btn {
+  background: linear-gradient(135deg, rgba(255, 60, 110, 0.35) 0%, rgba(255, 180, 50, 0.30) 100%);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1.5px solid rgba(255, 215, 120, 0.65);
   border-radius: 999px;
-  padding: 12px 28px;
+  padding: 13px 32px;
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #fffaf0;
+  color: #fffdf5;
   font-family: 'Inter', sans-serif;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 2.2px;
   cursor: pointer;
-  box-shadow: 0 10px 32px rgba(255, 40, 95, 0.35), 0 0 20px rgba(255, 215, 0, 0.25);
+  box-shadow: 
+    0 12px 35px rgba(255, 40, 95, 0.4),
+    0 0 24px rgba(255, 215, 0, 0.3);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: ctaBreathe 2.8s infinite ease-in-out;
 }
 
-.unseal-cta-btn:hover {
-  transform: scale(1.06);
+.gift-open-btn:hover {
+  transform: scale(1.07);
   border-color: #ffd700;
-  background: linear-gradient(135deg, rgba(255, 60, 110, 0.45), rgba(255, 200, 80, 0.35));
-  box-shadow: 0 14px 44px rgba(255, 40, 95, 0.6), 0 0 35px rgba(255, 215, 0, 0.5);
+  background: linear-gradient(135deg, rgba(255, 60, 110, 0.55) 0%, rgba(255, 200, 80, 0.45) 100%);
+  box-shadow: 
+    0 16px 48px rgba(255, 40, 95, 0.65),
+    0 0 38px rgba(255, 215, 0, 0.55);
 }
 
-.unseal-sparkle {
+.gift-sparkle {
   color: #ffd700;
   font-size: 14px;
   animation: sparkleTwinkle 1.8s infinite alternate ease-in-out;
 }
 
-.unseal-heart-icon {
-  font-size: 16px;
+.gift-btn-icon {
+  font-size: 18px;
   display: inline-block;
-  animation: heartHop 2s infinite ease-in-out;
+  animation: giftWiggle 2.2s infinite ease-in-out;
 }
 
-.unseal-subcaption {
+.gift-subcaption {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 16px;
+  font-size: 17px;
   font-style: italic;
   letter-spacing: 1.5px;
-  color: rgba(255, 215, 230, 0.85);
-  text-shadow: 0 0 12px rgba(255, 60, 110, 0.5);
+  color: rgba(255, 220, 235, 0.9);
+  text-shadow: 0 0 14px rgba(255, 60, 110, 0.6);
   text-align: center;
   white-space: nowrap;
 }
 
-@keyframes ctaFloat {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-6px); }
+@keyframes ctaBreathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes giftWiggle {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-8deg) scale(1.1); }
+  75% { transform: rotate(8deg) scale(1.1); }
 }
 
 @keyframes sparkleTwinkle {
@@ -315,24 +641,37 @@ body {
   100% { opacity: 1.0; transform: scale(1.2); }
 }
 
-@keyframes heartHop {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-3px) scale(1.15); }
-}
-
 @media (max-width: 600px) {
-  .unseal-cta-wrapper {
-    bottom: 7%;
-    gap: 6px;
-    width: 90%;
+  .surprise-gift-box {
+    width: 195px;
+    height: 190px;
+    margin-bottom: 25px;
   }
-  .unseal-cta-btn {
-    padding: 10px 20px;
+  .gift-body {
+    left: 12px;
+    width: 170px;
+    height: 140px;
+  }
+  .gift-lid-wrapper {
+    width: 195px;
+    height: 52px;
+  }
+  .gift-tag {
+    right: -14px;
+    transform: rotate(10deg) scale(0.9);
+  }
+  .gift-open-btn {
+    padding: 11px 24px;
     font-size: 11.5px;
-    letter-spacing: 1.4px;
+    letter-spacing: 1.6px;
   }
-  .unseal-subcaption {
-    font-size: 13.5px;
+  .gift-subcaption {
+    font-size: 14px;
+  }
+  .gift-floating-badge {
+    margin-bottom: 22px;
+    font-size: 9.5px;
+    padding: 6px 14px;
   }
 }
 

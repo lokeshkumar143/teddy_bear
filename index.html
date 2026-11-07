@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=9.0">
+  <link rel="stylesheet" href="css/style.css?v=10.0">
 </head>
 <body class="theme-aurora">
 
@@ -34,23 +34,65 @@
 
   <main class="stage">
 
-    <!-- Screen 1: The Carrier Pigeon & Delivered Sealed Letter -->
-    <div id="delivery-screen" class="scene active">
-      <!-- 1. Flying ASCII Carrier Dove bringing the letter across the starry sky -->
-      <canvas id="pigeon-canvas" aria-label="ASCII Carrier Pigeon flying with love letter"></canvas>
-      
-      <!-- 2. Sealed Romantic Letter resting in Center Stage -->
-      <canvas id="envelope-canvas" aria-label="Sealed Love Letter For You"></canvas>
+    <!-- Screen 1: The Enchanted Celestial Surprise Gift Box -->
+    <div id="gift-screen" class="scene active">
+      <!-- Ambient Sparkle Canvas behind gift -->
+      <canvas id="gift-sparkle-canvas"></canvas>
 
-      <!-- 3. Enchanted Unseal Call-to-Action -->
-      <div class="unseal-cta-wrapper" id="envelope-hint">
-        <button class="unseal-cta-btn" id="unseal-btn" type="button" aria-label="Touch the sacred seal to open your gift">
-          <span class="unseal-sparkle">✦</span>
-          <span class="unseal-text">TOUCH THE SEAL TO OPEN</span>
-          <span class="unseal-heart-icon">💌</span>
-          <span class="unseal-sparkle">✦</span>
-        </button>
-        <div class="unseal-subcaption">A celestial delivery specially crafted for Loki</div>
+      <div class="gift-showcase-container">
+        <!-- Floating Header Badge -->
+        <div class="gift-floating-badge">✦ &nbsp;A SPECIAL SURPRISE IS WAITING &nbsp;✦</div>
+
+        <!-- 3D Floating Surprise Gift Box -->
+        <div id="surprise-gift-box" class="surprise-gift-box" role="button" tabindex="0" aria-label="Open your surprise gift box">
+          <div class="gift-aura"></div>
+          
+          <!-- Box Lid & Bow -->
+          <div class="gift-lid-wrapper">
+            <div class="gift-lid">
+              <div class="lid-ribbon-h"></div>
+              <div class="lid-ribbon-v"></div>
+              <!-- Golden Ribbon Bow -->
+              <div class="golden-bow">
+                <div class="bow-loop bow-loop-left"></div>
+                <div class="bow-loop bow-loop-right"></div>
+                <div class="bow-knot">❤</div>
+                <div class="bow-tail bow-tail-left"></div>
+                <div class="bow-tail bow-tail-right"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Box Body -->
+          <div class="gift-body">
+            <div class="body-ribbon-v"></div>
+            <div class="body-ribbon-h"></div>
+            
+            <!-- Hanging Gift Tag for Loki -->
+            <div class="gift-tag">
+              <div class="tag-string"></div>
+              <div class="tag-card">
+                <span class="tag-label">For:</span>
+                <span class="tag-name">Loki ❤️</span>
+                <span class="tag-note">With all my love</span>
+              </div>
+            </div>
+
+            <!-- Radiant Light Beams (erupts on open) -->
+            <div class="gift-light-beams"></div>
+          </div>
+        </div>
+
+        <!-- Call-to-action button & subcaption -->
+        <div class="gift-cta-container">
+          <button class="gift-open-btn" id="gift-open-btn" type="button" aria-label="Open your surprise gift">
+            <span class="gift-sparkle">✦</span>
+            <span class="gift-btn-text">OPEN YOUR SURPRISE</span>
+            <span class="gift-btn-icon">🎁</span>
+            <span class="gift-sparkle">✦</span>
+          </button>
+          <p class="gift-subcaption">Tap the gift box to meet your companion ✨</p>
+        </div>
       </div>
     </div>
 
@@ -214,6 +256,6 @@
   <!-- Toast Notification Feedback -->
   <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=9.0"></script>
+  <script type="module" src="js/app.js?v=10.0"></script>
 </body>
 </html>

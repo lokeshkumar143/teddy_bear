@@ -1,29 +1,32 @@
 /**
- * Romantic Carrier Pigeon & Living ASCII Teddy Bear Experience (v5.0)
+ * Romantic Celestial Universe & Living ASCII Teddy Bear Experience (v10.0)
  * 
  * Flow:
- * 1. Carrier Pigeon flies in carrying a sealed romantic letter across the starry sky.
- * 2. Pigeon delivers letter to center stage, user taps letter to open it.
- * 3. Letter burns open with sparkling embers and sweet harp chimes.
- * 4. Living 24-bit True-Color ASCII Teddy Bear emerges slowly from bottom upward.
- * 5. Up-side (top) selector bar allows switching between 4 unique teddy bears.
- * 6. Floating Polaroid photo of Loki with handwritten script and customizable photo upload.
- * 7. Interactive action buttons: Save Gift 🎁, Make Teddy Wave 👋, Pulse Heart 💖, Explore World ✨.
- * 8. Real-time theme switcher (Aurora, Rose, Honey, Twilight) and synthesized Web Audio music box.
- * 9. Pure ASCII Key signature for LOKESH KUMAR.
+ * 1. Screen 1: An Enchanted 3D Surprise Gift Box hovers in the celestial night sky.
+ *    - Velvet crimson box, gilded satin ribbons, golden heart bow, and personalized tag: "For: Loki ❤️".
+ *    - Interactive 3D mouse parallax tilt & floating stardust sparkles.
+ * 2. Unboxing Ceremony:
+ *    - User taps the gift box or "OPEN YOUR SURPRISE" button.
+ *    - Golden bow unties, 3D lid pops off, radiant light beams shoot out.
+ *    - Exploding shower of floating hearts, confetti, and golden ASCII embers!
+ * 3. Living ASCII Teddy Bear:
+ *    - Living 24-bit True-Color ASCII Teddy Bear emerges slowly from the bottom upward.
+ *    - Up-side (top) selector bar allows switching between 4 unique teddy bears.
+ *    - Floating Polaroid photo of Loki with handwritten script and custom upload.
+ *    - Interactive action buttons: Save Gift 🎁, Make Teddy Wave 👋, Pulse Heart 💖, Explore World ✨.
+ *    - Real-time theme switcher (Aurora, Rose, Honey, Twilight) and Web Audio music box.
+ *    - Pure ASCII Key signature for LOKESH KUMAR.
  */
 
-import { AmbientParticles } from './ambient-particles.js?v=9.0';
-import { AsciiPigeon } from './ascii-pigeon.js?v=9.0';
-import { AsciiEnvelope } from './ascii-envelope.js?v=9.0';
-import { AsciiTeddy } from './ascii-teddy.js?v=9.0';
-import { AudioManager } from './audio-fx.js?v=9.0';
+import { AmbientParticles } from './ambient-particles.js?v=10.0';
+import { GiftBoxController } from './gift-box.js?v=10.0';
+import { AsciiTeddy } from './ascii-teddy.js?v=10.0';
+import { AudioManager } from './audio-fx.js?v=10.0';
 
 class PigeonTeddyApp {
   constructor() {
-    this.currentScreen = 'delivery'; // 'delivery' or 'teddy'
+    this.currentScreen = 'gift'; // 'gift' or 'teddy'
     this.isTransitioning = false;
-    this.letterDelivered = false;
 
     // Atmosphere Themes
     this.themes = [
@@ -44,13 +47,15 @@ class PigeonTeddyApp {
 
   initElements() {
     this.ambientCanvas = document.getElementById('ambient-canvas');
-    this.deliveryScreen = document.getElementById('delivery-screen');
+    this.giftScreen = document.getElementById('gift-screen');
     this.teddyScreen = document.getElementById('teddy-screen');
 
-    this.pigeonCanvas = document.getElementById('pigeon-canvas');
-    this.envelopeCanvas = document.getElementById('envelope-canvas');
-    this.envelopeHint = document.getElementById('envelope-hint');
+    // Gift Screen elements
+    this.surpriseGiftBox = document.getElementById('surprise-gift-box');
+    this.giftSparkleCanvas = document.getElementById('gift-sparkle-canvas');
+    this.giftOpenBtn = document.getElementById('gift-open-btn');
 
+    // Teddy Screen elements
     this.teddyCanvas = document.getElementById('teddy-canvas');
     this.teddySelectorBar = document.getElementById('teddy-selector-bar');
     this.floatingPolaroid = document.getElementById('floating-polaroid');
@@ -87,29 +92,18 @@ class PigeonTeddyApp {
   }
 
   initRenderers() {
-    // 1. ASCII Carrier Pigeon
-    if (this.pigeonCanvas) {
-      this.pigeonRenderer = new AsciiPigeon(
-        this.pigeonCanvas,
+    // 1. Interactive 3D Celestial Surprise Gift Box
+    if (this.surpriseGiftBox && this.giftSparkleCanvas) {
+      this.giftBoxController = new GiftBoxController(
+        this.surpriseGiftBox,
+        this.giftSparkleCanvas,
         () => {
-          this.onLetterDelivered();
-        },
-        () => {
-          if (this.pigeonCanvas) {
-            this.pigeonCanvas.style.pointerEvents = 'none';
-          }
+          this.transitionToTeddy();
         }
       );
     }
 
-    // 2. Sealed Envelope in Center Stage
-    if (this.envelopeCanvas) {
-      this.envelopeRenderer = new AsciiEnvelope(this.envelopeCanvas, () => {
-        this.transitionToTeddy();
-      });
-    }
-
-    // 3. Living Colored ASCII Teddy Bear
+    // 2. Living Colored ASCII Teddy Bear
     if (this.teddyCanvas) {
       this.teddyRenderer = new AsciiTeddy(this.teddyCanvas, () => {
         // Once teddy finishes emerging, show action card and signature
@@ -124,19 +118,6 @@ class PigeonTeddyApp {
         }
       });
     }
-  }
-
-  onLetterDelivered() {
-    this.letterDelivered = true;
-    if (this.envelopeRenderer) {
-      this.envelopeRenderer.start();
-    }
-    if (this.envelopeHint) {
-      this.envelopeHint.classList.add('visible');
-    }
-    try {
-      this.audioManager.playHeartBurst();
-    } catch (e) {}
   }
 
   showToast(text) {
@@ -164,46 +145,39 @@ class PigeonTeddyApp {
   }
 
   initInteractions() {
-    const handleLetterOpen = () => {
-      if (this.currentScreen !== 'delivery' || this.isTransitioning) return;
+    // Open Gift Trigger
+    const handleGiftOpen = () => {
+      if (this.currentScreen !== 'gift' || this.isTransitioning) return;
 
       try {
         this.audioManager.init();
         this.audioManager.playHeartBurst();
+        this.audioManager.playBloomChime();
       } catch (e) {}
 
-      if (this.envelopeHint) {
-        this.envelopeHint.style.opacity = '0';
-        this.envelopeHint.style.pointerEvents = 'none';
-      }
-
-      if (this.envelopeRenderer) {
-        this.envelopeRenderer.triggerClick();
+      if (this.giftBoxController) {
+        this.giftBoxController.openGift();
+      } else {
+        this.transitionToTeddy();
       }
     };
 
-    // Click / touch to open letter
-    if (this.envelopeCanvas) {
-      this.envelopeCanvas.addEventListener('click', handleLetterOpen);
-      this.envelopeCanvas.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        handleLetterOpen();
-      }, { passive: false });
-    }
-
-    const unsealBtn = document.getElementById('unseal-btn');
-    if (unsealBtn) {
-      unsealBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        handleLetterOpen();
+    // Tap gift box
+    if (this.surpriseGiftBox) {
+      this.surpriseGiftBox.addEventListener('click', handleGiftOpen);
+      this.surpriseGiftBox.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleGiftOpen();
+        }
       });
     }
 
-    if (this.deliveryScreen) {
-      this.deliveryScreen.addEventListener('click', () => {
-        if (this.letterDelivered) {
-          handleLetterOpen();
-        }
+    // Tap open button
+    if (this.giftOpenBtn) {
+      this.giftOpenBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleGiftOpen();
       });
     }
 
@@ -219,202 +193,207 @@ class PigeonTeddyApp {
           try {
             this.audioManager.playBloomChime();
           } catch (err) {}
-          this.showToast(`Revealing ${this.teddyRenderer.teddyAssets[index].title} 🧸`);
         }
       });
     }
 
-    // Tap canvas to trigger wave or cycle teddy
-    if (this.teddyCanvas) {
-      this.teddyCanvas.addEventListener('click', (e) => {
-        if (e.target && (e.target.closest('#btn-replay') || e.target.closest('#teddy-selector-bar'))) return;
-        if (this.teddyRenderer) {
-          this.teddyRenderer.triggerHeartPulse();
-          try {
-            this.audioManager.playBloomChime();
-          } catch (err) {}
-          this.showToast("Teddy loves you! 💖");
-        }
-      });
-    }
-
-    // Theme Switcher button
+    // Theme toggle button
     if (this.themeToggleBtn) {
-      this.themeToggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.cycleTheme();
-      });
+      this.themeToggleBtn.addEventListener('click', () => this.cycleTheme());
     }
 
-    // Sound Toggle interaction
+    // Sound / Music toggle button
     if (this.soundToggleBtn) {
-      this.soundToggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
+      this.soundToggleBtn.addEventListener('click', () => {
         const isMuted = this.audioManager.toggleMute();
-        if (this.soundIcon) this.soundIcon.textContent = isMuted ? '🔇' : '🔊';
-        if (this.soundLabel) this.soundLabel.textContent = isMuted ? 'Music' : 'Playing';
         this.soundToggleBtn.classList.toggle('active', !isMuted);
-        this.showToast(isMuted ? 'Sound muted 🔇' : 'Romantic music box playing 🎶');
-      });
-    }
-
-    // Action 1: Make Teddy Wave
-    if (this.btnMakeWave) {
-      this.btnMakeWave.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (this.teddyRenderer) {
-          this.teddyRenderer.triggerWave();
-          try {
-            this.audioManager.playBloomChime();
-          } catch (err) {}
-          this.showToast("Teddy is waving at you, Loki! 👋❤️");
+        if (this.soundIcon) {
+          this.soundIcon.textContent = isMuted ? '🔇' : '🎵';
         }
-      });
-    }
-
-    // Action 2: Pulse Heart
-    if (this.btnPulseHeart) {
-      this.btnPulseHeart.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (this.teddyRenderer) {
-          this.teddyRenderer.triggerHeartPulse();
-          try {
-            this.audioManager.playHeartBurst();
-          } catch (err) {}
-          this.showToast("Teddy's heart beats just for you! 💖");
+        if (this.soundLabel) {
+          this.soundLabel.textContent = isMuted ? 'Music' : 'Playing';
         }
+        this.showToast(isMuted ? 'Music paused 🔇' : 'Celestial music box playing 🎵');
       });
     }
 
-    // Action 3: Save Gift Snapshot (high-res canvas image)
+    // Interactive Action 1: Save Gift (Capture PNG Snapshot)
     if (this.btnSaveGift) {
-      this.btnSaveGift.addEventListener('click', (e) => {
-        e.stopPropagation();
+      this.btnSaveGift.addEventListener('click', () => {
         this.saveGiftSnapshot();
       });
     }
 
-    // Action 4: Explore World Portfolio Modal
-    if (this.btnExploreWorld) {
-      this.btnExploreWorld.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (this.worldModal) {
-          this.worldModal.classList.add('active');
-          this.worldModal.setAttribute('aria-hidden', 'false');
+    // Interactive Action 2: Make Teddy Wave
+    if (this.btnMakeWave) {
+      this.btnMakeWave.addEventListener('click', () => {
+        if (this.teddyRenderer) {
+          this.teddyRenderer.triggerWave();
+          this.showToast('Teddy waves happily to you! 👋✨');
           try {
             this.audioManager.playBloomChime();
-          } catch (err) {}
+          } catch (e) {}
+        }
+      });
+    }
+
+    // Interactive Action 3: Pulse Heart
+    if (this.btnPulseHeart) {
+      this.btnPulseHeart.addEventListener('click', () => {
+        if (this.teddyRenderer) {
+          this.teddyRenderer.triggerHeartPulse();
+          this.showToast('Teddy sends a warm heartbeat! 💖✨');
+          try {
+            this.audioManager.playHeartBurst();
+          } catch (e) {}
+        }
+      });
+    }
+
+    // Interactive Action 4: Explore World (Modal)
+    if (this.btnExploreWorld) {
+      this.btnExploreWorld.addEventListener('click', () => {
+        if (this.worldModal) {
+          this.worldModal.classList.add('visible');
+          try {
+            this.audioManager.playClick();
+          } catch (e) {}
         }
       });
     }
 
     if (this.btnCloseWorld) {
-      this.btnCloseWorld.addEventListener('click', (e) => {
-        e.stopPropagation();
+      this.btnCloseWorld.addEventListener('click', () => {
         if (this.worldModal) {
-          this.worldModal.classList.remove('active');
-          this.worldModal.setAttribute('aria-hidden', 'true');
+          this.worldModal.classList.remove('visible');
         }
       });
     }
 
     if (this.worldModal) {
       this.worldModal.addEventListener('click', (e) => {
-        if (e.target.classList.contains('world-modal-backdrop')) {
-          this.worldModal.classList.remove('active');
-          this.worldModal.setAttribute('aria-hidden', 'true');
+        if (e.target === this.worldModal) {
+          this.worldModal.classList.remove('visible');
         }
       });
     }
 
-    // Floating Polaroid click to enlarge
-    if (this.floatingPolaroid) {
-      this.floatingPolaroid.addEventListener('click', (e) => {
-        if (e.target.closest('.btn-change-photo') || e.target.closest('#photo-upload-input')) return;
-        this.floatingPolaroid.classList.toggle('enlarged');
+    // Replay Button: Open the Surprise Gift Again!
+    if (this.replayBtn) {
+      this.replayBtn.addEventListener('click', () => {
+        this.restartExperience();
       });
     }
 
-    // Custom photo upload support
-    if (this.photoUploadInput) {
+    // Floating Polaroid Photo: Click to Zoom / Enlarge
+    if (this.floatingPolaroid) {
+      this.floatingPolaroid.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-change-photo') || e.target.closest('input')) return;
+        this.floatingPolaroid.classList.toggle('enlarged');
+        try {
+          this.audioManager.playClick();
+        } catch (err) {}
+      });
+    }
+
+    // Custom Photo Upload on Polaroid
+    if (this.photoUploadInput && this.polaroidImg) {
       this.photoUploadInput.addEventListener('change', (e) => {
         const file = e.target.files && e.target.files[0];
         if (file) {
           const reader = new FileReader();
-          reader.onload = (evt) => {
-            if (this.polaroidImg) {
-              this.polaroidImg.src = evt.target.result;
-              this.showToast("Polaroid photo updated! 📸❤️");
-            }
+          reader.onload = (loadEvt) => {
+            this.polaroidImg.src = loadEvt.target.result;
+            this.showToast('Custom photo framed with love! 📸✨');
+            try {
+              this.audioManager.playBloomChime();
+            } catch (err) {}
           };
           reader.readAsDataURL(file);
         }
       });
     }
 
-    // Replay interaction (send pigeon again)
-    if (this.replayBtn) {
-      this.replayBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.restartExperience();
-      });
-    }
-
-    // Keyboard navigation
+    // Key accessibility navigation
     window.addEventListener('keydown', (e) => {
-      if ((e.key === 'Enter' || e.key === ' ') && this.currentScreen === 'delivery') {
-        e.preventDefault();
-        handleLetterOpen();
-      } else if (e.key === 'ArrowRight' && this.currentScreen === 'teddy' && this.teddyRenderer) {
-        const nextIdx = this.teddyRenderer.nextTeddy();
-        this.updateTeddySelectorUI(nextIdx);
-      } else if (e.key === 'ArrowLeft' && this.currentScreen === 'teddy' && this.teddyRenderer) {
-        const prevIdx = this.teddyRenderer.prevTeddy();
-        this.updateTeddySelectorUI(prevIdx);
-      } else if (e.key === 'Escape' && this.worldModal && this.worldModal.classList.contains('active')) {
-        this.worldModal.classList.remove('active');
+      if (e.key === 'Escape' && this.worldModal && this.worldModal.classList.contains('visible')) {
+        this.worldModal.classList.remove('visible');
+      }
+      if (e.key === 'ArrowRight' && this.currentScreen === 'teddy' && this.teddyRenderer) {
+        const next = (this.teddyRenderer.currentIndex + 1) % 4;
+        this.teddyRenderer.setTeddy(next);
+        this.updateTeddySelectorUI(next);
+      }
+      if (e.key === 'ArrowLeft' && this.currentScreen === 'teddy' && this.teddyRenderer) {
+        const prev = (this.teddyRenderer.currentIndex + 3) % 4;
+        this.teddyRenderer.setTeddy(prev);
+        this.updateTeddySelectorUI(prev);
       }
     });
 
     window.addEventListener('resize', () => {
-      if (this.pigeonRenderer) this.pigeonRenderer.resize();
-      if (this.envelopeRenderer) this.envelopeRenderer.resize();
+      if (this.giftBoxController) this.giftBoxController.resize();
       if (this.teddyRenderer) this.teddyRenderer.resize();
     });
   }
 
   saveGiftSnapshot() {
-    this.showToast("Preparing your high-res gift snapshot... 🎁");
-    setTimeout(() => {
-      try {
-        if (!this.teddyCanvas) return;
-        const dataUrl = this.teddyCanvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.download = `teddy_gift_for_loki.png`;
-        link.href = dataUrl;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        this.showToast("Gift saved to your downloads! 💖");
-      } catch (err) {
-        console.error("Save snapshot error:", err);
-        this.showToast("Screenshot captured! Right click to save image.");
+    this.showToast('Crafting your magical keepsake... 📸✨');
+    try {
+      const snapCanvas = document.createElement('canvas');
+      const w = 1200;
+      const h = 1200;
+      snapCanvas.width = w;
+      snapCanvas.height = h;
+      const sCtx = snapCanvas.getContext('2d');
+
+      // Gradient background
+      const grad = sCtx.createRadialGradient(w * 0.5, h * 0.5, 100, w * 0.5, h * 0.5, 700);
+      grad.addColorStop(0, '#15132d');
+      grad.addColorStop(0.5, '#0b0c1c');
+      grad.addColorStop(1, '#05050d');
+      sCtx.fillStyle = grad;
+      sCtx.fillRect(0, 0, w, h);
+
+      // Draw living ASCII teddy
+      if (this.teddyCanvas) {
+        sCtx.drawImage(this.teddyCanvas, 100, 100, 1000, 1000);
       }
-    }, 250);
+
+      // Gilded dedication banner
+      sCtx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      sCtx.font = 'bold 36px "Inter", sans-serif';
+      sCtx.textAlign = 'center';
+      sCtx.fillText('SPECIALLY CRAFTED FOR LOKI', w * 0.5, 90);
+
+      sCtx.fillStyle = '#ff7b9f';
+      sCtx.font = 'italic 28px "Cormorant Garamond", serif';
+      sCtx.fillText('"You bring endless warmth, comfort, and happiness."', w * 0.5, h - 90);
+
+      sCtx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+      sCtx.font = '600 20px monospace';
+      sCtx.fillText('> with love : LOKESH KUMAR', w * 0.5, h - 50);
+
+      const link = document.createElement('a');
+      link.download = `loki-teddy-gift-${Date.now()}.png`;
+      link.href = snapCanvas.toDataURL('image/png');
+      link.click();
+
+      this.showToast('Keepsake saved to your device! 🎁💖');
+      try {
+        this.audioManager.playHeartBurst();
+      } catch (e) {}
+    } catch (err) {
+      console.warn('Snapshot error:', err);
+      this.showToast('Could not save snapshot directly. Take a screenshot! 📸');
+    }
   }
 
-  updateTeddySelectorUI(activeIndex) {
+  updateTeddySelectorUI(index) {
     if (!this.teddySelectorBar) return;
     const buttons = this.teddySelectorBar.querySelectorAll('.teddy-tab-btn');
-    buttons.forEach((btn) => {
-      const idx = parseInt(btn.getAttribute('data-teddy'), 10);
-      if (idx === activeIndex) {
-        btn.classList.add('active');
-        btn.setAttribute('aria-selected', 'true');
-      } else {
-        btn.classList.remove('active');
-        btn.setAttribute('aria-selected', 'false');
-      }
+    buttons.forEach((btn, idx) => {
+      btn.classList.toggle('active', idx === index);
     });
   }
 
@@ -427,14 +406,13 @@ class PigeonTeddyApp {
       this.audioManager.playBloomChime();
     } catch (e) {}
 
-    // 1. Fade out delivery screen
-    if (this.deliveryScreen) {
-      this.deliveryScreen.classList.remove('active');
+    // 1. Fade out gift screen
+    if (this.giftScreen) {
+      this.giftScreen.classList.remove('active');
     }
 
     setTimeout(() => {
-      if (this.pigeonRenderer) this.pigeonRenderer.stop();
-      if (this.envelopeRenderer) this.envelopeRenderer.stop();
+      if (this.giftBoxController) this.giftBoxController.stop();
 
       // 2. Fade in teddy screen
       if (this.teddyScreen) {
@@ -455,20 +433,19 @@ class PigeonTeddyApp {
         this.teddySelectorBar.classList.add('visible');
       }
 
-      // 4. Start living teddy: reveals slowly from the bottom upward!
+      // 4. Start living teddy: reveals slowly from bottom upward!
       if (this.teddyRenderer) {
         this.teddyRenderer.reset(false);
         this.teddyRenderer.start();
       }
 
       this.isTransitioning = false;
-    }, 550);
+    }, 450);
   }
 
   restartExperience() {
     this.isTransitioning = true;
-    this.currentScreen = 'delivery';
-    this.letterDelivered = false;
+    this.currentScreen = 'gift';
 
     if (this.giftActionCard) {
       this.giftActionCard.classList.remove('visible');
@@ -489,44 +466,24 @@ class PigeonTeddyApp {
     setTimeout(() => {
       if (this.teddyRenderer) this.teddyRenderer.stop();
 
-      if (this.envelopeRenderer) {
-        this.envelopeRenderer.reset();
-      }
-      if (this.envelopeHint) {
-        this.envelopeHint.style.opacity = '';
-        this.envelopeHint.style.pointerEvents = '';
-        this.envelopeHint.classList.remove('visible');
+      if (this.giftBoxController) {
+        this.giftBoxController.reset();
+        this.giftBoxController.startAmbientLoop();
       }
 
-      if (this.deliveryScreen) {
-        this.deliveryScreen.classList.add('active');
-      }
-
-      // Relaunch the carrier pigeon flight from top-left
-      if (this.pigeonRenderer) {
-        this.pigeonRenderer.reset();
-        this.pigeonRenderer.start();
+      if (this.giftScreen) {
+        this.giftScreen.classList.add('active');
       }
 
       this.isTransitioning = false;
-    }, 500);
+    }, 400);
   }
 
   start() {
-    // Direct URL parameter check for quick scene testing: e.g. ?scene=teddy or ?scene=envelope
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('scene') === 'envelope') {
-      this.currentScreen = 'delivery';
-      this.letterDelivered = true;
-      if (this.envelopeRenderer) {
-        this.envelopeRenderer.start();
-      }
-      if (this.envelopeHint) {
-        this.envelopeHint.classList.add('visible');
-      }
-    } else if (urlParams.get('scene') === 'teddy') {
+    if (urlParams.get('scene') === 'teddy') {
       this.currentScreen = 'teddy';
-      if (this.deliveryScreen) this.deliveryScreen.classList.remove('active');
+      if (this.giftScreen) this.giftScreen.classList.remove('active');
       if (this.teddyScreen) {
         this.teddyScreen.classList.add('active');
         this.teddyScreen.style.transition = 'none';
@@ -555,14 +512,9 @@ class PigeonTeddyApp {
         this.teddyRenderer.reset(true);
         this.teddyRenderer.start();
       }
-    } else {
-      // Normal experience: Carrier Pigeon takes flight carrying the letter
-      if (this.pigeonRenderer) {
-        this.pigeonRenderer.start();
-      }
     }
 
-    // Start ambient floating golden stardust
+    // Start ambient celestial stardust & rising hearts
     let lastTime = performance.now();
     const loop = (now) => {
       const dt = Math.min((now - lastTime) / 1000, 0.1);
