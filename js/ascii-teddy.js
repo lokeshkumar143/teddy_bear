@@ -1,15 +1,15 @@
 /**
- * Grand Living ASCII Teddy Bear Engine
+ * Grand Living ASCII Teddy Bear Engine — Zero-Gap Solid Rendering
  * 
  * Features:
- * - 4 Hand-Crafted Watercolor Teddy Bears:
+ * - 4 Hand-Crafted Solid Watercolor Teddy Bears (snouts, hearts, and highlights 100% complete):
  *   1. Hugging Heart: Standing teddy bear holding a radiant glowing red heart in its paws.
  *   2. Sweet Dreams: Sleepy teddy bear sitting and hugging a big plush heart against its cheek.
  *   3. Heart Balloon: Shy standing teddy bear with a floating red heart balloon in the breeze.
  *   4. Love Balloon: Joyful watercolor teddy bear holding a grand "Love" heart balloon.
- * - 24-Bit True-Color Glowing Colored ASCII Rasterization at 60 FPS.
- * - Organic Emergence & Breathing Physics (gentle breathing scale & breeze sway).
- * - Multi-Teddy Switching with smooth crossfade and zero asset reload latency.
+ * - Solid 24-Bit True-Color Glowing Colored ASCII Rasterization at 60 FPS (zero holes or missing rows).
+ * - Organic Emergence & Breathing Physics (slow upward reveal from bottom floor).
+ * - Multi-Teddy Switching with instant response and zero asset reload latency.
  * - Floating Golden Stardust Fireflies & Crimson Heart Sparks.
  * - Responsive: dynamic uniform density across desktop, tablet, and mobile.
  */
@@ -23,11 +23,7 @@ export class AsciiTeddy {
     this.isRunning = false;
     this.animId = null;
     this.hasTriggeredReveal = false;
-
-    // Check if direct scene test is requested
-    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-    const isDirectTest = urlParams && (urlParams.get('scene') === 'teddy' || urlParams.get('scene') === 'flower');
-    this.t0 = isDirectTest ? performance.now() - 3500 : performance.now();
+    this.t0 = undefined;
     this.lastDraw = -1e9;
 
     // Multi-Teddy Gallery Configuration
@@ -89,8 +85,9 @@ export class AsciiTeddy {
     this.stageCanvas = typeof document !== 'undefined' ? document.createElement('canvas') : null;
     this.stageCtx = this.stageCanvas ? this.stageCanvas.getContext('2d') : null;
 
-    // ASCII Character Sets
-    this.chars = " .':;!~+=*#%@$";
+    // Solid Foreground Character Palette (Dense characters to ensure ZERO gaps)
+    this.bodyChars = "+*#%@$&";
+    this.heartChars = "♥♥♥✦";
 
     this.init();
   }
@@ -118,9 +115,9 @@ export class AsciiTeddy {
     this.isPortrait = cssH > cssW;
     this.charAspect = 0.54;
 
-    // Uniform density: ~7.0 - 8.2 CSS pixels per cell
+    // Crisp uniform cell height (~7.2 - 8.2 CSS pixels)
     const targetCellH = Math.max(7.2, Math.min(8.2, cssH / 115));
-    this.rows = Math.max(90, Math.min(140, Math.round(cssH / targetCellH)));
+    this.rows = Math.max(85, Math.min(135, Math.round(cssH / targetCellH)));
     this.columns = Math.round(this.rows * (w / h) / this.charAspect);
 
     if (this.simCanvas) {
@@ -164,7 +161,7 @@ export class AsciiTeddy {
 
   renderFrame(now) {
     if (!this.canvas || !this.ctx) return;
-    const t = Math.max(0, (now - this.t0) / 1000);
+    const t = Math.max(0, (now - (this.t0 || now)) / 1000);
 
     const W = this.canvas.width;
     const H = this.canvas.height;
@@ -207,16 +204,16 @@ export class AsciiTeddy {
       this.stageCtx.scale(breath, breath);
       this.stageCtx.translate(-sW * 0.5, -sH * 0.5);
 
-      // Fit aspect ratio inside stage
+      // Uniform framing scale so all 4 bears have beautiful proportions
       const imgW = curImg.width;
       const imgH = curImg.height;
-      const scale = Math.min((sW * 0.92) / imgW, (sH * 0.92) / imgH);
+      const scale = Math.min((sW * 0.94) / imgW, (sH * 0.94) / imgH);
       const drawImgW = imgW * scale;
       const drawImgH = imgH * scale;
       const imgX = (sW - drawImgW) / 2;
       const imgY = (sH - drawImgH) / 2;
 
-      // Handle upward emergence clip during initial reveal
+      // Handle slow bottom-up emergence clip
       if (!isFullyRevealed) {
         const cutY = sH * (1.0 - emerge);
         this.stageCtx.save();
@@ -234,16 +231,16 @@ export class AsciiTeddy {
       // Draw stage onto simulation grid
       const winH = window.innerHeight || 800;
       const isShort = winH < 720;
-      const targetHeightRatio = isPortrait ? 0.62 : (isShort ? 0.58 : 0.64);
+      const targetHeightRatio = isPortrait ? 0.64 : (isShort ? 0.58 : 0.64);
       const maxH = rows * targetHeightRatio;
-      const maxW = cols * (isPortrait ? 0.90 : 0.50);
+      const maxW = cols * (isPortrait ? 0.88 : 0.48);
 
       const teddyRatio = (sH / sW) * this.charAspect;
       const drawW = Math.min(maxW, maxH / teddyRatio);
       const drawH = drawW * teddyRatio;
       const drawX = (cols - drawW) / 2;
-      // Position teddy comfortably in upper-to-mid viewport so note card sits cleanly beneath
-      const drawY = rows * (isShort ? 0.03 : (isPortrait ? 0.04 : 0.05));
+      // Position teddy comfortably in upper-to-mid viewport so top bar and note card sit cleanly
+      const drawY = rows * (isShort ? 0.04 : (isPortrait ? 0.06 : 0.07));
 
       // Sinuous gentle sway anchored at feet base
       const anchorScreenX = drawX + drawW * 0.5;
@@ -260,6 +257,7 @@ export class AsciiTeddy {
 
     // ====================================================================
     // Sample Simulation Canvas & Render 24-Bit Glowing True-Color ASCII Art
+    // ZERO-GAP GUARANTEE: font size slightly exceeds cell height for tight packing
     // ====================================================================
     const simImg = this.simCtx.getImageData(0, 0, cols, rows);
     const data = simImg.data;
@@ -269,13 +267,11 @@ export class AsciiTeddy {
 
     const cellW = W / cols;
     const cellH = H / rows;
-    const fontSize = Math.max(8, Math.round(cellH * 0.94));
+    // Overlap font size to eliminate vertical gaps between rows
+    const fontSize = Math.max(9, Math.round(cellH * 1.18));
     ctx.font = `bold ${fontSize}px Menlo, Consolas, "JetBrains Mono", monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-
-    const charCount = this.chars.length;
-    const maxCharIdx = charCount - 1;
 
     // Ambient floating golden stardust fireflies
     const stardustTime = Math.floor(t * 3.0);
@@ -295,7 +291,7 @@ export class AsciiTeddy {
 
         const posX = c * cellW + cellW * 0.5;
 
-        // Subtle ambient stardust motes in the night
+        // Ambient stardust motes outside the teddy
         let isStardust = false;
         if (alpha < 0.08 && pv > 0) {
           const hash = Math.sin(c * 17.1 + (r + stardustTime) * 31.7) * 43758.5453;
@@ -311,51 +307,58 @@ export class AsciiTeddy {
 
         const maxC = Math.max(red, grn, blu);
         let lum = (0.55 * (maxC / 255) + 0.45 * (0.299 * red + 0.587 * grn + 0.114 * blu) / 255);
-        if (lum < 0.035 && !isStardust) continue;
 
-        let charIndex = Math.min(maxCharIdx, Math.floor(lum * charCount));
-        let char = this.chars[charIndex];
-        if (isStardust) char = '✦';
-
-        // 24-BIT RICH TRUE-COLOR ENHANCEMENT FOR TEDDY & HEART
+        let char;
         let finalCol;
         let isHeart = false;
 
         if (isStardust) {
+          char = '✦';
           finalCol = `rgba(255, 225, 130, ${0.7 + 0.3 * Math.sin(t * 4 + r)})`;
-        } else if (red > grn * 1.25 && red > blu * 1.20) {
+        } else if (red > grn * 1.22 && red > blu * 1.15) {
           // ==================================================================
           // Radiant Glowing Velvet Crimson Red Heart & Balloons
+          // ZERO HOLES: Use dense heart glyphs and high-brightness stars
           // ==================================================================
           isHeart = true;
-          const rBoost = Math.min(255, Math.floor(red * 1.20 + 20));
-          const gDrop = Math.floor(grn * 0.80);
-          const bDrop = Math.floor(blu * 0.80);
+          const rBoost = Math.min(255, Math.floor(red * 1.20 + 25));
+          const gDrop = Math.floor(grn * 0.78);
+          const bDrop = Math.floor(blu * 0.78);
           finalCol = `rgb(${rBoost}, ${gDrop}, ${bDrop})`;
-          // Use hearts or dense star symbols for peak brightness
-          if (lum > 0.75) char = '♥';
-        } else if (red > 40 && grn > 25 && blu > 15 && red > blu * 1.1) {
+          char = lum > 0.65 ? '♥' : '♦';
+        } else if (red < 65 && grn < 65 && blu < 65) {
+          // ==================================================================
+          // Expressive Eyes, Nose & Snout Details (Dark Chocolate)
+          // NEVER SKIP: Render with solid chocolate characters
+          // ==================================================================
+          finalCol = 'rgb(40, 22, 12)';
+          char = '@';
+        } else if (red > 215 && grn > 185 && blu > 155) {
+          // ==================================================================
+          // Snout, Muzzle Highlights & Soft Cheeks (Warm Cream / Peach)
+          // NEVER DELETE: Render as bright glowing cream characters
+          // ==================================================================
+          const rCol = Math.min(255, Math.floor(red * 1.05));
+          const gCol = Math.min(255, Math.floor(grn * 1.02));
+          const bCol = Math.min(255, Math.floor(blu * 0.95));
+          finalCol = `rgb(${rCol}, ${gCol}, ${bCol})`;
+          char = '%';
+        } else {
           // ==================================================================
           // Warm Plush Teddy Bear Fur (Honey Gold, Amber & Cinnamon)
+          // Solid dense character selection: + * # % @ $ &
           // ==================================================================
-          const rBoost = Math.min(255, Math.floor(red * 1.12 + 10));
+          const rBoost = Math.min(255, Math.floor(red * 1.14 + 10));
           const gBoost = Math.min(255, Math.floor(grn * 1.05 + 5));
           const bVal = Math.floor(blu * 0.95);
           finalCol = `rgb(${rBoost}, ${gBoost}, ${bVal})`;
-        } else if (red < 50 && grn < 50 && blu < 50) {
-          // ==================================================================
-          // Expressive Eyes & Snout Details (Dark Chocolate with Clear Outlines)
-          // ==================================================================
-          finalCol = 'rgb(45, 25, 15)';
-          char = '@';
-        } else {
-          // General watercolor shading / highlights
-          finalCol = `rgb(${red}, ${grn}, ${blu})`;
+          const charIdx = Math.min(this.bodyChars.length - 1, Math.floor(lum * this.bodyChars.length));
+          char = this.bodyChars[charIdx] || '#';
         }
 
         // Luminous glowing character rendering with highlight glow
         if (isHeart || lum > 0.65 || isStardust) {
-          ctx.shadowColor = isHeart ? 'rgba(255, 30, 80, 0.8)' : finalCol;
+          ctx.shadowColor = isHeart ? 'rgba(255, 30, 80, 0.85)' : finalCol;
           ctx.shadowBlur = dpr > 1 ? 5 : 3;
         } else {
           ctx.shadowBlur = 0;

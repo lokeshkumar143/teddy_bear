@@ -493,3 +493,4 @@ export class AsciiPigeon {
     this.particles = [];
   }
 }
+
