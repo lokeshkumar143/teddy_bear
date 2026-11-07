@@ -1,45 +1,11 @@
 {
   "name": "teddy_bear",
   "version": "1.0.0",
-  "description": "> A romantic, full-screen procedural ASCII art universe and interactive digital gift crafted with love, code, and mathematics.",
-  "main": "index.js",
+  "description": "A romantic, full-screen procedural ASCII art universe and interactive digital gift crafted with love, code, and mathematics for Loki.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npx serve ."
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lokeshkumar143/Teddy_Bear.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/lokeshkumar143/Teddy_Bear/issues"
-  },
-  "homepage": "https://github.com/lokeshkumar143/Teddy_Bear#readme",
-  "dependencies": {
-    "@react-three/drei": "^9.122.0",
-    "@react-three/fiber": "^8.18.0",
-    "@types/canvas-confetti": "^1.9.0",
-    "@types/three": "^0.160.0",
-    "canvas-confetti": "^1.9.4",
-    "framer-motion": "^11.18.2",
-    "gsap": "^3.15.1",
-    "lucide-react": "^0.350.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "three": "^0.160.1",
-    "zustand": "^4.5.7"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.31",
-    "@types/react-dom": "^18.3.7",
-    "@vitejs/plugin-react": "^4.7.0",
-    "autoprefixer": "^10.6.2",
-    "postcss": "^8.5.32",
-    "tailwindcss": "^3.4.19",
-    "typescript": "^5.9.3",
-    "vite": "^5.4.21"
-  }
+  "keywords": ["ascii-art", "creative-web", "gift", "interactive", "web-audio"],
+  "author": "Lokesh Kumar",
+  "license": "MIT"
 }
