@@ -33,8 +33,78 @@ class SoundSynthesizer {
     this.muted = !this.muted;
     if (!this.muted) {
       this.playChime([523.25, 659.25, 783.99], 0.35); // C-Major chord
+      this.startCosmicDrone();
+    } else {
+      this.stopCosmicDrone();
     }
     return !this.muted;
+  }
+
+  startCosmicDrone() {
+    if (this.muted || !this.ctx || this.droneOscs) return;
+    try {
+      this.droneGain = this.ctx.createGain();
+      this.droneGain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+      this.droneGain.gain.exponentialRampToValueAtTime(0.02, this.ctx.currentTime + 2.5);
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(280, this.ctx.currentTime);
+
+      this.droneOscs = [110.0, 164.81, 220.0, 329.63].map((f) => {
+        const osc = this.ctx.createOscillator();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(f, this.ctx.currentTime);
+        osc.connect(filter);
+        osc.start();
+        return osc;
+      });
+
+      filter.connect(this.droneGain);
+      this.droneGain.connect(this.ctx.destination);
+    } catch (e) {}
+  }
+
+  stopCosmicDrone() {
+    if (this.droneGain && this.ctx) {
+      try {
+        this.droneGain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.8);
+        setTimeout(() => {
+          if (this.droneOscs) {
+            this.droneOscs.forEach((o) => {
+              try { o.stop(); o.disconnect(); } catch (e) {}
+            });
+            this.droneOscs = null;
+          }
+        }, 900);
+      } catch (e) {}
+    }
+  }
+
+  playWarpSweep() {
+    if (this.muted || !this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1400, this.ctx.currentTime + 1.2);
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(280, this.ctx.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(3200, this.ctx.currentTime + 1.0);
+
+      gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.07, this.ctx.currentTime + 0.5);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 1.4);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 1.4);
+    } catch (e) {}
   }
 
   playChime(notes = [659.25, 880.0], duration = 0.45) {

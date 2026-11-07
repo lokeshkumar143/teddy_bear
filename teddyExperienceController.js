@@ -319,12 +319,19 @@ class TeddyExperienceController {
   }
 
   /**
-   * Scene 10: Camera Warp to Portfolio
+   * Scene 10: Cosmic Dimensional Warp to Creative Multiverse
    */
   transitionToPortfolio() {
     this.state = "PORTAL";
     this.renderer.portalActive = true;
     this.renderer.portalProgress = 0.0;
+
+    if (this.sound) {
+      this.sound.init();
+      if (typeof this.sound.playWarpSweep === "function") {
+        this.sound.playWarpSweep();
+      }
+    }
 
     let p = 0;
     const portalDuration = 1.6;
@@ -344,6 +351,7 @@ class TeddyExperienceController {
         if (this.viewport) this.viewport.classList.add("hidden");
         if (this.portfolioScreen) {
           this.portfolioScreen.classList.remove("hidden");
+          this.portfolioScreen.classList.add("fade-in");
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
       }
@@ -353,11 +361,28 @@ class TeddyExperienceController {
   }
 
   /**
-   * Return from Portfolio to Teddy Bear Experience
+   * Return Across Space from Multiverse to Teddy Bear Realm
    */
   revisitTeddy() {
-    if (this.portfolioScreen) this.portfolioScreen.classList.add("hidden");
-    if (this.viewport) this.viewport.classList.remove("hidden");
+    if (this.sound) {
+      this.sound.init();
+      if (typeof this.sound.playMagicChime === "function") {
+        this.sound.playMagicChime();
+      }
+    }
+
+    if (this.portfolioScreen) {
+      this.portfolioScreen.classList.add("fade-out");
+      setTimeout(() => {
+        this.portfolioScreen.classList.add("hidden");
+        this.portfolioScreen.classList.remove("fade-out");
+      }, 350);
+    }
+
+    if (this.viewport) {
+      this.viewport.classList.remove("hidden");
+      this.viewport.classList.add("fade-in");
+    }
 
     this.state = "FINAL_GIFT";
     this.anim.bloomProgress = 1.0;

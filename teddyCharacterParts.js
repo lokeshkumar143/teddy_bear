@@ -12,7 +12,8 @@ class TeddyCharacterParts {
     // Standard ASCII density ramp from densest to lightest:
     this.STANDARD_RAMP = ["@", "%", "#", "$", "&", "*", "+", "=", "-", ":", "."];
     this.SNOUT_RAMP = ["o", "*", "+", "=", "-", ":", "."];
-    this.HEART_RAMP = ["♥", "❤", "#", "♥", "%", "♥", "@", "♥"];
+    // Pure, unmistakable luminous heart glyphs:
+    this.HEART_RAMP = ["♥", "❤", "♥", "💖", "♥", "✦", "♥", "❤"];
     this.PAD_RAMP = ["o", "·", "•"];
 
     // Default theme colors (Cyber Rose)
@@ -86,7 +87,7 @@ class TeddyCharacterParts {
 
       case "heart":
         if (extra.isEdge) {
-          return (Math.abs(hash) % 2 === 0) ? "█" : "♥";
+          return "♥";
         }
         const hIdx = Math.abs(hash) % this.HEART_RAMP.length;
         return this.HEART_RAMP[hIdx];
@@ -157,13 +158,12 @@ class TeddyCharacterParts {
         return { color: `rgb(${theme.snout.join(",")})`, glow: null };
 
       case "heart":
-        const isUpper = extra.hy !== undefined ? (extra.hy > 0.15) : (intensity > 0.6);
-        let hCol;
-        if (extra.isEdge && theme.heartEdge) {
-          hCol = theme.heartEdge;
-        } else {
-          hCol = isUpper ? theme.heartHighlight : theme.heartCore;
+        if (extra.isEdge) {
+          // Brilliant diamond-white contour defining the heart perimeter
+          return { color: "rgb(255, 255, 255)", glow: "rgba(255, 255, 255, 1.0)" };
         }
+        const isUpper = extra.hy !== undefined ? (extra.hy > 0.15) : (intensity > 0.6);
+        const hCol = isUpper ? theme.heartHighlight : theme.heartCore;
         return { color: `rgb(${hCol.join(",")})`, glow: theme.heartGlow };
 
       case "head": {

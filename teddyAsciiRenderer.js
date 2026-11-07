@@ -73,9 +73,15 @@ class TeddyAsciiRenderer {
       this.SCENE_SCALE = Math.min(this.height * 0.68, this.width * 0.44);
     } else {
       this.CENTER_X = this.width * 0.50;
-      // In portrait, position teddy in upper-middle to leave room for polaroid & bottom card
-      this.CENTER_Y = this.userPhoto ? this.height * 0.32 : this.height * 0.36;
-      this.SCENE_SCALE = Math.min(this.width * 0.78, this.height * 0.38);
+      // In portrait, scale dynamically for short screens like iPhone SE (568px height)
+      const isShortScreen = (this.height < 650);
+      if (isShortScreen) {
+        this.CENTER_Y = this.userPhoto ? this.height * 0.25 : this.height * 0.31;
+        this.SCENE_SCALE = Math.min(this.width * 0.66, this.height * 0.29);
+      } else {
+        this.CENTER_Y = this.userPhoto ? this.height * 0.29 : this.height * 0.34;
+        this.SCENE_SCALE = Math.min(this.width * 0.74, this.height * 0.35);
+      }
     }
 
     this.CELL_W = (this.SCENE_SCALE * 0.92) / this.COLS;
@@ -298,44 +304,49 @@ class TeddyAsciiRenderer {
       ctx.save();
       const heartPulse = anim.heartScale || 1.0;
       const hScale = Math.min(1.0, bloomProgress * 1.2) * heartPulse;
-      const hW = this.SCENE_SCALE * 0.38 * hScale;
-      const hH = this.SCENE_SCALE * 0.28 * hScale;
+      const hW = this.SCENE_SCALE * 0.40 * hScale;
+      const hH = this.SCENE_SCALE * 0.30 * hScale;
       const hCx = this.CENTER_X;
       const hCy = this.CENTER_Y + 0.16 * this.SCENE_SCALE;
 
       // Cardioid Heart Path
       ctx.beginPath();
       const topY = hCy - hH * 0.42;
-      const bottomY = hCy + hH * 0.56;
+      const bottomY = hCy + hH * 0.58;
       const cleftY = hCy - hH * 0.16;
       const leftX = hCx - hW * 0.50;
       const rightX = hCx + hW * 0.50;
 
       ctx.moveTo(hCx, cleftY);
-      ctx.bezierCurveTo(hCx - hW * 0.26, topY - hH * 0.14, leftX, topY + hH * 0.08, leftX, hCy);
+      ctx.bezierCurveTo(hCx - hW * 0.26, topY - hH * 0.16, leftX, topY + hH * 0.08, leftX, hCy);
       ctx.bezierCurveTo(leftX, hCy + hH * 0.28, hCx - hW * 0.20, bottomY - hH * 0.08, hCx, bottomY);
       ctx.bezierCurveTo(hCx + hW * 0.20, bottomY - hH * 0.08, rightX, hCy + hH * 0.28, rightX, hCy);
-      ctx.bezierCurveTo(rightX, topY + hH * 0.08, hCx + hW * 0.26, topY - hH * 0.14, hCx, cleftY);
+      ctx.bezierCurveTo(rightX, topY + hH * 0.08, hCx + hW * 0.26, topY - hH * 0.16, hCx, cleftY);
       ctx.closePath();
 
-      // Atmospheric radial gradient filling the heart
-      const heartFillGrad = ctx.createRadialGradient(hCx, hCy - hH * 0.08, 0, hCx, hCy, hW * 0.60);
+      // A. Deep velvet backdrop plate: cuts cleanly through the tummy fur
+      ctx.fillStyle = "rgba(15, 5, 12, 0.88)";
+      ctx.shadowColor = theme.heartGlow;
+      ctx.shadowBlur = 32 * heartPulse;
+      ctx.fill();
+
+      // B. Brilliant luminous inner gradient
+      const heartFillGrad = ctx.createRadialGradient(hCx, hCy - hH * 0.08, 0, hCx, hCy, hW * 0.58);
       const auraAlpha = Math.min(1.0, bloomProgress * 1.4);
-      heartFillGrad.addColorStop(0, `rgba(${theme.heartHighlight.join(",")}, ${0.60 * auraAlpha})`);
-      heartFillGrad.addColorStop(0.5, `rgba(${theme.heartCore.join(",")}, ${0.45 * auraAlpha})`);
-      heartFillGrad.addColorStop(0.85, `rgba(${theme.heartCore.join(",")}, ${0.28 * auraAlpha})`);
+      heartFillGrad.addColorStop(0, `rgba(${theme.heartHighlight.join(",")}, ${0.90 * auraAlpha})`);
+      heartFillGrad.addColorStop(0.35, `rgba(${theme.heartCore.join(",")}, ${0.85 * auraAlpha})`);
+      heartFillGrad.addColorStop(0.80, `rgba(${theme.heartCore.join(",")}, ${0.60 * auraAlpha})`);
       heartFillGrad.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = heartFillGrad;
       ctx.shadowColor = theme.heartGlow;
-      ctx.shadowBlur = 24 * heartPulse;
+      ctx.shadowBlur = 28 * heartPulse;
       ctx.fill();
 
-      // Sharp luminous heart contour border
-      const edgeCol = theme.heartEdge ? theme.heartEdge.join(",") : "255,230,240";
-      ctx.strokeStyle = `rgba(${edgeCol}, ${0.80 * auraAlpha})`;
-      ctx.lineWidth = 2.5;
+      // C. Unmistakable diamond-white neon contour border
+      ctx.strokeStyle = `rgba(255, 255, 255, ${0.95 * auraAlpha})`;
+      ctx.lineWidth = 3.0;
       ctx.shadowColor = theme.heartGlow;
-      ctx.shadowBlur = 18;
+      ctx.shadowBlur = 22 * heartPulse;
       ctx.stroke();
 
       ctx.restore();
@@ -571,7 +582,7 @@ class TeddyAsciiRenderer {
       } else {
         ctx.drawImage(this.userPhoto, imgX, imgY, imgW, imgH);
       }
-    } catch (e) {}
+    } catch (e) { }
 
     // Handwritten caption with Caveat font
     const captionFontSize = Math.max(13, Math.floor(pw * 0.08));
@@ -585,47 +596,71 @@ class TeddyAsciiRenderer {
   }
 
   /**
-   * Magical Portal Warp Explosion for Transition to Portfolio
+   * Magical Cosmic Portal Warp Explosion for Transition into the Multiverse
    */
   drawPortalWarp(progress) {
     const ctx = this.ctx;
     const cx = this.width / 2;
-    const cy = this.height * 0.45;
-    const maxR = Math.max(this.width, this.height) * 1.2;
+    const cy = this.height * 0.44;
+    const maxR = Math.max(this.width, this.height) * 1.35;
     const r = progress * maxR;
 
     ctx.save();
+
+    // 1. Hyperspace Star Streaks accelerating outward
+    const numStreaks = 72;
+    for (let i = 0; i < numStreaks; i++) {
+      const angle = (i / numStreaks) * Math.PI * 2 + progress * 3.2;
+      const innerDist = r * 0.12;
+      const outerDist = r * (0.85 + 0.35 * Math.sin(i * 11 + progress * 7.0));
+      const x1 = cx + Math.cos(angle) * innerDist;
+      const y1 = cy + Math.sin(angle) * innerDist;
+      const x2 = cx + Math.cos(angle) * outerDist;
+      const y2 = cy + Math.sin(angle) * outerDist;
+
+      const streakAlpha = (1.0 - progress * 0.35) * (0.35 + 0.65 * Math.sin(i * 7 + progress * 4.0));
+      ctx.strokeStyle = i % 2 === 0 
+        ? `rgba(255, 120, 180, ${streakAlpha})` 
+        : `rgba(180, 230, 255, ${streakAlpha})`;
+      ctx.lineWidth = 1.8 + progress * 3.5;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
+
+    // 2. Cosmic Singularity Plasma Radial Gradient
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-    grad.addColorStop(0, `rgba(255, 255, 255, ${Math.min(1.0, progress * 1.5)})`);
-    grad.addColorStop(0.3, `rgba(255, 45, 95, ${0.9 * (1.0 - progress * 0.2)})`);
-    grad.addColorStop(0.7, `rgba(255, 120, 160, ${0.7 * (1.0 - progress * 0.3)})`);
-    grad.addColorStop(1, "rgba(255, 255, 255, 0)");
+    grad.addColorStop(0, `rgba(255, 255, 255, ${Math.min(1.0, progress * 1.6)})`);
+    grad.addColorStop(0.25, `rgba(255, 77, 121, ${0.92 * (1.0 - progress * 0.2)})`);
+    grad.addColorStop(0.55, `rgba(121, 40, 202, ${0.85 * (1.0 - progress * 0.25)})`);
+    grad.addColorStop(0.85, `rgba(14, 165, 233, ${0.60 * (1.0 - progress * 0.3)})`);
+    grad.addColorStop(1, "rgba(3, 2, 6, 0)");
 
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.arc(cx, cy, r, 0, Math.PI * 2);
     ctx.fill();
 
-    const rays = 36;
-    for (let i = 0; i < rays; i++) {
-      const angle = (i / rays) * Math.PI * 2 + progress * 2.0;
-      const rayLen = r * (0.8 + 0.4 * Math.sin(angle * 4 + progress * 10));
-      const rx = cx + Math.cos(angle) * rayLen;
-      const ry = cy + Math.sin(angle) * rayLen;
-
-      ctx.strokeStyle = `rgba(255, 180, 210, ${(1.0 - progress) * 0.8})`;
-      ctx.lineWidth = 3 + (1.0 - progress) * 5;
+    // 3. Shockwave Rings
+    const rings = 4;
+    for (let j = 0; j < rings; j++) {
+      const ringR = r * (0.35 + (j / rings) * 0.65);
+      const ringAlpha = (1.0 - progress) * 0.8;
+      ctx.strokeStyle = j % 2 === 0 ? `rgba(255, 255, 255, ${ringAlpha})` : `rgba(255, 150, 200, ${ringAlpha})`;
+      ctx.lineWidth = 2 + (1.0 - progress) * 4;
       ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.lineTo(rx, ry);
+      ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
       ctx.stroke();
     }
 
-    if (progress > 0.7) {
-      const flashAlpha = (progress - 0.7) / 0.3;
-      ctx.fillStyle = `rgba(255, 245, 250, ${flashAlpha})`;
+    // 4. White-Violet Supernova Dimensional Flash
+    if (progress > 0.72) {
+      const flashAlpha = (progress - 0.72) / 0.28;
+      ctx.fillStyle = `rgba(250, 245, 255, ${flashAlpha})`;
       ctx.fillRect(0, 0, this.width, this.height);
     }
+
     ctx.restore();
   }
 }
