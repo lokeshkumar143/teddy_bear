@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "> A romantic, full-screen procedural ASCII art universe and interactive digital gift crafted with love, code, and mathematics.",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "repository": {
     "type": "git",
@@ -13,7 +16,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/lokeshkumar143/Teddy_Bear/issues"
   },
