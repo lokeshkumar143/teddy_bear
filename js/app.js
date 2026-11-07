@@ -1,23 +1,26 @@
 /**
- * A Seamless Romantic Experience — Teddy Bear Universe
- * Scene 1: The ASCII Knight (on the right) + Sealed Envelope ("FOR YOU", in bottom-left)
- * Interaction: Touch the letter -> Cellular fire ignition, burning embers, burns open
- * Scene 2: Multilingual Stardust Heart (Tamil + global languages) builds in center
- * Scene 3: Heart glides to top-left corner -> Living 24-Bit Glowing ASCII Teddy Bear emerges
- * Scene 4: Interactive Teddy Selector (all 4 teddy bears) + Love Note & Personalized ASCII Signature for Lokesh Kumar
+ * Romantic Carrier Pigeon & Living ASCII Teddy Bear Experience
+ * 
+ * Flow:
+ * 1. Pigeon flies in from top-left carrying a sealed romantic letter.
+ * 2. Pigeon swoops into center, drops the letter into center stage, then flies off.
+ * 3. User taps the sealed letter -> Letter opens with sparkling hearts, embers, and chimes.
+ * 4. Living 24-bit true-color ASCII Teddy Bear reveals slowly from the bottom upward.
+ * 5. Up-side (top) selector displays the remaining teddy buttons to switch between all 4 teddy bears.
+ * 6. Minimal love note card & personalized ASCII key signature for Lokesh Kumar.
  */
 
 import { AmbientParticles } from './ambient-particles.js';
-import { AsciiKnight } from './ascii-knight.js';
+import { AsciiPigeon } from './ascii-pigeon.js';
 import { AsciiEnvelope } from './ascii-envelope.js';
-import { AsciiHeart } from './ascii-heart.js';
 import { AsciiTeddy } from './ascii-teddy.js';
 import { AudioManager } from './audio-fx.js';
 
-class LiveAsciiLoveApp {
+class PigeonTeddyApp {
   constructor() {
-    this.currentScreen = 'knight'; // 'knight' or 'teddy'
+    this.currentScreen = 'delivery'; // 'delivery' or 'teddy'
     this.isTransitioning = false;
+    this.letterDelivered = false;
 
     this.initElements();
     this.initAmbientParticles();
@@ -29,20 +32,19 @@ class LiveAsciiLoveApp {
 
   initElements() {
     this.ambientCanvas = document.getElementById('ambient-canvas');
-    this.knightScreen = document.getElementById('knight-screen');
-    this.teddyScreen = document.getElementById('teddy-screen') || document.getElementById('flower-screen');
+    this.deliveryScreen = document.getElementById('delivery-screen');
+    this.teddyScreen = document.getElementById('teddy-screen');
 
-    this.knightCanvas = document.getElementById('knight-canvas');
+    this.pigeonCanvas = document.getElementById('pigeon-canvas');
     this.envelopeCanvas = document.getElementById('envelope-canvas');
-    this.knightHint = document.getElementById('knight-hint');
+    this.envelopeHint = document.getElementById('envelope-hint');
 
-    this.heartCanvas = document.getElementById('heart-canvas');
-    this.teddyCanvas = document.getElementById('teddy-canvas') || document.getElementById('rose-canvas');
+    this.teddyCanvas = document.getElementById('teddy-canvas');
+    this.teddySelectorBar = document.getElementById('teddy-selector-bar');
     this.cloudNote = document.getElementById('cloud-note');
     this.cornerSignature = document.getElementById('corner-signature');
     this.replayBtn = document.getElementById('btn-replay');
     this.soundToggleBtn = document.getElementById('sound-toggle-btn');
-    this.teddySelectorBar = document.getElementById('teddy-selector-bar');
   }
 
   initAmbientParticles() {
@@ -55,67 +57,81 @@ class LiveAsciiLoveApp {
   }
 
   initRenderers() {
-    // 1. Knight on the right side
-    if (this.knightCanvas) {
-      this.knightRenderer = new AsciiKnight(this.knightCanvas);
+    // 1. ASCII Carrier Pigeon
+    if (this.pigeonCanvas) {
+      this.pigeonRenderer = new AsciiPigeon(
+        this.pigeonCanvas,
+        () => {
+          // When letter is delivered to center:
+          this.onLetterDelivered();
+        },
+        () => {
+          // When pigeon departs into stars:
+          if (this.pigeonCanvas) {
+            this.pigeonCanvas.style.pointerEvents = 'none';
+          }
+        }
+      );
     }
 
-    // 2. Sealed Envelope in bottom-left
+    // 2. Sealed Envelope in Center Stage
     if (this.envelopeCanvas) {
       this.envelopeRenderer = new AsciiEnvelope(this.envelopeCanvas, () => {
-        // When envelope completes burning open, transition to the Multilingual Heart!
-        this.transitionToHeart();
+        // When envelope completes opening, transition to the Teddy Reveal!
+        this.transitionToTeddy();
       });
     }
 
-    // 3. Multilingual Love Heart (Tamil + global languages)
-    if (this.heartCanvas) {
-      this.heartRenderer = new AsciiHeart(this.heartCanvas, () => {
-        // When heart finishes building and glides to corner, reveal the living ASCII Teddy!
-        this.revealTeddy();
-      });
-    }
-
-    // 4. Living Colored ASCII Teddy Bear (with all 4 watercolor teddy styles)
+    // 3. Living Colored ASCII Teddy Bear (slow upward reveal from bottom)
     if (this.teddyCanvas) {
       this.teddyRenderer = new AsciiTeddy(this.teddyCanvas, () => {
-        // When Teddy completes emergence, ensure Note & Signature & Switcher are visible!
+        // Once teddy finishes emerging, show note card and signature
         if (this.cloudNote) {
           this.cloudNote.classList.add('visible');
         }
         if (this.cornerSignature) {
           this.cornerSignature.classList.add('visible');
         }
-        if (this.teddySelectorBar) {
-          this.teddySelectorBar.classList.add('visible');
-        }
       });
     }
   }
 
+  onLetterDelivered() {
+    this.letterDelivered = true;
+    if (this.envelopeRenderer) {
+      this.envelopeRenderer.start();
+    }
+    if (this.envelopeHint) {
+      this.envelopeHint.classList.add('visible');
+    }
+    try {
+      this.audioManager.playHeartBurst();
+    } catch (e) {}
+  }
+
   initInteractions() {
     const handleLetterOpen = () => {
-      if (this.currentScreen !== 'knight' || this.isTransitioning) return;
+      if (this.currentScreen !== 'delivery' || this.isTransitioning) return;
 
-      // 1. Play warm harmonic love chime
+      // Play warm love chime
       try {
         this.audioManager.init();
         this.audioManager.playHeartBurst();
       } catch (e) {}
 
-      // 2. Hide hint and quote gently
-      if (this.knightHint) {
-        this.knightHint.style.opacity = '0';
-        this.knightHint.style.pointerEvents = 'none';
+      // Hide hint smoothly
+      if (this.envelopeHint) {
+        this.envelopeHint.style.opacity = '0';
+        this.envelopeHint.style.pointerEvents = 'none';
       }
 
-      // 3. Trigger envelope ignition in bottom-left
+      // Open the envelope
       if (this.envelopeRenderer) {
         this.envelopeRenderer.triggerClick();
       }
     };
 
-    // Attach click / touch handlers for Letter
+    // Click / touch to open letter
     if (this.envelopeCanvas) {
       this.envelopeCanvas.addEventListener('click', handleLetterOpen);
       this.envelopeCanvas.addEventListener('touchstart', (e) => {
@@ -124,32 +140,15 @@ class LiveAsciiLoveApp {
       }, { passive: false });
     }
 
-    if (this.knightCanvas) {
-      this.knightCanvas.addEventListener('click', handleLetterOpen);
-    }
-
-    if (this.knightHint) {
-      this.knightHint.addEventListener('click', handleLetterOpen);
-    }
-
-    // Tap during heart build to fast-forward to teddy
-    if (this.teddyScreen) {
-      this.teddyScreen.addEventListener('click', (e) => {
-        if (e.target && (e.target.closest('#btn-replay') || e.target.closest('#teddy-selector-bar') || e.target.closest('#sound-toggle-btn'))) return;
-        if (this.heartRenderer && !this.heartRenderer.isDocked) {
-          this.heartRenderer.fastForward();
-        } else if (this.teddyRenderer) {
-          // Tap teddy canvas to cycle to next teddy
-          const nextIdx = this.teddyRenderer.nextTeddy();
-          this.updateTeddySelectorUI(nextIdx);
-          try {
-            this.audioManager.playBloomChime();
-          } catch (err) {}
+    if (this.deliveryScreen) {
+      this.deliveryScreen.addEventListener('click', (e) => {
+        if (this.letterDelivered) {
+          handleLetterOpen();
         }
       });
     }
 
-    // Teddy Selector Button Click Handlers
+    // Up-side (top) Teddy Selector buttons
     if (this.teddySelectorBar) {
       this.teddySelectorBar.addEventListener('click', (e) => {
         const btn = e.target.closest('.teddy-tab-btn');
@@ -165,8 +164,23 @@ class LiveAsciiLoveApp {
       });
     }
 
+    // Tap canvas to cycle to next teddy
+    if (this.teddyCanvas) {
+      this.teddyCanvas.addEventListener('click', (e) => {
+        if (e.target && (e.target.closest('#btn-replay') || e.target.closest('#teddy-selector-bar'))) return;
+        if (this.teddyRenderer) {
+          const nextIdx = this.teddyRenderer.nextTeddy();
+          this.updateTeddySelectorUI(nextIdx);
+          try {
+            this.audioManager.playBloomChime();
+          } catch (err) {}
+        }
+      });
+    }
+
+    // Keyboard navigation
     window.addEventListener('keydown', (e) => {
-      if ((e.key === 'Enter' || e.key === ' ') && this.currentScreen === 'knight') {
+      if ((e.key === 'Enter' || e.key === ' ') && this.currentScreen === 'delivery') {
         e.preventDefault();
         handleLetterOpen();
       } else if (e.key === 'ArrowRight' && this.currentScreen === 'teddy' && this.teddyRenderer) {
@@ -179,13 +193,12 @@ class LiveAsciiLoveApp {
     });
 
     window.addEventListener('resize', () => {
-      if (this.knightRenderer) this.knightRenderer.resize();
+      if (this.pigeonRenderer) this.pigeonRenderer.resize();
       if (this.envelopeRenderer) this.envelopeRenderer.resize();
-      if (this.heartRenderer) this.heartRenderer.resize();
       if (this.teddyRenderer) this.teddyRenderer.resize();
     });
 
-    // Replay interaction
+    // Replay interaction (send pigeon again)
     if (this.replayBtn) {
       this.replayBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -220,7 +233,7 @@ class LiveAsciiLoveApp {
     });
   }
 
-  transitionToHeart() {
+  transitionToTeddy() {
     if (this.isTransitioning || this.currentScreen === 'teddy') return;
     this.isTransitioning = true;
     this.currentScreen = 'teddy';
@@ -229,13 +242,13 @@ class LiveAsciiLoveApp {
       this.audioManager.playBloomChime();
     } catch (e) {}
 
-    // 1. Fade out knight screen
-    if (this.knightScreen) {
-      this.knightScreen.classList.remove('active');
+    // 1. Fade out delivery screen
+    if (this.deliveryScreen) {
+      this.deliveryScreen.classList.remove('active');
     }
 
     setTimeout(() => {
-      if (this.knightRenderer) this.knightRenderer.stop();
+      if (this.pigeonRenderer) this.pigeonRenderer.stop();
       if (this.envelopeRenderer) this.envelopeRenderer.stop();
 
       // 2. Fade in teddy screen
@@ -248,51 +261,26 @@ class LiveAsciiLoveApp {
       if (this.cornerSignature) {
         this.cornerSignature.classList.remove('visible');
       }
-      if (this.teddySelectorBar) {
-        this.teddySelectorBar.classList.remove('visible');
-      }
 
-      // 3. Start Multilingual Love Heart in center
-      if (this.heartRenderer) {
-        this.heartRenderer.reset();
-        this.heartRenderer.start();
-      }
-
-      this.isTransitioning = false;
-    }, 600);
-  }
-
-  revealTeddy() {
-    try {
-      this.audioManager.playBloomChime();
-    } catch (e) {}
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const isDirect = urlParams.get('scene') === 'teddy' || urlParams.get('scene') === 'flower';
-
-    // 1. Reveal living 24-bit glowing ASCII Teddy Bear in center
-    if (this.teddyRenderer) {
-      this.teddyRenderer.reset(isDirect);
-      this.teddyRenderer.start();
-    }
-
-    // 2. Reveal the minimal love note card, teddy switcher, & signature
-    setTimeout(() => {
-      if (this.cloudNote) {
-        this.cloudNote.classList.add('visible');
-      }
-      if (this.cornerSignature) {
-        this.cornerSignature.classList.add('visible');
-      }
+      // 3. Show up-side (top) teddy selector bar
       if (this.teddySelectorBar) {
         this.teddySelectorBar.classList.add('visible');
       }
-    }, 500);
+
+      // 4. Start living teddy: reveals slowly from the bottom upward!
+      if (this.teddyRenderer) {
+        this.teddyRenderer.reset(false);
+        this.teddyRenderer.start();
+      }
+
+      this.isTransitioning = false;
+    }, 550);
   }
 
   restartExperience() {
     this.isTransitioning = true;
-    this.currentScreen = 'knight';
+    this.currentScreen = 'delivery';
+    this.letterDelivered = false;
 
     if (this.cloudNote) {
       this.cloudNote.classList.remove('visible');
@@ -309,59 +297,49 @@ class LiveAsciiLoveApp {
 
     setTimeout(() => {
       if (this.teddyRenderer) this.teddyRenderer.stop();
-      if (this.heartRenderer) this.heartRenderer.stop();
 
       if (this.envelopeRenderer) {
         this.envelopeRenderer.reset();
       }
-      if (this.knightHint) {
-        this.knightHint.style.opacity = '';
-        this.knightHint.style.pointerEvents = '';
+      if (this.envelopeHint) {
+        this.envelopeHint.style.opacity = '';
+        this.envelopeHint.style.pointerEvents = '';
+        this.envelopeHint.classList.remove('visible');
       }
 
-      if (this.knightScreen) {
-        this.knightScreen.classList.add('active');
+      if (this.deliveryScreen) {
+        this.deliveryScreen.classList.add('active');
       }
 
-      if (this.knightRenderer) {
-        this.knightRenderer.start();
-      }
-      if (this.envelopeRenderer) {
-        this.envelopeRenderer.start();
+      // Relaunch the carrier pigeon flight from top-left
+      if (this.pigeonRenderer) {
+        this.pigeonRenderer.reset();
+        this.pigeonRenderer.start();
       }
 
       this.isTransitioning = false;
-    }, 600);
+    }, 500);
   }
 
   start() {
     // Direct URL parameter check for quick scene testing: e.g. ?scene=teddy
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('scene') === 'teddy' || urlParams.get('scene') === 'flower') {
+    if (urlParams.get('scene') === 'teddy') {
       this.currentScreen = 'teddy';
-      if (this.knightScreen) {
-        this.knightScreen.classList.remove('active');
-        this.knightScreen.style.display = 'none';
-      }
-      if (this.knightHint) {
-        this.knightHint.style.display = 'none';
-      }
+      if (this.deliveryScreen) this.deliveryScreen.classList.remove('active');
       if (this.teddyScreen) {
         this.teddyScreen.classList.add('active');
         this.teddyScreen.style.transition = 'none';
         this.teddyScreen.style.opacity = '1';
       }
+      if (this.teddySelectorBar) {
+        this.teddySelectorBar.classList.add('visible');
+      }
       if (this.cloudNote) {
-        this.cloudNote.style.transition = 'none';
         this.cloudNote.classList.add('visible');
       }
       if (this.cornerSignature) {
-        this.cornerSignature.style.transition = 'none';
         this.cornerSignature.classList.add('visible');
-      }
-      if (this.teddySelectorBar) {
-        this.teddySelectorBar.style.transition = 'none';
-        this.teddySelectorBar.classList.add('visible');
       }
 
       const teddyParam = parseInt(urlParams.get('teddy'), 10);
@@ -370,18 +348,18 @@ class LiveAsciiLoveApp {
         this.updateTeddySelectorUI(this.teddyRenderer.currentIndex);
       }
 
-      this.revealTeddy();
-    } else {
-      // Start Scene 1: Knight on right + Letter in bottom-left
-      if (this.knightRenderer) {
-        this.knightRenderer.start();
+      if (this.teddyRenderer) {
+        this.teddyRenderer.reset(true);
+        this.teddyRenderer.start();
       }
-      if (this.envelopeRenderer) {
-        this.envelopeRenderer.start();
+    } else {
+      // Normal experience: Carrier Pigeon takes flight carrying the letter
+      if (this.pigeonRenderer) {
+        this.pigeonRenderer.start();
       }
     }
 
-    // Start ambient drifting stardust & hearts
+    // Start ambient floating golden stardust
     let lastTime = performance.now();
     const loop = (now) => {
       const dt = Math.min((now - lastTime) / 1000, 0.1);
@@ -399,8 +377,8 @@ class LiveAsciiLoveApp {
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
-    window.app = new LiveAsciiLoveApp();
+    window.app = new PigeonTeddyApp();
   });
 } else {
-  window.app = new LiveAsciiLoveApp();
+  window.app = new PigeonTeddyApp();
 }

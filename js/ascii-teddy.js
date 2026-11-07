@@ -135,9 +135,12 @@ export class AsciiTeddy {
   }
 
   setTeddy(index) {
-    if (index < 0 || index >= this.teddyAssets.length || index === this.currentIndex) return;
+    if (index < 0 || index >= this.teddyAssets.length) return;
     this.previousIndex = this.currentIndex;
     this.currentIndex = index;
+    // Trigger slow upward emergence for newly selected teddy
+    this.t0 = performance.now();
+    this.hasTriggeredReveal = false;
     this.switchStartTime = performance.now();
     this.isSwitching = true;
   }
@@ -167,9 +170,9 @@ export class AsciiTeddy {
     const H = this.canvas.height;
     const isPortrait = this.isPortrait;
 
-    // Emergence / reveal progress (0s -> 2.8s)
-    const emerge = this.smoothstep(0.0, 2.8, t);
-    const isFullyRevealed = t >= 2.8;
+    // Slow, graceful upward emergence reveal from the bottom (0.0s -> 3.5s)
+    const emerge = this.smoothstep(0.0, 3.5, t);
+    const isFullyRevealed = t >= 3.5;
 
     // Living organic breathing (gentle 1.8% pulse)
     const breath = isFullyRevealed ? 1.0 + 0.018 * Math.sin(t * 1.8) : 1.0;
@@ -177,8 +180,8 @@ export class AsciiTeddy {
     // Multi-harmonic gentle breeze sway
     const windSway = Math.sin(t * 0.9) * 2.2 + Math.sin(t * 1.5) * 1.0;
 
-    // Trigger reveal callback
-    if (t >= 2.8 && !this.hasTriggeredReveal) {
+    // Trigger reveal callback once fully emerged
+    if (t >= 3.5 && !this.hasTriggeredReveal) {
       this.hasTriggeredReveal = true;
       if (this.onRevealComplete) this.onRevealComplete();
     }
@@ -367,8 +370,9 @@ export class AsciiTeddy {
   start() {
     if (this.isRunning) return;
     this.isRunning = true;
-    this.hasTriggeredReveal = false;
-    this.t0 = performance.now();
+    if (this.t0 === undefined || this.t0 === null) {
+      this.t0 = performance.now();
+    }
     this.lastDraw = -1e9;
 
     const loop = (now) => {
@@ -398,8 +402,6 @@ export class AsciiTeddy {
   reset(skipEmergence = false) {
     this.stop();
     this.hasTriggeredReveal = false;
-    const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-    const isDirectTest = skipEmergence || (urlParams && (urlParams.get('scene') === 'teddy' || urlParams.get('scene') === 'flower'));
-    this.t0 = isDirectTest ? performance.now() - 3500 : performance.now();
+    this.t0 = skipEmergence ? performance.now() - 4500 : performance.now();
   }
 }

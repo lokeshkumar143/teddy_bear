@@ -3,25 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>for you 🧸 | A Special Teddy For You ❤️</title>
-  <meta name="description" content="A gentle, romantic living ASCII Teddy Bear universe crafted with love for someone special.">
+  <title>A Special Teddy Delivery For You 💌🧸</title>
+  <meta name="description" content="A carrier pigeon arrives with a sealed letter, revealing a magical living ASCII Teddy Bear universe crafted with love.">
   <meta name="theme-color" content="#000000">
 
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Homemade+Apple&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Homemade+Apple&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=2.0">
+  <link rel="stylesheet" href="css/style.css?v=3.0">
 </head>
 <body class="pure-black">
 
-  <!-- Ambient ASCII Stardust & Gentle Hearts Field (Fills Desktop Flanks) -->
+  <!-- Ambient Golden Stardust & Floating Mini Hearts Field -->
   <canvas id="ambient-canvas"></canvas>
 
-  <!-- Top Floating Sound Toggle Bar -->
+  <!-- Top Floating Music Pill -->
   <div class="top-nav-bar">
-    <button id="sound-toggle-btn" class="sound-toggle-btn" type="button" aria-label="Toggle Sound Effects" title="Sound Effects">
+    <button id="sound-toggle-btn" class="sound-toggle-btn" type="button" aria-label="Toggle Sound Effects" title="Music & Sound Effects">
       <span aria-hidden="true">🔇</span>
       <span>Music</span>
     </button>
@@ -29,29 +29,23 @@
 
   <main class="stage">
 
-    <!-- Screen 1: The ASCII Knight with Sealed Envelope Letter in Bottom-Left -->
-    <div id="knight-screen" class="scene active">
-      <!-- Background: ASCII Knight positioned on right side with waving red cloak -->
-      <canvas id="knight-canvas" aria-label="ASCII Knight with waving red cloak"></canvas>
+    <!-- Screen 1: The Carrier Pigeon & Delivered Sealed Letter -->
+    <div id="delivery-screen" class="scene active">
+      <!-- 1. Flying ASCII Carrier Dove bringing the letter across the starry sky -->
+      <canvas id="pigeon-canvas" aria-label="ASCII Carrier Pigeon flying with love letter"></canvas>
       
-      <!-- Foreground: Sealed ASCII Letter For You positioned in bottom-left -->
-      <canvas id="envelope-canvas" aria-label="ASCII Sealed Letter For You"></canvas>
+      <!-- 2. Sealed Romantic Letter resting in Center Stage -->
+      <canvas id="envelope-canvas" aria-label="Sealed Love Letter For You"></canvas>
 
-      <p class="whisper-hint" id="knight-hint">touch the letter to open</p>
+      <!-- 3. Soft Whisper Hint below the Letter -->
+      <p class="whisper-hint" id="envelope-hint">touch the letter to open 💌</p>
     </div>
 
-    <!-- Screen 2: Multilingual Love Heart & Living Colored ASCII Teddy Bear -->
+    <!-- Screen 2: Living ASCII Teddy Bear Universe with Up-Side Selector -->
     <div id="teddy-screen" class="scene teddy-screen">
-      <!-- 1. The Multilingual Love Heart (Builds in center, then glides to top-left corner as logo badge) -->
-      <canvas id="heart-canvas" class="heart-canvas" aria-label="Multilingual Love Heart"></canvas>
 
-      <!-- 2. The Living Colored ASCII Teddy Bear (Full true-color 24-bit living breathing canvas) -->
-      <div class="seamless-teddy-wrapper">
-        <canvas id="teddy-canvas" width="800" height="800" aria-label="Living ASCII Teddy Bear"></canvas>
-      </div>
-
-      <!-- 3. Interactive Multi-Teddy Selector Bar (Switch between all 4 Teddy Bears) -->
-      <div id="teddy-selector-bar" class="teddy-selector-bar" role="tablist" aria-label="Choose Your Teddy Bear">
+      <!-- 1. Up-Side (Top) Multi-Teddy Selector Bar -->
+      <div id="teddy-selector-bar" class="teddy-selector-bar" role="tablist" aria-label="Choose Teddy Bear">
         <button class="teddy-tab-btn active" data-teddy="0" type="button" role="tab" aria-selected="true" title="Teddy holding heart">
           <span class="tab-icon">🧸</span>
           <span class="tab-label">Hugging Heart</span>
@@ -70,7 +64,12 @@
         </button>
       </div>
 
-      <!-- 4. Minimal, Compact Romantic Love Note Card -->
+      <!-- 2. The Living Colored ASCII Teddy Bear (Reveals slowly from the bottom upward) -->
+      <div class="seamless-teddy-wrapper">
+        <canvas id="teddy-canvas" width="800" height="800" aria-label="Living ASCII Teddy Bear"></canvas>
+      </div>
+
+      <!-- 3. Minimal, Compact Romantic Love Note Card -->
       <div id="cloud-note" class="minimal-note">
         <div class="note-pill">✦ &nbsp;SPECIALLY CRAFTED WITH LOVE &nbsp;✦</div>
         
@@ -83,10 +82,10 @@
           Every quiet thought finds its way to you &mdash; today, tomorrow, always.
         </p>
 
-        <button id="btn-replay" class="note-replay" title="Experience again">watch again ↺</button>
+        <button id="btn-replay" class="note-replay" title="Send another letter">send pigeon again 🕊️</button>
       </div>
 
-      <!-- 5. Pure ASCII Key Design Signature of Lokesh Kumar -->
+      <!-- 4. Pure ASCII Key Design Signature of Lokesh Kumar -->
       <div id="corner-signature" class="corner-signature" aria-label="ASCII Key Signature of Lokesh Kumar">
         <div class="ascii-sig-box">
           <div class="ascii-sig-head">
@@ -119,6 +118,6 @@
 
   </main>
 
-  <script type="module" src="js/app.js?v=2.0"></script>
+  <script type="module" src="js/app.js?v=3.0"></script>
 </body>
 </html>

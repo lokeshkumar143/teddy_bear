@@ -102,21 +102,20 @@ body.pure-black {
   pointer-events: auto;
 }
 
-/* Screen 1: Canvas for ASCII Knight with Red Cloak */
-#knight-canvas {
+/* Screen 1: Canvas for ASCII Carrier Pigeon */
+#pigeon-canvas {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
   height: 100dvh;
   display: block;
-  object-fit: cover;
-  object-position: center bottom;
-  background: #000000;
-  z-index: 3;
+  background: transparent;
+  pointer-events: none;
+  z-index: 4;
 }
 
-/* Foreground Sealed Envelope in Front of Knight */
+/* Center Stage Sealed Envelope */
 #envelope-canvas {
   position: fixed;
   inset: 0;
@@ -124,14 +123,12 @@ body.pure-black {
   height: 100vh;
   height: 100dvh;
   display: block;
-  object-fit: cover;
-  object-position: center bottom;
   background: transparent;
   cursor: pointer;
   z-index: 5;
 }
 
-#knight-screen:not(.active) .whisper-hint {
+#delivery-screen:not(.active) .whisper-hint {
   display: none !important;
   opacity: 0 !important;
   pointer-events: none !important;
@@ -139,20 +136,27 @@ body.pure-black {
 
 .whisper-hint {
   position: fixed;
-  bottom: 24px;
-  left: 23%;
+  bottom: 22%;
+  left: 50%;
   transform: translateX(-50%);
   font-family: 'Cormorant Garamond', serif;
   font-size: 20px;
   font-style: italic;
-  letter-spacing: 2.8px;
+  letter-spacing: 2px;
   color: #ff9ebb;
   text-shadow: 0 0 16px rgba(255, 20, 80, 0.55);
   cursor: pointer;
   z-index: 10;
-  animation: breathing 3s infinite ease-in-out;
-  transition: color 0.3s ease, transform 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease, transform 0.4s ease;
   white-space: nowrap;
+}
+
+.whisper-hint.visible {
+  opacity: 1;
+  pointer-events: auto;
+  animation: breathing 3s infinite ease-in-out;
 }
 
 .whisper-hint:hover {
@@ -165,30 +169,7 @@ body.pure-black {
   50% { opacity: 0.95; }
 }
 
-/* Screen 2: Canvases for Multilingual Heart & Rose */
-.heart-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  display: block;
-  object-fit: contain;
-  background: transparent;
-  pointer-events: none;
-  z-index: 7;
-  transform: scale(1) translate(0, 0);
-  transform-origin: 50% 50%;
-  transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s ease;
-}
-
-.heart-canvas.docked-corner {
-  transform: translate(calc(-50vw + 68px), calc(-50vh + 60px)) scale(0.14);
-  opacity: 0.95;
-  filter: drop-shadow(0 0 16px rgba(255, 30, 80, 0.55));
-}
-
-.seamless-teddy-wrapper,
-.seamless-rose-wrapper {
+.seamless-teddy-wrapper {
   position: fixed;
   inset: 0;
   width: 100vw;
@@ -201,8 +182,7 @@ body.pure-black {
   z-index: 5;
 }
 
-.seamless-teddy-wrapper canvas,
-.seamless-rose-wrapper canvas {
+.seamless-teddy-wrapper canvas {
   width: 100vw;
   height: 100vh;
   height: 100dvh;
@@ -214,26 +194,26 @@ body.pure-black {
 }
 
 /* ==========================================================================
-   Interactive Multi-Teddy Selector Bar
+   Up-Side (Top) Multi-Teddy Selector Bar
    ========================================================================== */
 .teddy-selector-bar {
   position: fixed;
-  bottom: 215px;
+  top: 24px;
   left: 50%;
-  transform: translateX(-50%) translateY(16px) scale(0.95);
+  transform: translateX(-50%) translateY(-16px) scale(0.95);
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 10px;
-  background: rgba(18, 10, 16, 0.78);
-  backdrop-filter: blur(24px) saturate(160%);
-  -webkit-backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid rgba(255, 170, 200, 0.22);
+  padding: 6px 12px;
+  background: rgba(18, 10, 16, 0.85);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 170, 200, 0.28);
   border-radius: 999px;
   box-shadow: 
-    0 12px 32px rgba(0, 0, 0, 0.8),
-    0 0 16px rgba(255, 40, 80, 0.15);
-  z-index: 25;
+    0 16px 36px rgba(0, 0, 0, 0.85),
+    0 0 20px rgba(255, 40, 80, 0.2);
+  z-index: 30;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -514,27 +494,21 @@ body.pure-black {
    ========================================================================== */
 @media (max-width: 960px), (orientation: portrait), (max-aspect-ratio: 1/1) {
   /* Screen 1: Knight & Letter */
-  #knight-screen:not(.active) .whisper-hint {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-.whisper-hint {
-    left: 50%;
-    bottom: 18px;
-    font-size: 14px;
-    letter-spacing: 2px;
+  #delivery-screen:not(.active) .whisper-hint {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 
-  /* Screen 2: Docked Mini Heart Logo */
-  .heart-canvas.docked-corner {
-    transform: translate(calc(-50vw + 38px), calc(-50vh + 38px)) scale(0.09);
+  .whisper-hint {
+    left: 50%;
+    bottom: 20%;
+    font-size: 16px;
+    letter-spacing: 1.5px;
   }
 
   /* Screen 2: Living 3D Teddy Bear spans the full screen */
-  .seamless-teddy-wrapper,
-  .seamless-rose-wrapper {
+  .seamless-teddy-wrapper {
     position: fixed;
     inset: 0;
     width: 100vw;
@@ -548,7 +522,8 @@ body.pure-black {
   }
 
   .teddy-selector-bar {
-    bottom: 220px;
+    top: 16px;
+    bottom: auto;
     padding: 4px 8px;
     gap: 4px;
     max-width: 95vw;
