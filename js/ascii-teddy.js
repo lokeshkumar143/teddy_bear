@@ -34,22 +34,22 @@ export class AsciiTeddy {
       {
         id: 'hugging-heart',
         title: 'Hugging Heart',
-        src: 'assets/teddy-1-clean.png?v=7.0'
+        src: 'assets/teddy-1-clean.png?v=11.0'
       },
       {
         id: 'sweet-dreams',
         title: 'Sweet Dreams',
-        src: 'assets/teddy-2-clean.png?v=7.0'
+        src: 'assets/teddy-2-clean.png?v=11.0'
       },
       {
         id: 'heart-balloon',
         title: 'Heart Balloon',
-        src: 'assets/teddy-3-clean.png?v=7.0'
+        src: 'assets/teddy-3-clean.png?v=11.0'
       },
       {
         id: 'love-balloon',
         title: 'Love Balloon',
-        src: 'assets/teddy-4-standing-clean.png?v=7.0'
+        src: 'assets/teddy-4-standing-clean.png?v=11.0'
       }
     ];
 
@@ -329,7 +329,7 @@ export class AsciiTeddy {
           }
         }
 
-        if (alpha < 0.08 && !isStardust) continue;
+        if (alpha < 0.16 && !isStardust) continue;
 
         const maxC = Math.max(red, grn, blu);
         let lum = (0.55 * (maxC / 255) + 0.45 * (0.299 * red + 0.587 * grn + 0.114 * blu) / 255);
@@ -339,10 +339,11 @@ export class AsciiTeddy {
         let isHeart = false;
 
         // Accurate Heart vs Plush Fur classification
-        // In watercolor red hearts, red heavily exceeds green and blue, and green is NOT much higher than blue (unlike yellow/amber fur where green >> blue)
+        // In watercolor red hearts, red heavily exceeds green and blue, and green is NOT much higher than blue
         const isHeartColor = (red - grn >= 46) && (red - blu >= 42) && (grn - blu <= 16) && (red > 125);
         const isDarkEyes = (red < 65) && (grn < 65) && (blu < 65);
-        const isMuzzleHighlight = !isHeartColor && !isDarkEyes && (red > 225) && (grn > 200) && (blu > 170);
+        // Genuine warm muzzle/snout highlight requires true warmth (red > blu + 26) so bleached paper fringes never glow
+        const isMuzzleHighlight = !isHeartColor && !isDarkEyes && (red > 220) && (grn > 195) && (blu > 165) && (red - blu >= 26) && (red - grn >= 8);
 
         if (isStardust) {
           char = '✦';
@@ -360,8 +361,8 @@ export class AsciiTeddy {
           finalCol = 'rgb(30, 14, 6)';
           char = '@';
         } else if (isMuzzleHighlight) {
-          // Soft warm cream muzzle, snout & cheek highlights
-          finalCol = 'rgb(248, 230, 205)';
+          // Soft warm golden cream muzzle, snout & cheek highlights
+          finalCol = 'rgb(244, 218, 180)';
           char = '%';
         } else {
           // Warm Plush Honey-Amber Fur (Rich golden caramel & cinnamon brown)
@@ -374,9 +375,9 @@ export class AsciiTeddy {
           char = this.bodyChars[charIdx] || '#';
         }
 
-        // Luminous glowing character rendering with highlight glow
-        if (isHeart || lum > 0.65 || isStardust) {
-          const glowRadius = isHeart ? (isPulsing ? 14 : 7) : (dpr > 1 ? 5 : 3);
+        // Luminous glowing character rendering with highlight glow (only for opaque highlights, avoiding edge noise)
+        if (isHeart || (lum > 0.72 && alpha > 0.7) || isStardust) {
+          const glowRadius = isHeart ? (isPulsing ? 14 : 7) : (dpr > 1 ? 4 : 2);
           ctx.shadowColor = isHeart ? 'rgba(255, 40, 90, 0.95)' : finalCol;
           ctx.shadowBlur = glowRadius;
         } else {

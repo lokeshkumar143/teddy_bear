@@ -18,10 +18,10 @@
  *    - Pure ASCII Key signature for LOKESH KUMAR.
  */
 
-import { AmbientParticles } from './ambient-particles.js?v=10.0';
-import { GiftBoxController } from './gift-box.js?v=10.0';
-import { AsciiTeddy } from './ascii-teddy.js?v=10.0';
-import { AudioManager } from './audio-fx.js?v=10.0';
+import { AmbientParticles } from './ambient-particles.js?v=11.0';
+import { GiftBoxController } from './gift-box.js?v=11.0';
+import { AsciiTeddy } from './ascii-teddy.js?v=11.0';
+import { AudioManager } from './audio-fx.js?v=11.0';
 
 class PigeonTeddyApp {
   constructor() {
