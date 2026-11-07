@@ -13,11 +13,11 @@
  * 9. Pure ASCII Key signature for LOKESH KUMAR.
  */
 
-import { AmbientParticles } from './ambient-particles.js';
-import { AsciiPigeon } from './ascii-pigeon.js';
-import { AsciiEnvelope } from './ascii-envelope.js';
-import { AsciiTeddy } from './ascii-teddy.js';
-import { AudioManager } from './audio-fx.js';
+import { AmbientParticles } from './ambient-particles.js?v=7.0';
+import { AsciiPigeon } from './ascii-pigeon.js?v=7.0';
+import { AsciiEnvelope } from './ascii-envelope.js?v=7.0';
+import { AsciiTeddy } from './ascii-teddy.js?v=7.0';
+import { AudioManager } from './audio-fx.js?v=7.0';
 
 class PigeonTeddyApp {
   constructor() {

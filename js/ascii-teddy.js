@@ -29,27 +29,27 @@ export class AsciiTeddy {
     this.waveTime = -1e9;
     this.heartPulseTime = -1e9;
 
-    // Multi-Teddy Gallery Configuration
+    // Multi-Teddy Gallery Configuration with Cache Busting
     this.teddyAssets = [
       {
         id: 'hugging-heart',
         title: 'Hugging Heart',
-        src: 'assets/teddy-1-clean.png'
+        src: 'assets/teddy-1-clean.png?v=7.0'
       },
       {
         id: 'sweet-dreams',
         title: 'Sweet Dreams',
-        src: 'assets/teddy-2-clean.png'
+        src: 'assets/teddy-2-clean.png?v=7.0'
       },
       {
         id: 'heart-balloon',
         title: 'Heart Balloon',
-        src: 'assets/teddy-3-clean.png'
+        src: 'assets/teddy-3-clean.png?v=7.0'
       },
       {
         id: 'love-balloon',
         title: 'Love Balloon',
-        src: 'assets/teddy-4-clean.png'
+        src: 'assets/teddy-4-standing-clean.png?v=7.0'
       }
     ];
 
@@ -265,8 +265,8 @@ export class AsciiTeddy {
         : Math.round((cols - drawW) * 0.5);
 
       const drawY = isDualStage
-        ? Math.round((rows - drawH) * 0.46)
-        : Math.round(rows * (winH < 650 ? 0.08 : 0.12));
+        ? Math.round((rows - drawH) * 0.38)
+        : Math.round(rows * (winH < 650 ? 0.08 : 0.10));
 
       // Sinuous gentle sway anchored at feet base
       const anchorScreenX = drawX + drawW * 0.5;
