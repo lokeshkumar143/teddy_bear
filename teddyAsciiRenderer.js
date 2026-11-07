@@ -480,11 +480,19 @@ class TeddyAsciiRenderer {
         if (col === "transparent" || ch === " ") continue;
 
         if (cell.part === "heart") {
-          ctx.shadowColor = glow || theme.heartGlow;
-          ctx.shadowBlur = cell.isEdge ? 20 : 15;
+          ctx.save();
+          // Boost heart font size and neon glow for maximum clarity
+          const heartFontSize = Math.floor(charFontSize * 1.25);
+          ctx.font = `bold ${heartFontSize}px "Fira Code", "Apple Color Emoji", "Segoe UI Emoji", monospace`;
+          ctx.shadowColor = cell.isEdge ? "rgba(255, 255, 255, 1.0)" : (glow || theme.heartGlow);
+          ctx.shadowBlur = cell.isEdge ? 24 : 18;
+          ctx.fillStyle = cell.isEdge ? "#ffffff" : col;
+          ctx.fillText(ch, px, py);
+          ctx.restore();
+          continue;
         } else if (cell.part === "badge") {
           ctx.shadowColor = glow || theme.badgeGlow;
-          ctx.shadowBlur = 16;
+          ctx.shadowBlur = 18;
         } else if (glow) {
           ctx.shadowColor = glow;
           ctx.shadowBlur = 8;
@@ -499,10 +507,9 @@ class TeddyAsciiRenderer {
 
     ctx.shadowBlur = 0;
 
-    // 12. Floating Polaroid Snapshot on Canvas (Rendered during snapshot export or when DOM frame is not present)
-    const domFrame = document.getElementById("floatingPolaroidFrame");
-    const shouldDrawOnCanvas = this.renderPolaroidToCanvas || (!domFrame || domFrame.classList.contains("hidden"));
-    if (this.userPhoto && isBloomed && (this.renderPolaroidToCanvas || shouldDrawOnCanvas)) {
+    // 12. Floating Polaroid Snapshot on Canvas (ONLY rendered during downloaded PNG snapshot export)
+    // The interactive DOM polaroid (#floatingPolaroidFrame) handles on-screen display.
+    if (this.userPhoto && isBloomed && this.renderPolaroidToCanvas) {
       this.drawPolaroidOnCanvas();
     }
 
