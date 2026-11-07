@@ -205,3 +205,4 @@ export const StarPlaygroundScene: React.FC = () => {
     </group>
   );
 };
+

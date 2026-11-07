@@ -129,3 +129,4 @@ export const CreativeWorldScene: React.FC = () => {
     </group>
   );
 };
+

@@ -55,3 +55,4 @@ export const IntroScene: React.FC = () => {
     </group>
   );
 };
+

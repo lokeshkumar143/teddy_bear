@@ -114,3 +114,4 @@ export const Stars: React.FC<{ count?: number }> = ({ count = 900 }) => {
     </group>
   );
 };
+

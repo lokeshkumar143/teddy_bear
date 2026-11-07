@@ -73,3 +73,4 @@ export const FinalScene: React.FC = () => {
     </group>
   );
 };
+

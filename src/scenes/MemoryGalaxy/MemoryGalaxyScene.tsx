@@ -108,3 +108,4 @@ export const MemoryGalaxyScene: React.FC = () => {
     </group>
   );
 };
+

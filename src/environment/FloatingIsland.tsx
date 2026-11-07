@@ -222,3 +222,4 @@ export const FloatingIsland: React.FC = () => {
     </group>
   );
 };
+

@@ -48,3 +48,4 @@ export const Clouds: React.FC = () => {
     </group>
   );
 };
+

@@ -37,3 +37,4 @@ export const TeddyIslandScene: React.FC = () => {
     </group>
   );
 };
+

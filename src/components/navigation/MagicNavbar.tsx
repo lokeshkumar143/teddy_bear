@@ -154,3 +154,4 @@ export const MagicNavbar: React.FC = () => {
     </header>
   );
 };
+
