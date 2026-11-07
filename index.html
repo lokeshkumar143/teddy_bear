@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=7.0">
+  <link rel="stylesheet" href="css/style.css?v=8.0">
 </head>
 <body class="theme-aurora">
 
@@ -42,8 +42,16 @@
       <!-- 2. Sealed Romantic Letter resting in Center Stage -->
       <canvas id="envelope-canvas" aria-label="Sealed Love Letter For You"></canvas>
 
-      <!-- 3. Soft Whisper Hint below the Letter -->
-      <p class="whisper-hint" id="envelope-hint">touch the letter to open 💌</p>
+      <!-- 3. Enchanted Unseal Call-to-Action -->
+      <div class="unseal-cta-wrapper" id="envelope-hint">
+        <button class="unseal-cta-btn" id="unseal-btn" type="button" aria-label="Touch the sacred seal to open your gift">
+          <span class="unseal-sparkle">✦</span>
+          <span class="unseal-text">TOUCH THE SEAL TO OPEN</span>
+          <span class="unseal-heart-icon">💌</span>
+          <span class="unseal-sparkle">✦</span>
+        </button>
+        <div class="unseal-subcaption">A celestial delivery specially crafted for Loki</div>
+      </div>
     </div>
 
     <!-- Screen 2: Living ASCII Teddy Bear Universe with Up-Side Selector & Rich UI -->
@@ -206,6 +214,6 @@
   <!-- Toast Notification Feedback -->
   <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=7.0"></script>
+  <script type="module" src="js/app.js?v=8.0"></script>
 </body>
 </html>

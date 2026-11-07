@@ -13,11 +13,11 @@
  * 9. Pure ASCII Key signature for LOKESH KUMAR.
  */
 
-import { AmbientParticles } from './ambient-particles.js?v=7.0';
-import { AsciiPigeon } from './ascii-pigeon.js?v=7.0';
-import { AsciiEnvelope } from './ascii-envelope.js?v=7.0';
-import { AsciiTeddy } from './ascii-teddy.js?v=7.0';
-import { AudioManager } from './audio-fx.js?v=7.0';
+import { AmbientParticles } from './ambient-particles.js?v=8.0';
+import { AsciiPigeon } from './ascii-pigeon.js?v=8.0';
+import { AsciiEnvelope } from './ascii-envelope.js?v=8.0';
+import { AsciiTeddy } from './ascii-teddy.js?v=8.0';
+import { AudioManager } from './audio-fx.js?v=8.0';
 
 class PigeonTeddyApp {
   constructor() {
@@ -189,6 +189,14 @@ class PigeonTeddyApp {
         e.preventDefault();
         handleLetterOpen();
       }, { passive: false });
+    }
+
+    const unsealBtn = document.getElementById('unseal-btn');
+    if (unsealBtn) {
+      unsealBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        handleLetterOpen();
+      });
     }
 
     if (this.deliveryScreen) {
@@ -505,9 +513,18 @@ class PigeonTeddyApp {
   }
 
   start() {
-    // Direct URL parameter check for quick scene testing: e.g. ?scene=teddy
+    // Direct URL parameter check for quick scene testing: e.g. ?scene=teddy or ?scene=envelope
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('scene') === 'teddy') {
+    if (urlParams.get('scene') === 'envelope') {
+      this.currentScreen = 'delivery';
+      this.letterDelivered = true;
+      if (this.envelopeRenderer) {
+        this.envelopeRenderer.start();
+      }
+      if (this.envelopeHint) {
+        this.envelopeHint.classList.add('visible');
+      }
+    } else if (urlParams.get('scene') === 'teddy') {
       this.currentScreen = 'teddy';
       if (this.deliveryScreen) this.deliveryScreen.classList.remove('active');
       if (this.teddyScreen) {
