@@ -250,9 +250,9 @@ export class AsciiTeddy {
       const winH = window.innerHeight || 800;
       const isDualStage = !isPortrait && winW > 920;
 
-      const targetHeightRatio = isDualStage ? 0.70 : (isPortrait ? 0.58 : 0.65);
+      const targetHeightRatio = isDualStage ? 0.70 : (isPortrait ? 0.46 : 0.62);
       const maxH = rows * targetHeightRatio;
-      const maxW = cols * (isDualStage ? 0.44 : (isPortrait ? 0.86 : 0.52));
+      const maxW = cols * (isDualStage ? 0.44 : (isPortrait ? 0.76 : 0.50));
 
       // Compensate for character font aspect ratio (0.55) so teddy retains 1:1 geometry
       const stageAspect = (drawImgH / drawImgW);
@@ -266,7 +266,7 @@ export class AsciiTeddy {
 
       const drawY = isDualStage
         ? Math.round((rows - drawH) * 0.46)
-        : Math.round(rows * (winH < 650 ? 0.04 : 0.08));
+        : Math.round(rows * (winH < 650 ? 0.08 : 0.12));
 
       // Sinuous gentle sway anchored at feet base
       const anchorScreenX = drawX + drawW * 0.5;
@@ -338,10 +338,11 @@ export class AsciiTeddy {
         let finalCol = 'rgb(200, 150, 100)';
         let isHeart = false;
 
-        // Accurate Heart vs Plush Fur classification (Prevents brown fur from turning red)
-        const isHeartColor = (red - grn > 40) && (red - blu > 40) && (red > 120);
+        // Accurate Heart vs Plush Fur classification
+        // In watercolor red hearts, red heavily exceeds green and blue, and green is NOT much higher than blue (unlike yellow/amber fur where green >> blue)
+        const isHeartColor = (red - grn >= 46) && (red - blu >= 42) && (grn - blu <= 16) && (red > 125);
         const isDarkEyes = (red < 65) && (grn < 65) && (blu < 65);
-        const isMuzzleHighlight = !isHeartColor && !isDarkEyes && (red > 220) && (grn > 195) && (blu > 170);
+        const isMuzzleHighlight = !isHeartColor && !isDarkEyes && (red > 225) && (grn > 200) && (blu > 170);
 
         if (isStardust) {
           char = '✦';
