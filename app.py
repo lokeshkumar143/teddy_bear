@@ -63,6 +63,10 @@ class UniverseHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             return "text/html; charset=utf-8"
         elif path_str.endswith(".json"):
             return "application/json; charset=utf-8"
+        elif path_str.endswith(".svg"):
+            return "image/svg+xml"
+        elif path_str.endswith(".png"):
+            return "image/png"
         return super().guess_type(path)
 
     def end_headers(self):
