@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>for you 🌹</title>
-  <meta name="description" content="A gentle flower and romantic ASCII universe for someone special.">
+  <title>for you 🧸 | A Special Teddy For You ❤️</title>
+  <meta name="description" content="A gentle, romantic living ASCII Teddy Bear universe crafted with love for someone special.">
   <meta name="theme-color" content="#000000">
 
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -12,14 +12,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Homemade+Apple&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=1.0">
+  <link rel="stylesheet" href="css/style.css?v=2.0">
 </head>
 <body class="pure-black">
 
-  <!-- Ambient Botanical ASCII Petals & Stardust Field (Fills Desktop Flanks) -->
+  <!-- Ambient ASCII Stardust & Gentle Hearts Field (Fills Desktop Flanks) -->
   <canvas id="ambient-canvas"></canvas>
 
-  <!-- Top Floating Sound Toggle & Portal Pill -->
+  <!-- Top Floating Sound Toggle Bar -->
   <div class="top-nav-bar">
     <button id="sound-toggle-btn" class="sound-toggle-btn" type="button" aria-label="Toggle Sound Effects" title="Sound Effects">
       <span aria-hidden="true">🔇</span>
@@ -40,33 +40,53 @@
       <p class="whisper-hint" id="knight-hint">touch the letter to open</p>
     </div>
 
-    <!-- Screen 2: Multilingual Love Heart & Realistic Blooming Rose -->
-    <div id="flower-screen" class="scene">
+    <!-- Screen 2: Multilingual Love Heart & Living Colored ASCII Teddy Bear -->
+    <div id="teddy-screen" class="scene teddy-screen">
       <!-- 1. The Multilingual Love Heart (Builds in center, then glides to top-left corner as logo badge) -->
       <canvas id="heart-canvas" class="heart-canvas" aria-label="Multilingual Love Heart"></canvas>
 
-      <!-- 2. The Living Colored ASCII Rose (Blooms organically, moves with the breeze) -->
-      <div class="seamless-rose-wrapper">
-        <canvas id="rose-canvas" width="720" height="720" aria-label="Blooming ASCII Rose"></canvas>
+      <!-- 2. The Living Colored ASCII Teddy Bear (Full true-color 24-bit living breathing canvas) -->
+      <div class="seamless-teddy-wrapper">
+        <canvas id="teddy-canvas" width="800" height="800" aria-label="Living ASCII Teddy Bear"></canvas>
       </div>
 
-      <!-- 3. Minimal, Compact Love Note (Small & Elegant) -->
+      <!-- 3. Interactive Multi-Teddy Selector Bar (Switch between all 4 Teddy Bears) -->
+      <div id="teddy-selector-bar" class="teddy-selector-bar" role="tablist" aria-label="Choose Your Teddy Bear">
+        <button class="teddy-tab-btn active" data-teddy="0" type="button" role="tab" aria-selected="true" title="Teddy holding heart">
+          <span class="tab-icon">🧸</span>
+          <span class="tab-label">Hugging Heart</span>
+        </button>
+        <button class="teddy-tab-btn" data-teddy="1" type="button" role="tab" aria-selected="false" title="Sleepy teddy hugging heart">
+          <span class="tab-icon">✨</span>
+          <span class="tab-label">Sweet Dreams</span>
+        </button>
+        <button class="teddy-tab-btn" data-teddy="2" type="button" role="tab" aria-selected="false" title="Teddy with heart balloon">
+          <span class="tab-icon">🎈</span>
+          <span class="tab-label">Heart Balloon</span>
+        </button>
+        <button class="teddy-tab-btn" data-teddy="3" type="button" role="tab" aria-selected="false" title="Teddy with love balloon">
+          <span class="tab-icon">❤️</span>
+          <span class="tab-label">Love Balloon</span>
+        </button>
+      </div>
+
+      <!-- 4. Minimal, Compact Romantic Love Note Card -->
       <div id="cloud-note" class="minimal-note">
-        <div class="note-pill">✦ &nbsp;FOREVER WRITTEN IN STARLIGHT &nbsp;✦</div>
+        <div class="note-pill">✦ &nbsp;SPECIALLY CRAFTED WITH LOVE &nbsp;✦</div>
         
         <p class="note-quote">
-          &ldquo;In a world of fleeting moments, you are my constant.<br>
-          My feelings for you will never end.&rdquo;
+          &ldquo;In a world of fleeting moments, you bring warmth and endless comfort.<br>
+          Sending you love, peace, and eternal happiness.&rdquo;
         </p>
 
         <p class="note-subtext">
           Every quiet thought finds its way to you &mdash; today, tomorrow, always.
         </p>
 
-        <button id="btn-replay" class="note-replay" title="Experience again">hold again ↺</button>
+        <button id="btn-replay" class="note-replay" title="Experience again">watch again ↺</button>
       </div>
 
-      <!-- 4. Pure ASCII Key Design Signature of Lokesh Kumar -->
+      <!-- 5. Pure ASCII Key Design Signature of Lokesh Kumar -->
       <div id="corner-signature" class="corner-signature" aria-label="ASCII Key Signature of Lokesh Kumar">
         <div class="ascii-sig-box">
           <div class="ascii-sig-head">
@@ -99,6 +119,6 @@
 
   </main>
 
-  <script type="module" src="js/app.js?v=1.0"></script>
+  <script type="module" src="js/app.js?v=2.0"></script>
 </body>
 </html>

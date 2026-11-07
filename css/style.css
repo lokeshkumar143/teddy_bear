@@ -131,6 +131,12 @@ body.pure-black {
   z-index: 5;
 }
 
+#knight-screen:not(.active) .whisper-hint {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 .whisper-hint {
   position: fixed;
   bottom: 24px;
@@ -181,6 +187,7 @@ body.pure-black {
   filter: drop-shadow(0 0 16px rgba(255, 30, 80, 0.55));
 }
 
+.seamless-teddy-wrapper,
 .seamless-rose-wrapper {
   position: fixed;
   inset: 0;
@@ -194,6 +201,7 @@ body.pure-black {
   z-index: 5;
 }
 
+.seamless-teddy-wrapper canvas,
 .seamless-rose-wrapper canvas {
   width: 100vw;
   height: 100vh;
@@ -201,6 +209,77 @@ body.pure-black {
   object-fit: contain;
   display: block;
   background: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Interactive Multi-Teddy Selector Bar
+   ========================================================================== */
+.teddy-selector-bar {
+  position: fixed;
+  bottom: 215px;
+  left: 50%;
+  transform: translateX(-50%) translateY(16px) scale(0.95);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(18, 10, 16, 0.78);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 170, 200, 0.22);
+  border-radius: 999px;
+  box-shadow: 
+    0 12px 32px rgba(0, 0, 0, 0.8),
+    0 0 16px rgba(255, 40, 80, 0.15);
+  z-index: 25;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.teddy-selector-bar.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.teddy-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: #c9b8c0;
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.teddy-tab-btn .tab-icon {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.teddy-tab-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.teddy-tab-btn.active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(255, 40, 80, 0.75), rgba(200, 20, 60, 0.85));
+  border-color: rgba(255, 160, 190, 0.5);
+  box-shadow: 0 0 12px rgba(255, 40, 80, 0.45);
 }
 
 /* ==========================================================================
@@ -435,7 +514,13 @@ body.pure-black {
    ========================================================================== */
 @media (max-width: 960px), (orientation: portrait), (max-aspect-ratio: 1/1) {
   /* Screen 1: Knight & Letter */
-  .whisper-hint {
+  #knight-screen:not(.active) .whisper-hint {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.whisper-hint {
     left: 50%;
     bottom: 18px;
     font-size: 14px;
@@ -447,7 +532,8 @@ body.pure-black {
     transform: translate(calc(-50vw + 38px), calc(-50vh + 38px)) scale(0.09);
   }
 
-  /* Screen 2: Living 3D Rose spans the full screen */
+  /* Screen 2: Living 3D Teddy Bear spans the full screen */
+  .seamless-teddy-wrapper,
   .seamless-rose-wrapper {
     position: fixed;
     inset: 0;
@@ -459,6 +545,21 @@ body.pure-black {
     left: 0;
     max-width: none;
     max-height: none;
+  }
+
+  .teddy-selector-bar {
+    bottom: 220px;
+    padding: 4px 8px;
+    gap: 4px;
+    max-width: 95vw;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .teddy-tab-btn {
+    padding: 5px 9px;
+    font-size: 10.5px;
+    gap: 4px;
   }
 
   /* Screen 2: Minimal Love Note Card (Spaced comfortably in mid-lower zone) */

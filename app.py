@@ -67,6 +67,8 @@ class UniverseHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             return "image/svg+xml"
         elif path_str.endswith(".png"):
             return "image/png"
+        elif path_str.endswith((".jpg", ".jpeg")):
+            return "image/jpeg"
         return super().guess_type(path)
 
     def end_headers(self):
