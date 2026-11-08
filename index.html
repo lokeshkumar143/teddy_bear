@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=22.0">
+  <link rel="stylesheet" href="css/style.css?v=23.0">
 </head>
 <body class="theme-aurora">
 
@@ -66,43 +66,14 @@
       </div>
     </div>
 
-    <!-- Screen 1.5: Interstitial Multi-Language Cosmic Heart Ceremony -->
-    <div id="ceremony-screen" class="scene ceremony-screen" aria-label="Worldwide Multilingual Name Heart Ceremony">
-      <!-- Full-screen Dynamic Canvas rendering the Multilingual Heart & Flight -->
-      <canvas id="heart-ceremony-canvas" class="heart-ceremony-canvas" aria-label="Glowing Multilingual Heart Assembled from World Languages"></canvas>
-
-      <!-- Celestial HUD Overlays -->
-      <div class="ceremony-top-hud">
-        <div class="ceremony-badge">
-          <span class="ceremony-sparkle">✦</span>
-          <span>A SACRED HEART OF WORLD LANGUAGES</span>
-          <span class="ceremony-sparkle">✦</span>
-        </div>
-        <p class="ceremony-subtitle">Names from across the stars united in one heart for <strong id="ceremony-raw-name">Loki</strong></p>
-      </div>
-
-      <!-- Bottom Flight Action & Status Indicator -->
-      <div class="ceremony-bottom-hud">
-        <button id="btn-reveal-teddy" class="btn-reveal-teddy btn-fly-heart" type="button" aria-label="Fly the Multilingual Heart to the Teddy Bear">
-          <span class="btn-sparkle">✦</span>
-          <span id="btn-fly-text">FLY HEART TO TEDDY</span>
-          <span class="btn-bear-icon">🧸💖</span>
-          <span class="btn-sparkle">✦</span>
-        </button>
-        <div class="ceremony-flight-sub" id="ceremony-flight-sub">✨ Watch the glowing heart fly directly into your teddy bear's chest</div>
-      </div>
-    </div>
-
     <!-- Screen 2: Living ASCII Teddy Bear Universe with Up-Side Selector & Rich UI -->
     <div id="teddy-screen" class="scene teddy-screen">
 
-      <!-- Header Title Badge with Multi-Language Ribbon -->
+      <!-- Header Title Badge -->
       <div class="experience-header-badge" id="experience-header-badge">
         <span class="badge-sparkle">✦</span>
         <span>SPECIALLY CRAFTED FOR</span>
         <span id="header-name-display" class="highlight-name">LOKI</span>
-        <span class="badge-separator">•</span>
-        <span id="header-multilang-ticker" class="multilang-ticker">லோகி • लोकी • ロキ • 로키 • 洛基 • لوكي</span>
         <span class="badge-sparkle">✦</span>
       </div>
 
@@ -131,23 +102,7 @@
         <canvas id="teddy-canvas" width="800" height="800" aria-label="Living ASCII Teddy Bear"></canvas>
       </div>
 
-      <!-- 3. Floating Polaroid Photo of Loki -->
-      <div id="floating-polaroid" class="floating-polaroid" title="Click to view photo">
-        <div class="polaroid-tape"></div>
-        <div class="polaroid-inner">
-          <img id="polaroid-img" src="assets/loki-portrait.jpg?v=22.0" alt="Loki Portrait">
-          <label for="photo-upload-input" class="btn-change-photo" title="Upload custom photo" aria-label="Upload custom photo">
-            <span>📷</span>
-          </label>
-          <input type="file" id="photo-upload-input" accept="image/*" class="sr-only">
-        </div>
-        <p id="polaroid-caption" class="polaroid-caption">
-          <span>Best Friends Forever</span>
-          <span class="caption-name-line">❤️ <span id="polaroid-name">Loki</span> <span id="polaroid-native-script" class="polaroid-native-script">லோகி</span></span>
-        </p>
-      </div>
-
-      <!-- 4. Interactive Frosted Glass Action Card -->
+      <!-- 3. Interactive Frosted Glass Action Card -->
       <div id="gift-action-card" class="gift-action-card">
         <div class="card-sparkle-pill">✦ &nbsp;HEARTFELT DEDICATION &nbsp;✦</div>
         
@@ -155,16 +110,6 @@
         
         <p id="gift-card-sub1" class="gift-card-sub">This little teddy was made just for you.</p>
         <p id="gift-card-sub2" class="gift-card-sub highlight">Sending you warmth, comfort, and happiness. ❤️</p>
-
-        <!-- Compact Actions: Replay Heart Ceremony & Change Name -->
-        <div class="card-ceremony-bar">
-          <button id="btn-re-ceremony" class="btn-ceremony-pill" type="button" title="Watch World Languages Heart Ceremony Again">
-            <span class="ceremony-globe">💖</span>
-            <span>Watch Heart Ceremony</span>
-            <span class="pill-sparkle">✦</span>
-          </button>
-          <button id="btn-edit-name" class="btn-edit-name-compact" type="button" title="Change Name">✎ Change</button>
-        </div>
 
         <!-- Interactive Action Buttons -->
         <div class="gift-action-group">
@@ -233,7 +178,7 @@
       <div class="name-modal-icon">💌</div>
       <div class="name-modal-badge">✦ &nbsp;A CELESTIAL LETTER FOR YOU &nbsp;✦</div>
       <h2 class="name-modal-title">Who is this surprise for? ✨</h2>
-      <p class="name-modal-subtitle">Enter your name to break the wax seal and see your name transformed across 10+ world languages!</p>
+      <p class="name-modal-subtitle">Enter your name to break the wax seal and reveal your personalized living teddy bear! ✨</p>
 
       <form id="name-form" class="name-form" onsubmit="return false;">
         <div class="name-input-wrapper">
@@ -305,53 +250,9 @@
     </div>
   </div>
 
-  <!-- Universal Multi-Language Name & Transliteration Customization Modal -->
-  <div id="edit-names-modal" class="edit-names-modal" role="dialog" aria-modal="true" aria-hidden="true" inert>
-    <div class="edit-names-backdrop"></div>
-    <div class="edit-names-card">
-      <button id="btn-close-edit-names" class="btn-close-modal" aria-label="Close edit names modal">&times;</button>
-      
-      <div class="edit-names-badge" id="edit-modal-badge">🌍 &nbsp;NAME &amp; TRANSLITERATION MANAGER &nbsp;🌍</div>
-      <h2 class="edit-names-title" id="edit-modal-title">Personalize Your Name Across Languages ✨</h2>
-      <p class="edit-names-subtitle" id="edit-modal-sub">Your name is your identity. You have full control to edit and approve every language version:</p>
-
-      <form id="edit-names-form" class="edit-names-form" onsubmit="return false;">
-        <!-- Top Row: Original Name & Script Detection -->
-        <div class="edit-primary-row">
-          <div class="edit-field-group">
-            <label for="edit-original-name" id="label-original-name">Original Name (Exact Native Input):</label>
-            <input type="text" id="edit-original-name" class="edit-input primary-input" dir="auto" maxlength="120" required>
-          </div>
-          <div class="edit-field-group">
-            <label id="label-detected-script">Detected Writing System:</label>
-            <div id="edit-detected-script" class="detected-script-pill">Latin</div>
-          </div>
-        </div>
-
-        <!-- Transliteration Grid for World Languages -->
-        <div class="edit-grid-label">✏️ Edit / Approve Language Representations:</div>
-        <div id="edit-langs-grid" class="edit-langs-grid">
-          <!-- Dynamically populated 10+ language rows with inputs -->
-        </div>
-
-        <div class="edit-modal-actions">
-          <button type="button" id="btn-reset-translit" class="btn-secondary-act">
-            <span>↺ Reset to Auto</span>
-          </button>
-          <button type="button" id="btn-cancel-edit-names" class="btn-secondary-act">
-            <span>Cancel</span>
-          </button>
-          <button type="submit" id="btn-save-edit-names" class="btn-primary-save">
-            <span>Save &amp; Apply Changes 💖</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <!-- Toast Notification Feedback -->
   <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=22.0"></script>
+  <script type="module" src="js/app.js?v=23.0"></script>
 </body>
 </html>

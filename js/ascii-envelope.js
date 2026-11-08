@@ -222,17 +222,11 @@ export class AsciiEnvelope {
       ctx.font = 'bold 15px "Cinzel", "Cormorant Garamond", system-ui, sans-serif';
       ctx.textAlign = 'center';
       const safeName = (this.recipientName || 'Loki');
-      ctx.fillText(`✦  A SACRED MESSAGE FOR ${safeName}  ✦`, 0, -lH * 0.5 + 34);
+      ctx.fillText(`✦  A SACRED MESSAGE FOR ${safeName}  ✦`, 0, -lH * 0.5 + 38);
 
-      if (this.multiLang) {
-        ctx.font = 'bold 12px "Inter", "Noto Sans Tamil", "Noto Sans Arabic", "Noto Sans JP", sans-serif';
-        ctx.fillStyle = '#c9184a';
-        ctx.fillText(`${this.multiLang.ta || ''} • ${this.multiLang.hi || ''} • ${this.multiLang.ja || ''} • ${this.multiLang.ar || ''}`, 0, -lH * 0.5 + 52);
-      }
-
-      ctx.font = 'italic 17px "Caveat", cursive';
+      ctx.font = 'italic 18px "Caveat", cursive';
       ctx.fillStyle = '#3a2113';
-      ctx.fillText('"In a sky full of stars, you shine the brightest."', 0, -lH * 0.5 + 78);
+      ctx.fillText('"In a sky full of stars, you shine the brightest."', 0, -lH * 0.5 + 72);
       ctx.fillText('"Every gentle moment with you is a cherished gift."', 0, -lH * 0.5 + 104);
       ctx.fillText('Sending you boundless warmth & eternal affection...', 0, -lH * 0.5 + 132);
 
