@@ -51,7 +51,8 @@ export class AsciiEnvelope {
     this.multiLang = null;
 
     // ASCII Density Characters (high fidelity)
-    this.densityChars = " .':;!~+=*#%@$";
+    // Soft, elegant romantic character ramp (avoids harsh computer symbols like @ % $ #)
+    this.densityChars = "  ·.:~=+*✦";
 
     this.init();
   }
@@ -238,11 +239,11 @@ export class AsciiEnvelope {
     }
 
     // 3. Envelope Body Backing & Pocket
-    // Rich Warm Parchment Gradient
+    // Rich Warm Parchment Gradient (harmonious tones, no harsh banding)
     const bodyGrad = ctx.createLinearGradient(x0, y0, x1, y1);
-    bodyGrad.addColorStop(0, '#f9ecd7');
-    bodyGrad.addColorStop(0.5, '#edd5b6');
-    bodyGrad.addColorStop(1, '#dfc19c');
+    bodyGrad.addColorStop(0, '#faf1e4');
+    bodyGrad.addColorStop(0.5, '#f4e5cf');
+    bodyGrad.addColorStop(1, '#ebd4b6');
 
     ctx.fillStyle = bodyGrad;
     ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
@@ -290,7 +291,7 @@ export class AsciiEnvelope {
 
     // 6. Gilded Royal Crimson Satin Ribbon Cross
     // Horizontal ribbon
-    const ribH = 42;
+    const ribH = 46;
     const ribGrad = ctx.createLinearGradient(x0, cy - ribH * 0.5, x0, cy + ribH * 0.5);
     ribGrad.addColorStop(0, '#c91838');
     ribGrad.addColorStop(0.4, '#ff3b65');
@@ -304,6 +305,14 @@ export class AsciiEnvelope {
     ctx.fillStyle = '#ffd700';
     ctx.fillRect(x0 + 12, cy - ribH * 0.5 - 2, envW - 24, 2.5);
     ctx.fillRect(x0 + 12, cy + ribH * 0.5 - 0.5, envW - 24, 2.5);
+
+    // Inscribed Love Motto on left and right sides of ribbon
+    ctx.font = 'bold 13px "Cinzel", "Inter", sans-serif';
+    ctx.fillStyle = '#ffe082';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('❤  W I T H   L O V E  ❤', x0 + (cx - x0) * 0.48, cy);
+    ctx.fillText('❤  T R U E   L O V E  ❤', cx + (x1 - cx) * 0.52, cy);
 
     // 7. Envelope Top Triangular Flap (Folds open during unsealing)
     const flapApexY = y0 + envH * 0.54;
@@ -325,9 +334,9 @@ export class AsciiEnvelope {
     ctx.closePath();
 
     const flapGrad = ctx.createLinearGradient(cx, y0, cx, flapApexY);
-    flapGrad.addColorStop(0, '#fff3df');
-    flapGrad.addColorStop(0.85, '#edd1ad');
-    flapGrad.addColorStop(1, '#dcb88f');
+    flapGrad.addColorStop(0, '#fdf7ee');
+    flapGrad.addColorStop(0.85, '#f5e8d5');
+    flapGrad.addColorStop(1, '#ebd7be');
 
     ctx.fillStyle = flapGrad;
     ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
@@ -346,24 +355,21 @@ export class AsciiEnvelope {
 
     // 8. Elegant Inscription Calligraphy On Front
     if (flapOpenProgress < 0.25) {
-      ctx.font = 'bold 18px "Cinzel", "Cormorant Garamond", serif';
-      ctx.fillStyle = '#b8860b';
+      ctx.font = 'bold 22px "Cinzel", "Cormorant Garamond", serif';
+      ctx.fillStyle = '#d4af37';
       ctx.textAlign = 'center';
-      ctx.shadowColor = 'rgba(255, 215, 0, 0.4)';
-      ctx.shadowBlur = 6;
-      ctx.fillText('✦  A  C E L E S T I A L   D E L I V E R Y  ✦', cx, y0 + 52);
+      ctx.shadowColor = 'rgba(255, 215, 0, 0.6)';
+      ctx.shadowBlur = 8;
+      ctx.fillText('❤  A   L O V E   L E T T E R   F O R   Y O U  ❤', cx, y0 + 54);
       ctx.shadowBlur = 0;
 
       ctx.font = 'bold 18px "Inter", "Noto Sans Tamil", "Noto Sans Arabic", sans-serif';
       ctx.fillStyle = '#ffffff';
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
-      ctx.shadowBlur = 8;
-      const rawRecipient = (this.recipientName || 'Loki').trim();
-      const isPureLatin = /^[A-Za-z0-9 ]+$/.test(rawRecipient);
-      const formattedTitle = isPureLatin
-        ? `S P E C I A L L Y   F O R   ${rawRecipient.toUpperCase().split('').join(' ')}`
-        : `SPECIALLY FOR  ${rawRecipient}`;
-      ctx.fillText(formattedTitle, cx, cy - 38);
+      ctx.shadowColor = 'rgba(255, 60, 110, 0.7)';
+      ctx.shadowBlur = 10;
+      const rawRecipient = (this.recipientName || 'Lokesh Kumar').trim();
+      const formattedTitle = `WITH ENDLESS LOVE FOR  ${rawRecipient.toUpperCase()}`;
+      ctx.fillText(formattedTitle, cx, cy - 36);
       ctx.shadowBlur = 0;
     }
 
@@ -372,23 +378,23 @@ export class AsciiEnvelope {
     const sealBroken = unsealProgress > 0.15;
 
     if (!sealBroken) {
-      const sealRad = 48;
+      const sealRad = 52;
       // Lub-dub realistic heartbeat pulse
       const hbTime = (t * 3.2) % (Math.PI * 2);
-      const hbPulse = Math.sin(hbTime) > 0.4 ? 1.0 + 0.09 * Math.sin(hbTime * 2) : 1.0;
+      const hbPulse = Math.sin(hbTime) > 0.4 ? 1.0 + 0.10 * Math.sin(hbTime * 2) : 1.0;
       const curSealRad = sealRad * hbPulse;
 
       // Radiant Golden Aura Waves radiating from Seal
       const auraWave1 = (t * 40) % 75;
       const auraWave2 = ((t * 40) + 38) % 75;
-      ctx.strokeStyle = `rgba(255, 215, 0, ${Math.max(0, 0.55 - auraWave1 / 75)})`;
+      ctx.strokeStyle = `rgba(255, 215, 0, ${Math.max(0, 0.65 - auraWave1 / 75)})`;
       ctx.lineWidth = 2.4;
       ctx.beginPath();
       ctx.arc(cx, sealApexY, curSealRad + auraWave1, 0, Math.PI * 2);
       ctx.stroke();
 
-      ctx.strokeStyle = `rgba(255, 100, 160, ${Math.max(0, 0.45 - auraWave2 / 75)})`;
-      ctx.lineWidth = 1.8;
+      ctx.strokeStyle = `rgba(255, 60, 120, ${Math.max(0, 0.55 - auraWave2 / 75)})`;
+      ctx.lineWidth = 2.0;
       ctx.beginPath();
       ctx.arc(cx, sealApexY, curSealRad + auraWave2, 0, Math.PI * 2);
       ctx.stroke();
@@ -397,10 +403,10 @@ export class AsciiEnvelope {
       ctx.save();
       ctx.translate(cx, sealApexY);
       ctx.beginPath();
-      const numTeeth = 18;
+      const numTeeth = 20;
       for (let i = 0; i <= numTeeth * 2; i++) {
         const theta = (i / (numTeeth * 2)) * Math.PI * 2;
-        const r = (i % 2 === 0 ? curSealRad + 5 : curSealRad - 1) + 2.5 * Math.sin(i * 3 + t);
+        const r = (i % 2 === 0 ? curSealRad + 6 : curSealRad - 1) + 2.5 * Math.sin(i * 3 + t);
         const px = Math.cos(theta) * r;
         const py = Math.sin(theta) * r;
         if (i === 0) ctx.moveTo(px, py);
@@ -409,33 +415,40 @@ export class AsciiEnvelope {
       ctx.closePath();
 
       // 3D Shaded Molten Ruby Wax Gradient
-      const waxGrad = ctx.createRadialGradient(-10, -12, 5, 0, 0, curSealRad + 8);
+      const waxGrad = ctx.createRadialGradient(-10, -12, 5, 0, 0, curSealRad + 10);
       waxGrad.addColorStop(0, '#ff476f');
-      waxGrad.addColorStop(0.3, '#d8113b');
-      waxGrad.addColorStop(0.75, '#990724');
-      waxGrad.addColorStop(1, '#500110');
+      waxGrad.addColorStop(0.35, '#d8113b');
+      waxGrad.addColorStop(0.75, '#a3082a');
+      waxGrad.addColorStop(1, '#660216');
 
       ctx.fillStyle = waxGrad;
-      ctx.shadowColor = 'rgba(255, 30, 80, 0.8)';
-      ctx.shadowBlur = 26;
+      ctx.shadowColor = 'rgba(255, 30, 80, 0.9)';
+      ctx.shadowBlur = 28;
       ctx.fill();
       ctx.shadowBlur = 0;
 
       // Gilded Outer Rim Ring
       ctx.strokeStyle = '#ffd700';
-      ctx.lineWidth = 2.2;
+      ctx.lineWidth = 2.4;
       ctx.beginPath();
       ctx.arc(0, 0, curSealRad - 8, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Embossed Gilded Heart In Center
+      // Radiant Gilded Heart in Center of Wax Seal
       ctx.fillStyle = '#ffffff';
-      ctx.shadowColor = '#ffeaa7';
-      ctx.shadowBlur = 10;
-      ctx.font = 'bold 30px serif';
+      ctx.shadowColor = '#ff2052';
+      ctx.shadowBlur = 12;
+      ctx.font = 'bold 28px serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('❤', 0, 2);
+      ctx.fillText('❤', 0, -10);
+
+      // Bold Golden "LOVE" inscription inside the seal
+      ctx.font = '900 17px "Cinzel", "Inter", sans-serif';
+      ctx.fillStyle = '#ffd700';
+      ctx.shadowColor = '#ffeaa7';
+      ctx.shadowBlur = 8;
+      ctx.fillText('L O V E', 0, 15);
       ctx.shadowBlur = 0;
 
       ctx.restore();
@@ -555,6 +568,7 @@ export class AsciiEnvelope {
     ctx.textBaseline = 'middle';
 
     const numChars = this.densityChars.length;
+    const dpr = this.dpr || 1;
 
     for (let r = 0; r < rows; r++) {
       const posY = r * cellH + cellH * 0.5;
@@ -569,15 +583,44 @@ export class AsciiEnvelope {
         const grn = data[offset + 1];
         const blu = data[offset + 2];
 
-        // Perceptual luminance calculation
-        const lum = (0.299 * red + 0.587 * grn + 0.114 * blu) / 255;
-        const charIdx = Math.min(numChars - 1, Math.floor(lum * (numChars - 1)));
-        const ch = this.densityChars[charIdx];
-
         const posX = c * cellW + cellW * 0.5;
+        const lum = (0.299 * red + 0.587 * grn + 0.114 * blu) / 255;
 
-        // True color glow
-        ctx.fillStyle = `rgba(${red}, ${grn}, ${blu}, ${alpha.toFixed(2)})`;
+        let ch = '#';
+        let finalCol = `rgba(${red}, ${grn}, ${blu}, ${alpha.toFixed(2)})`;
+
+        // Semantic Detection:
+        // 1. Ruby Red Wax Seal & Satin Ribbon (Hearts!)
+        const isRedSealOrRibbon = (red > 135 && red > grn * 1.45 && red > blu * 1.45);
+        // 2. Gleaming Gold Letters / Filigree / Gilded Ribbon Borders
+        const isGold = (red > 195 && grn > 155 && blu < 115);
+        // 3. Bright White Inscription / Heart Highlights
+        const isWhiteText = (red > 225 && grn > 225 && blu > 225);
+
+        if (isRedSealOrRibbon) {
+          // Romantic red velvet wax & ribbon rendered with glowing hearts!
+          ch = '♥';
+          finalCol = `rgba(${Math.min(255, red + 30)}, ${grn}, ${blu}, ${Math.max(0.85, alpha).toFixed(2)})`;
+          ctx.shadowColor = '#ff2052';
+          ctx.shadowBlur = 5 * dpr;
+        } else if (isGold) {
+          ch = '✦';
+          finalCol = `rgba(255, 215, 0, ${Math.max(0.9, alpha).toFixed(2)})`;
+          ctx.shadowColor = '#ffd700';
+          ctx.shadowBlur = 4 * dpr;
+        } else if (isWhiteText) {
+          ch = '❤';
+          finalCol = '#ffffff';
+          ctx.shadowColor = 'rgba(255, 60, 110, 0.9)';
+          ctx.shadowBlur = 4 * dpr;
+        } else {
+          // Warm Parchment Paper Shading
+          ctx.shadowBlur = 0;
+          const charIdx = Math.min(numChars - 1, Math.floor(lum * (numChars - 1)));
+          ch = this.densityChars[charIdx];
+        }
+
+        ctx.fillStyle = finalCol;
         ctx.fillText(ch, posX, posY);
       }
     }
@@ -585,7 +628,6 @@ export class AsciiEnvelope {
     // =========================================================================
     // Step 4: Overlay Dynamic Particles (Stardust, Wax Shards, Shockwaves)
     // =========================================================================
-    const dpr = this.dpr || 1;
 
     // A. Expanding Shockwave Rings
     for (let i = this.shockwaves.length - 1; i >= 0; i--) {
