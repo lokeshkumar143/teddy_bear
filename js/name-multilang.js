@@ -596,3 +596,4 @@ export function getLanguageList(langObj) {
     { code: 'en', label: 'English', script: 'Latin', text: langObj.en, flag: '🌐' }
   ];
 }
+
