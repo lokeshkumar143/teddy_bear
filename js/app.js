@@ -479,20 +479,6 @@ class PigeonTeddyApp {
       `).join('');
     }
 
-    // 5b. Card Language Grid (new v14.0 — inline in gift action card)
-    if (this.cardLangGrid) {
-      const list = getLanguageList(this.multiLangData);
-      this.cardLangGrid.innerHTML = list.map(item => `
-        <div class="card-lang-pill" title="${item.label} — ${item.script} Script">
-          <div class="card-lang-pill-meta">
-            <span class="card-lang-pill-flag">${item.flag}</span>
-            <span class="card-lang-pill-name">${item.script}</span>
-          </div>
-          <div class="card-lang-pill-text" dir="${item.dir || 'ltr'}">${item.text}</div>
-        </div>
-      `).join('');
-    }
-
     // 6. Unicode Dynamic Signature
     this.updateAsciiSignature(displayName);
   }

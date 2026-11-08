@@ -2102,57 +2102,18 @@ body {
     margin-bottom: 4px;
   }
 
-  /* Multilingual grid inside card: 2 compact columns */
-  .multilang-name-grid-wrapper {
-    max-height: 110px;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 6px 8px;
-    margin: 4px 0 6px;
-  }
-
-  .multilang-grid-header {
-    font-size: 9.5px;
-    margin-bottom: 6px;
-  }
-
   .btn-edit-name-compact {
     padding: 3px 8px;
     font-size: 9.5px;
   }
 
-  .card-lang-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 4px;
-  }
-
-  .card-lang-pill {
-    padding: 4px 6px;
-    min-height: 28px;
-    border-radius: 8px;
-  }
-
-  .card-lang-pill-meta {
-    min-width: 26px;
-    font-size: 7.5px;
-  }
-
-  .card-lang-pill-name {
-    font-size: 7.5px;
-    max-width: 40px;
-  }
-
-  .card-lang-pill-text {
-    font-size: 11px;
-  }
-
   .card-ceremony-bar {
-    margin: 4px 0 6px;
+    margin: 4px 0 8px;
   }
 
   .btn-ceremony-pill {
-    padding: 4px 10px;
-    font-size: 9.5px;
+    padding: 5px 12px;
+    font-size: 10px;
   }
 
   .gift-action-group {
@@ -2236,9 +2197,5 @@ body {
     bottom: 8px;
     padding: 8px 10px 6px;
     max-height: 52vh;
-  }
-
-  .card-lang-grid {
-    grid-template-columns: 1fr; /* On ultra-narrow 320px, 1 column with scrolling */
   }
 }
