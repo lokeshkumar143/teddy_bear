@@ -56,12 +56,6 @@ class PigeonTeddyApp {
     this.unsealBtn = document.getElementById('unseal-btn');
     this.unsealSubcaption = document.getElementById('unseal-subcaption');
 
-    // First Screen: Name Prompt Modal
-    this.nameModal = document.getElementById('name-modal');
-    this.nameForm = document.getElementById('name-form');
-    this.nameInput = document.getElementById('recipient-name-input');
-    this.btnConfirmName = document.getElementById('btn-confirm-name');
-
     // Teddy Screen elements
     this.experienceHeaderBadge = document.getElementById('experience-header-badge');
     this.teddyCanvas = document.getElementById('teddy-canvas');
@@ -171,27 +165,6 @@ class PigeonTeddyApp {
     } catch (e) {}
   }
 
-  openNameModal() {
-    if (!this.nameModal) return;
-    this.nameModal.removeAttribute('inert');
-    this.nameModal.classList.add('visible');
-    this.nameModal.removeAttribute('aria-hidden');
-    if (this.nameInput) {
-      this.nameInput.value = this.recipientName || 'Loki';
-      setTimeout(() => this.nameInput.focus(), 150);
-    }
-  }
-
-  closeNameModal() {
-    if (!this.nameModal) return;
-    if (document.activeElement && this.nameModal.contains(document.activeElement)) {
-      document.activeElement.blur();
-    }
-    this.nameModal.classList.remove('visible');
-    this.nameModal.setAttribute('aria-hidden', 'true');
-    this.nameModal.setAttribute('inert', '');
-  }
-
   openWorldModal() {
     if (!this.worldModal) return;
     this.worldModal.removeAttribute('inert');
@@ -282,14 +255,20 @@ class PigeonTeddyApp {
   }
 
   initInteractions() {
-    // Click letter / envelope to ask name
+    // Click letter / envelope to open immediately without name prompting
     const handleLetterOpenRequest = () => {
       if (this.currentScreen !== 'delivery' || this.isTransitioning) return;
       try {
         this.audioManager.init();
-        this.audioManager.playClick();
+        this.audioManager.playHeartBurst();
+        this.audioManager.playBloomChime();
       } catch (e) {}
-      this.openNameModal();
+
+      if (this.envelopeRenderer) {
+        this.envelopeRenderer.triggerClick();
+      } else {
+        this.transitionToTeddy();
+      }
     };
 
     if (this.envelopeCanvas) {
@@ -297,29 +276,6 @@ class PigeonTeddyApp {
     }
     if (this.unsealBtn) {
       this.unsealBtn.addEventListener('click', handleLetterOpenRequest);
-    }
-
-    // Name input Enter key handler
-    if (this.nameInput) {
-      this.nameInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          this.submitInitialName();
-        }
-      });
-    }
-
-    // Confirm Initial Name Form Submit
-    if (this.nameForm) {
-      this.nameForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        this.submitInitialName();
-      });
-    }
-    if (this.btnConfirmName) {
-      this.btnConfirmName.addEventListener('click', () => {
-        this.submitInitialName();
-      });
     }
 
     // Up-side (top) Teddy Selector buttons
@@ -395,27 +351,6 @@ class PigeonTeddyApp {
     }
     if (this.replayBtn) {
       this.replayBtn.addEventListener('click', () => this.restartExperience());
-    }
-  }
-
-  submitInitialName() {
-    const rawVal = this.nameInput ? this.nameInput.value : '';
-    this.applyRecipientName(rawVal || 'Loki');
-    this.closeNameModal();
-
-    if (this.currentScreen === 'delivery') {
-      try {
-        this.audioManager.playHeartBurst();
-        this.audioManager.playBloomChime();
-      } catch (e) {}
-
-      if (this.envelopeRenderer) {
-        this.envelopeRenderer.triggerClick();
-      } else {
-        this.transitionToTeddy();
-      }
-    } else {
-      this.showToast(`Updated name to ${this.recipientName}! ✨`);
     }
   }
 

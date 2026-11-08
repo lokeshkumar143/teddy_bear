@@ -244,15 +244,13 @@ export class AsciiTeddy {
 
       this.stageCtx.restore();
 
-      // Dual-stage layout: on desktop, teddy sits comfortably on the center-left
-      // On mobile / portrait, teddy is centered in the upper viewport
+      // Centered layout: Teddy sits proudly in the center on all screens
       const winW = window.innerWidth || 800;
       const winH = window.innerHeight || 800;
-      const isDualStage = !isPortrait && winW > 920;
 
-      const targetHeightRatio = isDualStage ? 0.70 : (isPortrait ? 0.46 : 0.62);
+      const targetHeightRatio = isPortrait ? 0.48 : 0.65;
       const maxH = rows * targetHeightRatio;
-      const maxW = cols * (isDualStage ? 0.44 : (isPortrait ? 0.76 : 0.50));
+      const maxW = cols * (isPortrait ? 0.78 : 0.58);
 
       // Compensate for character font aspect ratio (0.55) so teddy retains 1:1 geometry
       const stageAspect = (drawImgH / drawImgW);
@@ -260,13 +258,12 @@ export class AsciiTeddy {
       const drawW = Math.min(maxW, maxH / (stageAspect * cellAspectCorrection));
       const drawH = drawW * stageAspect * cellAspectCorrection;
 
-      const drawX = isDualStage 
-        ? Math.round(cols * 0.26 - drawW * 0.5) 
-        : Math.round((cols - drawW) * 0.5);
+      // Perfectly centered horizontally on all screens
+      const drawX = Math.round((cols - drawW) * 0.5);
 
-      const drawY = isDualStage
-        ? Math.round((rows - drawH) * 0.38)
-        : Math.round(rows * (winH < 650 ? 0.08 : 0.10));
+      const drawY = isPortrait
+        ? Math.round(rows * (winH < 650 ? 0.07 : 0.09))
+        : Math.round((rows - drawH) * 0.35);
 
       // Sinuous gentle sway anchored at feet base
       const anchorScreenX = drawX + drawW * 0.5;
