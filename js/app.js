@@ -1,32 +1,42 @@
 /**
- * Romantic Celestial Universe & Living ASCII Teddy Bear Experience (v10.0)
+ * Romantic Celestial Universe & Living ASCII Teddy Bear Experience (v12.0)
  * 
- * Flow:
- * 1. Screen 1: An Enchanted 3D Surprise Gift Box hovers in the celestial night sky.
- *    - Velvet crimson box, gilded satin ribbons, golden heart bow, and personalized tag: "For: Loki ❤️".
- *    - Interactive 3D mouse parallax tilt & floating stardust sparkles.
- * 2. Unboxing Ceremony:
- *    - User taps the gift box or "OPEN YOUR SURPRISE" button.
- *    - Golden bow unties, 3D lid pops off, radiant light beams shoot out.
- *    - Exploding shower of floating hearts, confetti, and golden ASCII embers!
- * 3. Living ASCII Teddy Bear:
- *    - Living 24-bit True-Color ASCII Teddy Bear emerges slowly from the bottom upward.
+ * Interactive Flow:
+ * 1. Carrier Pigeon Delivery:
+ *    - Majestically flies in across the starry sky carrying a sealed romantic letter.
+ *    - Drops the letter into the center of the screen, then swoops away into the cosmos.
+ * 2. Interactive Name Entry & Multi-Language Generation:
+ *    - When the user taps the letter / "TOUCH THE LETTER TO OPEN", an enchanting modal opens.
+ *    - Asking: "Who is this surprise for? ✨"
+ *    - User types their name (e.g. Loki, Priya, Rahul, Alex, etc.).
+ *    - In real time, the multi-language transliteration engine translates and previews their name
+ *      across 10+ languages: Tamil, Hindi, Telugu, Japanese, Korean, Chinese, Arabic, Russian, Greek, English!
+ * 3. Sacred Wax Unsealing Ceremony:
+ *    - 3D wax seal shatters into 80+ glowing crystal shards and light shockwaves.
+ *    - The envelope unrolls with an illuminated love decree addressed to their name in multi-languages!
+ *    - The letter dissolves into ascending golden stardust and hearts.
+ * 4. Living ASCII Teddy Bear & Global Name Dedication:
+ *    - The 24-bit True-Color ASCII Teddy Bear emerges slowly from the bottom upward.
  *    - Up-side (top) selector bar allows switching between 4 unique teddy bears.
- *    - Floating Polaroid photo of Loki with handwritten script and custom upload.
- *    - Interactive action buttons: Save Gift 🎁, Make Teddy Wave 👋, Pulse Heart 💖, Explore World ✨.
- *    - Real-time theme switcher (Aurora, Rose, Honey, Twilight) and Web Audio music box.
- *    - Pure ASCII Key signature for LOKESH KUMAR.
+ *    - Floating Polaroid photo of Loki framed with love and user's name in native script.
+ *    - Top header badge features a dynamic rotating multi-language ribbon of their name.
+ *    - Interactive dedication card showcases their name across all 10 world languages with an "Edit Name ✎" option.
+ *    - Pure ASCII signature dynamically adapts to spell their name in ASCII keys and hex bytes.
  */
 
-import { AmbientParticles } from './ambient-particles.js?v=11.0';
-import { GiftBoxController } from './gift-box.js?v=11.0';
-import { AsciiTeddy } from './ascii-teddy.js?v=11.0';
-import { AudioManager } from './audio-fx.js?v=11.0';
+import { AmbientParticles } from './ambient-particles.js?v=12.0';
+import { AsciiPigeon } from './ascii-pigeon.js?v=12.0';
+import { AsciiEnvelope } from './ascii-envelope.js?v=12.0';
+import { AsciiTeddy } from './ascii-teddy.js?v=12.0';
+import { AudioManager } from './audio-fx.js?v=12.0';
+import { generateMultiLangName, getLanguageList } from './name-multilang.js?v=12.0';
 
 class PigeonTeddyApp {
   constructor() {
-    this.currentScreen = 'gift'; // 'gift' or 'teddy'
+    this.currentScreen = 'delivery'; // 'delivery' or 'teddy'
     this.isTransitioning = false;
+    this.recipientName = 'Loki';
+    this.multiLangData = generateMultiLangName(this.recipientName);
 
     // Atmosphere Themes
     this.themes = [
@@ -47,22 +57,40 @@ class PigeonTeddyApp {
 
   initElements() {
     this.ambientCanvas = document.getElementById('ambient-canvas');
-    this.giftScreen = document.getElementById('gift-screen');
+    this.deliveryScreen = document.getElementById('delivery-screen');
     this.teddyScreen = document.getElementById('teddy-screen');
 
-    // Gift Screen elements
-    this.surpriseGiftBox = document.getElementById('surprise-gift-box');
-    this.giftSparkleCanvas = document.getElementById('gift-sparkle-canvas');
-    this.giftOpenBtn = document.getElementById('gift-open-btn');
+    // Delivery Screen elements
+    this.pigeonCanvas = document.getElementById('pigeon-canvas');
+    this.envelopeCanvas = document.getElementById('envelope-canvas');
+    this.envelopeHint = document.getElementById('envelope-hint');
+    this.unsealBtn = document.getElementById('unseal-btn');
+    this.unsealSubcaption = document.getElementById('unseal-subcaption');
+
+    // Name Entry & Multi-Language Modal
+    this.nameModal = document.getElementById('name-modal');
+    this.nameForm = document.getElementById('name-form');
+    this.nameInput = document.getElementById('recipient-name-input');
+    this.previewChips = document.getElementById('preview-chips');
+    this.btnConfirmName = document.getElementById('btn-confirm-name');
 
     // Teddy Screen elements
     this.teddyCanvas = document.getElementById('teddy-canvas');
     this.teddySelectorBar = document.getElementById('teddy-selector-bar');
+    this.headerNameDisplay = document.getElementById('header-name-display');
+    this.headerMultilangTicker = document.getElementById('header-multilang-ticker');
+
     this.floatingPolaroid = document.getElementById('floating-polaroid');
     this.polaroidImg = document.getElementById('polaroid-img');
     this.photoUploadInput = document.getElementById('photo-upload-input');
+    this.polaroidName = document.getElementById('polaroid-name');
+    this.polaroidNativeScript = document.getElementById('polaroid-native-script');
 
     this.giftActionCard = document.getElementById('gift-action-card');
+    this.cardName = document.getElementById('card-name');
+    this.langGridDisplay = document.getElementById('lang-grid-display');
+    this.btnEditName = document.getElementById('btn-edit-name');
+
     this.btnSaveGift = document.getElementById('btn-save-gift');
     this.btnMakeWave = document.getElementById('btn-make-wave');
     this.btnPulseHeart = document.getElementById('btn-pulse-heart');
@@ -92,18 +120,42 @@ class PigeonTeddyApp {
   }
 
   initRenderers() {
-    // 1. Interactive 3D Celestial Surprise Gift Box
-    if (this.surpriseGiftBox && this.giftSparkleCanvas) {
-      this.giftBoxController = new GiftBoxController(
-        this.surpriseGiftBox,
-        this.giftSparkleCanvas,
+    // 1. ASCII Carrier Pigeon Dove
+    if (this.pigeonCanvas) {
+      this.pigeonRenderer = new AsciiPigeon(
+        this.pigeonCanvas,
+        // On letter dropped into center stage:
         () => {
-          this.transitionToTeddy();
+          if (this.envelopeCanvas) {
+            this.envelopeCanvas.classList.add('visible');
+          }
+          if (this.envelopeHint) {
+            this.envelopeHint.classList.add('visible');
+          }
+          try {
+            this.audioManager.playDrop();
+          } catch (e) {}
+        },
+        // On pigeon departed into stars:
+        () => {
+          if (this.pigeonRenderer) this.pigeonRenderer.stop();
         }
       );
     }
 
-    // 2. Living Colored ASCII Teddy Bear
+    // 2. ASCII Sealed Letter & Unsealing Ceremony
+    if (this.envelopeCanvas) {
+      this.envelopeRenderer = new AsciiEnvelope(
+        this.envelopeCanvas,
+        // On envelope unseal & burn complete:
+        () => {
+          this.transitionToTeddy();
+        }
+      );
+      this.envelopeRenderer.setRecipientName(this.recipientName, this.multiLangData);
+    }
+
+    // 3. Living Colored ASCII Teddy Bear
     if (this.teddyCanvas) {
       this.teddyRenderer = new AsciiTeddy(this.teddyCanvas, () => {
         // Once teddy finishes emerging, show action card and signature
@@ -144,40 +196,153 @@ class PigeonTeddyApp {
     } catch (e) {}
   }
 
-  initInteractions() {
-    // Open Gift Trigger
-    const handleGiftOpen = () => {
-      if (this.currentScreen !== 'gift' || this.isTransitioning) return;
+  openNameModal() {
+    if (!this.nameModal) return;
+    this.nameModal.classList.add('visible');
+    this.nameModal.setAttribute('aria-hidden', 'false');
+    if (this.nameInput) {
+      this.nameInput.value = this.recipientName || 'Loki';
+      this.updateLivePreview(this.nameInput.value);
+      setTimeout(() => this.nameInput.focus(), 150);
+    }
+  }
 
+  closeNameModal() {
+    if (!this.nameModal) return;
+    this.nameModal.classList.remove('visible');
+    this.nameModal.setAttribute('aria-hidden', 'true');
+  }
+
+  updateLivePreview(nameStr) {
+    if (!this.previewChips) return;
+    const data = generateMultiLangName(nameStr || 'Loki');
+    const list = getLanguageList(data);
+
+    this.previewChips.innerHTML = list.map(item => `
+      <div class="preview-chip" title="${item.label} (${item.script})">
+        <span class="chip-flag">${item.flag}</span>
+        <span class="chip-lang">${item.script}:</span>
+        <span class="chip-text">${item.text}</span>
+      </div>
+    `).join('');
+  }
+
+  applyRecipientName(nameStr) {
+    const cleanName = (nameStr || 'Loki').trim() || 'Loki';
+    this.recipientName = cleanName;
+    this.multiLangData = generateMultiLangName(cleanName);
+
+    // 1. Update Envelope Renderer
+    if (this.envelopeRenderer) {
+      this.envelopeRenderer.setRecipientName(this.recipientName, this.multiLangData);
+    }
+
+    // 2. Update Header Banner Display & Ticker
+    if (this.headerNameDisplay) {
+      this.headerNameDisplay.textContent = this.recipientName.toUpperCase();
+    }
+    if (this.headerMultilangTicker) {
+      this.headerMultilangTicker.textContent = `${this.multiLangData.ta} • ${this.multiLangData.hi} • ${this.multiLangData.ja} • ${this.multiLangData.ko} • ${this.multiLangData.zh} • ${this.multiLangData.ar}`;
+    }
+
+    // 3. Update Polaroid Caption
+    if (this.polaroidName) {
+      this.polaroidName.textContent = this.recipientName;
+    }
+    if (this.polaroidNativeScript) {
+      this.polaroidNativeScript.textContent = this.multiLangData.ta || this.multiLangData.hi;
+    }
+
+    // 4. Update Dedication Card
+    if (this.cardName) {
+      this.cardName.textContent = this.recipientName;
+    }
+
+    // 5. Update Multi-Language Showcase Grid in Dedication Card
+    if (this.langGridDisplay) {
+      const list = getLanguageList(this.multiLangData);
+      this.langGridDisplay.innerHTML = list.map(item => `
+        <div class="lang-pill" title="${item.label}">
+          <div class="lang-pill-left">
+            <span>${item.flag}</span>
+            <span>${item.script}</span>
+          </div>
+          <div class="lang-pill-text">${item.text}</div>
+        </div>
+      `).join('');
+    }
+
+    // 6. Update ASCII Signature Key cluster
+    this.updateAsciiSignature(this.recipientName);
+  }
+
+  updateAsciiSignature(name) {
+    if (!this.cornerSignature) return;
+    const cluster = this.cornerSignature.querySelector('.ascii-key-cluster');
+    const bytesDiv = this.cornerSignature.querySelector('.ascii-sig-bytes');
+    if (!cluster) return;
+
+    const upper = name.toUpperCase().replace(/[^A-Z]/g, '') || 'LOKI';
+    cluster.innerHTML = `
+      <div class="ascii-key-word">
+        ${upper.split('').map(ch => `<span class="ascii-key">${ch}</span>`).join('')}
+      </div>
+    `;
+
+    if (bytesDiv) {
+      const hexBytes = upper.split('').map(ch => ch.charCodeAt(0).toString(16).toUpperCase()).join(' ');
+      bytesDiv.innerHTML = `<span class="ascii-code">ASCII_KEY:</span> ${hexBytes} <span class="sig-star">✦</span>`;
+    }
+  }
+
+  initInteractions() {
+    // Click letter / envelope to ask name
+    const handleLetterOpenRequest = () => {
+      if (this.currentScreen !== 'delivery' || this.isTransitioning) return;
       try {
         this.audioManager.init();
-        this.audioManager.playHeartBurst();
-        this.audioManager.playBloomChime();
+        this.audioManager.playClick();
       } catch (e) {}
-
-      if (this.giftBoxController) {
-        this.giftBoxController.openGift();
-      } else {
-        this.transitionToTeddy();
-      }
+      this.openNameModal();
     };
 
-    // Tap gift box
-    if (this.surpriseGiftBox) {
-      this.surpriseGiftBox.addEventListener('click', handleGiftOpen);
-      this.surpriseGiftBox.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+    if (this.envelopeCanvas) {
+      this.envelopeCanvas.addEventListener('click', handleLetterOpenRequest);
+    }
+    if (this.unsealBtn) {
+      this.unsealBtn.addEventListener('click', handleLetterOpenRequest);
+    }
+
+    // Real-time input typing transliteration
+    if (this.nameInput) {
+      this.nameInput.addEventListener('input', (e) => {
+        this.updateLivePreview(e.target.value);
+      });
+      this.nameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
           e.preventDefault();
-          handleGiftOpen();
+          this.submitName();
         }
       });
     }
 
-    // Tap open button
-    if (this.giftOpenBtn) {
-      this.giftOpenBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        handleGiftOpen();
+    // Confirm Name Form Submit
+    if (this.nameForm) {
+      this.nameForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.submitName();
+      });
+    }
+    if (this.btnConfirmName) {
+      this.btnConfirmName.addEventListener('click', () => {
+        this.submitName();
+      });
+    }
+
+    // Edit Name button in Dedication card
+    if (this.btnEditName) {
+      this.btnEditName.addEventListener('click', () => {
+        this.openNameModal();
       });
     }
 
@@ -229,7 +394,7 @@ class PigeonTeddyApp {
       this.btnMakeWave.addEventListener('click', () => {
         if (this.teddyRenderer) {
           this.teddyRenderer.triggerWave();
-          this.showToast('Teddy waves happily to you! 👋✨');
+          this.showToast(`Teddy waves happily to you, ${this.recipientName}! 👋✨`);
           try {
             this.audioManager.playBloomChime();
           } catch (e) {}
@@ -242,7 +407,7 @@ class PigeonTeddyApp {
       this.btnPulseHeart.addEventListener('click', () => {
         if (this.teddyRenderer) {
           this.teddyRenderer.triggerHeartPulse();
-          this.showToast('Teddy sends a warm heartbeat! 💖✨');
+          this.showToast(`Glowing heart pulses with love for ${this.recipientName}! 💖`);
           try {
             this.audioManager.playHeartBurst();
           } catch (e) {}
@@ -250,15 +415,16 @@ class PigeonTeddyApp {
       });
     }
 
-    // Interactive Action 4: Explore World (Modal)
+    // Interactive Action 4: Explore Developer Portfolio Modal
     if (this.btnExploreWorld) {
       this.btnExploreWorld.addEventListener('click', () => {
         if (this.worldModal) {
           this.worldModal.classList.add('visible');
-          try {
-            this.audioManager.playClick();
-          } catch (e) {}
+          this.worldModal.setAttribute('aria-hidden', 'false');
         }
+        try {
+          this.audioManager.playClick();
+        } catch (e) {}
       });
     }
 
@@ -266,37 +432,19 @@ class PigeonTeddyApp {
       this.btnCloseWorld.addEventListener('click', () => {
         if (this.worldModal) {
           this.worldModal.classList.remove('visible');
+          this.worldModal.setAttribute('aria-hidden', 'true');
         }
       });
     }
 
-    if (this.worldModal) {
-      this.worldModal.addEventListener('click', (e) => {
-        if (e.target === this.worldModal) {
-          this.worldModal.classList.remove('visible');
-        }
-      });
-    }
-
-    // Replay Button: Open the Surprise Gift Again!
+    // Replay Experience (Watch Again)
     if (this.replayBtn) {
       this.replayBtn.addEventListener('click', () => {
         this.restartExperience();
       });
     }
 
-    // Floating Polaroid Photo: Click to Zoom / Enlarge
-    if (this.floatingPolaroid) {
-      this.floatingPolaroid.addEventListener('click', (e) => {
-        if (e.target.closest('.btn-change-photo') || e.target.closest('input')) return;
-        this.floatingPolaroid.classList.toggle('enlarged');
-        try {
-          this.audioManager.playClick();
-        } catch (err) {}
-      });
-    }
-
-    // Custom Photo Upload on Polaroid
+    // Custom Photo Upload Input
     if (this.photoUploadInput && this.polaroidImg) {
       this.photoUploadInput.addEventListener('change', (e) => {
         const file = e.target.files && e.target.files[0];
@@ -316,8 +464,12 @@ class PigeonTeddyApp {
 
     // Key accessibility navigation
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && this.worldModal && this.worldModal.classList.contains('visible')) {
-        this.worldModal.classList.remove('visible');
+      if (e.key === 'Escape') {
+        if (this.nameModal && this.nameModal.classList.contains('visible')) {
+          this.closeNameModal();
+        } else if (this.worldModal && this.worldModal.classList.contains('visible')) {
+          this.worldModal.classList.remove('visible');
+        }
       }
       if (e.key === 'ArrowRight' && this.currentScreen === 'teddy' && this.teddyRenderer) {
         const next = (this.teddyRenderer.currentIndex + 1) % 4;
@@ -332,9 +484,32 @@ class PigeonTeddyApp {
     });
 
     window.addEventListener('resize', () => {
-      if (this.giftBoxController) this.giftBoxController.resize();
+      if (this.pigeonRenderer) this.pigeonRenderer.resize();
+      if (this.envelopeRenderer) this.envelopeRenderer.resize();
       if (this.teddyRenderer) this.teddyRenderer.resize();
     });
+  }
+
+  submitName() {
+    const nameVal = this.nameInput ? this.nameInput.value : 'Loki';
+    this.applyRecipientName(nameVal);
+    this.closeNameModal();
+
+    if (this.currentScreen === 'delivery') {
+      try {
+        this.audioManager.playHeartBurst();
+        this.audioManager.playBloomChime();
+      } catch (e) {}
+
+      // Trigger spectacular envelope unsealing ceremony
+      if (this.envelopeRenderer) {
+        this.envelopeRenderer.triggerClick();
+      } else {
+        this.transitionToTeddy();
+      }
+    } else {
+      this.showToast(`Updated name to ${this.recipientName} across all languages! ✨`);
+    }
   }
 
   saveGiftSnapshot() {
@@ -360,32 +535,30 @@ class PigeonTeddyApp {
         sCtx.drawImage(this.teddyCanvas, 100, 100, 1000, 1000);
       }
 
-      // Gilded dedication banner
-      sCtx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-      sCtx.font = 'bold 36px "Inter", sans-serif';
+      // Title & multi-language dedication overlay
+      sCtx.fillStyle = '#ffd700';
+      sCtx.font = 'bold 36px serif';
       sCtx.textAlign = 'center';
-      sCtx.fillText('SPECIALLY CRAFTED FOR LOKI', w * 0.5, 90);
+      sCtx.fillText(`✦ SPECIALLY CRAFTED FOR ${this.recipientName.toUpperCase()} ✦`, w * 0.5, 90);
 
-      sCtx.fillStyle = '#ff7b9f';
-      sCtx.font = 'italic 28px "Cormorant Garamond", serif';
-      sCtx.fillText('"You bring endless warmth, comfort, and happiness."', w * 0.5, h - 90);
+      sCtx.fillStyle = '#ff7b9c';
+      sCtx.font = '22px sans-serif';
+      sCtx.fillText(`${this.multiLangData.ta} • ${this.multiLangData.hi} • ${this.multiLangData.ja} • ${this.multiLangData.ar}`, w * 0.5, 130);
 
-      sCtx.fillStyle = 'rgba(255, 255, 255, 0.65)';
-      sCtx.font = '600 20px monospace';
-      sCtx.fillText('> with love : LOKESH KUMAR', w * 0.5, h - 50);
+      // Footer
+      sCtx.fillStyle = '#c5d0e8';
+      sCtx.font = 'italic 20px "Cormorant Garamond", serif';
+      sCtx.fillText('Living 24-Bit Procedural ASCII Art • Handcrafted with love by Lokesh Kumar', w * 0.5, h - 50);
 
       const link = document.createElement('a');
-      link.download = `loki-teddy-gift-${Date.now()}.png`;
+      link.download = `Teddy_Gift_For_${this.recipientName}.png`;
       link.href = snapCanvas.toDataURL('image/png');
       link.click();
 
-      this.showToast('Keepsake saved to your device! 🎁💖');
-      try {
-        this.audioManager.playHeartBurst();
-      } catch (e) {}
+      this.showToast(`Keepsake downloaded for ${this.recipientName}! 🎁✨`);
     } catch (err) {
-      console.warn('Snapshot error:', err);
-      this.showToast('Could not save snapshot directly. Take a screenshot! 📸');
+      console.error(err);
+      this.showToast('Unable to export snapshot in this browser.');
     }
   }
 
@@ -406,14 +579,15 @@ class PigeonTeddyApp {
       this.audioManager.playBloomChime();
     } catch (e) {}
 
-    // 1. Fade out gift screen
-    if (this.giftScreen) {
-      this.giftScreen.classList.remove('active');
+    // 1. Fade out delivery screen
+    if (this.deliveryScreen) {
+      this.deliveryScreen.classList.remove('active');
     }
 
     setTimeout(() => {
-      if (this.giftBoxController) this.giftBoxController.stop();
-      if (this.giftScreen) this.giftScreen.style.display = 'none';
+      if (this.pigeonRenderer) this.pigeonRenderer.stop();
+      if (this.envelopeRenderer) this.envelopeRenderer.stop();
+      if (this.deliveryScreen) this.deliveryScreen.style.display = 'none';
 
       // 2. Fade in teddy screen
       if (this.teddyScreen) {
@@ -446,35 +620,35 @@ class PigeonTeddyApp {
 
   restartExperience() {
     this.isTransitioning = true;
-    this.currentScreen = 'gift';
+    this.currentScreen = 'delivery';
 
-    if (this.giftActionCard) {
-      this.giftActionCard.classList.remove('visible');
-    }
-    if (this.floatingPolaroid) {
-      this.floatingPolaroid.classList.remove('visible');
-    }
-    if (this.cornerSignature) {
-      this.cornerSignature.classList.remove('visible');
-    }
-    if (this.teddySelectorBar) {
-      this.teddySelectorBar.classList.remove('visible');
-    }
+    if (this.teddyRenderer) this.teddyRenderer.stop();
     if (this.teddyScreen) {
       this.teddyScreen.classList.remove('active');
     }
 
     setTimeout(() => {
-      if (this.teddyRenderer) this.teddyRenderer.stop();
-
-      if (this.giftBoxController) {
-        this.giftBoxController.reset();
-        this.giftBoxController.startAmbientLoop();
+      if (this.pigeonRenderer) {
+        this.pigeonRenderer.reset();
+        this.pigeonRenderer.start();
       }
 
-      if (this.giftScreen) {
-        this.giftScreen.style.display = '';
-        this.giftScreen.classList.add('active');
+      if (this.envelopeRenderer) {
+        this.envelopeRenderer.reset();
+        this.envelopeRenderer.start();
+      }
+
+      if (this.envelopeHint) {
+        this.envelopeHint.classList.remove('visible');
+      }
+
+      if (this.envelopeCanvas) {
+        this.envelopeCanvas.classList.remove('visible');
+      }
+
+      if (this.deliveryScreen) {
+        this.deliveryScreen.style.display = '';
+        this.deliveryScreen.classList.add('active');
       }
 
       this.isTransitioning = false;
@@ -482,12 +656,19 @@ class PigeonTeddyApp {
   }
 
   start() {
+    this.applyRecipientName('Loki');
+
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('scene') === 'teddy') {
+    const nameParam = urlParams.get('name');
+    if (nameParam) {
+      this.applyRecipientName(nameParam);
+    }
+
+    if (urlParams.get('scene') === 'teddy' || urlParams.get('testScene') === 'reveal') {
       this.currentScreen = 'teddy';
-      if (this.giftScreen) {
-        this.giftScreen.classList.remove('active');
-        this.giftScreen.style.display = 'none';
+      if (this.deliveryScreen) {
+        this.deliveryScreen.classList.remove('active');
+        this.deliveryScreen.style.display = 'none';
       }
       if (this.teddyScreen) {
         this.teddyScreen.classList.add('active');
@@ -496,15 +677,23 @@ class PigeonTeddyApp {
       }
       if (this.teddySelectorBar) {
         this.teddySelectorBar.classList.add('visible');
+        this.teddySelectorBar.style.transition = 'none';
+        this.teddySelectorBar.style.opacity = '1';
       }
       if (this.giftActionCard) {
         this.giftActionCard.classList.add('visible');
+        this.giftActionCard.style.transition = 'none';
+        this.giftActionCard.style.opacity = '1';
       }
       if (this.floatingPolaroid) {
         this.floatingPolaroid.classList.add('visible');
+        this.floatingPolaroid.style.transition = 'none';
+        this.floatingPolaroid.style.opacity = '1';
       }
       if (this.cornerSignature) {
         this.cornerSignature.classList.add('visible');
+        this.cornerSignature.style.transition = 'none';
+        this.cornerSignature.style.opacity = '1';
       }
 
       const teddyParam = parseInt(urlParams.get('teddy'), 10);
@@ -517,30 +706,21 @@ class PigeonTeddyApp {
         this.teddyRenderer.reset(true);
         this.teddyRenderer.start();
       }
-    }
-
-    // Start ambient celestial stardust & rising hearts
-    let lastTime = performance.now();
-    const loop = (now) => {
-      const dt = Math.min((now - lastTime) / 1000, 0.1);
-      lastTime = now;
-
-      if (this.ambientParticles) {
-        this.ambientParticles.update(dt);
-        this.ambientParticles.render();
+    } else {
+      // Start Carrier Pigeon flight & envelope engine
+      if (this.pigeonRenderer) {
+        this.pigeonRenderer.start();
       }
-      requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
+      if (this.envelopeRenderer) {
+        this.envelopeRenderer.start();
+      }
+    }
   }
 }
 
-if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      window.app = new PigeonTeddyApp();
-    });
-  } else {
-    window.app = new PigeonTeddyApp();
-  }
+// Bootstrap once DOM is ready
+if (typeof window !== 'undefined') {
+  window.addEventListener('DOMContentLoaded', () => {
+    window.__pigeonTeddyApp = new PigeonTeddyApp();
+  });
 }

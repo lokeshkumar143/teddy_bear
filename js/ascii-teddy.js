@@ -34,22 +34,22 @@ export class AsciiTeddy {
       {
         id: 'hugging-heart',
         title: 'Hugging Heart',
-        src: 'assets/teddy-1-clean.png?v=11.0'
+        src: 'assets/teddy-1-clean.png?v=12.0'
       },
       {
         id: 'sweet-dreams',
         title: 'Sweet Dreams',
-        src: 'assets/teddy-2-clean.png?v=11.0'
+        src: 'assets/teddy-2-clean.png?v=12.0'
       },
       {
         id: 'heart-balloon',
         title: 'Heart Balloon',
-        src: 'assets/teddy-3-clean.png?v=11.0'
+        src: 'assets/teddy-3-clean.png?v=12.0'
       },
       {
         id: 'love-balloon',
         title: 'Love Balloon',
-        src: 'assets/teddy-4-standing-clean.png?v=11.0'
+        src: 'assets/teddy-4-standing-clean.png?v=12.0'
       }
     ];
 

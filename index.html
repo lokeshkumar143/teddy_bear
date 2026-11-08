@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=11.0">
+  <link rel="stylesheet" href="css/style.css?v=12.0">
 </head>
 <body class="theme-aurora">
 
@@ -34,73 +34,38 @@
 
   <main class="stage">
 
-    <!-- Screen 1: The Enchanted Celestial Surprise Gift Box -->
-    <div id="gift-screen" class="scene active">
-      <!-- Ambient Sparkle Canvas behind gift -->
-      <canvas id="gift-sparkle-canvas"></canvas>
+    <!-- Screen 1: Carrier Pigeon Delivering the Romantic Letter -->
+    <div id="delivery-screen" class="scene active">
+      <!-- 1. Flying ASCII Carrier Dove bringing the letter across the starry sky -->
+      <canvas id="pigeon-canvas" aria-label="ASCII Carrier Pigeon flying with love letter"></canvas>
+      
+      <!-- 2. Sealed Romantic Letter resting in Center Stage -->
+      <canvas id="envelope-canvas" aria-label="Sealed Love Letter For You"></canvas>
 
-      <div class="gift-showcase-container">
-        <!-- Floating Header Badge -->
-        <div class="gift-floating-badge">✦ &nbsp;A SPECIAL SURPRISE IS WAITING &nbsp;✦</div>
-
-        <!-- 3D Floating Surprise Gift Box -->
-        <div id="surprise-gift-box" class="surprise-gift-box" role="button" tabindex="0" aria-label="Open your surprise gift box">
-          <div class="gift-aura"></div>
-          
-          <!-- Box Lid & Bow -->
-          <div class="gift-lid-wrapper">
-            <div class="gift-lid">
-              <div class="lid-ribbon-h"></div>
-              <div class="lid-ribbon-v"></div>
-              <!-- Golden Ribbon Bow -->
-              <div class="golden-bow">
-                <div class="bow-loop bow-loop-left"></div>
-                <div class="bow-loop bow-loop-right"></div>
-                <div class="bow-knot">❤</div>
-                <div class="bow-tail bow-tail-left"></div>
-                <div class="bow-tail bow-tail-right"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Box Body -->
-          <div class="gift-body">
-            <div class="body-ribbon-v"></div>
-            <div class="body-ribbon-h"></div>
-            
-            <!-- Hanging Gift Tag for Loki -->
-            <div class="gift-tag">
-              <div class="tag-string"></div>
-              <div class="tag-card">
-                <span class="tag-label">For:</span>
-                <span class="tag-name">Loki ❤️</span>
-                <span class="tag-note">With all my love</span>
-              </div>
-            </div>
-
-            <!-- Radiant Light Beams (erupts on open) -->
-            <div class="gift-light-beams"></div>
-          </div>
-        </div>
-
-        <!-- Call-to-action button & subcaption -->
-        <div class="gift-cta-container">
-          <button class="gift-open-btn" id="gift-open-btn" type="button" aria-label="Open your surprise gift">
-            <span class="gift-sparkle">✦</span>
-            <span class="gift-btn-text">OPEN YOUR SURPRISE</span>
-            <span class="gift-btn-icon">🎁</span>
-            <span class="gift-sparkle">✦</span>
-          </button>
-          <p class="gift-subcaption">Tap the gift box to meet your companion ✨</p>
-        </div>
+      <!-- 3. Enchanted Unseal Call-to-Action -->
+      <div class="unseal-cta-wrapper" id="envelope-hint">
+        <button class="unseal-cta-btn" id="unseal-btn" type="button" aria-label="Touch the sacred seal to open your letter">
+          <span class="unseal-sparkle">✦</span>
+          <span class="unseal-text">TOUCH THE LETTER TO OPEN</span>
+          <span class="unseal-heart-icon">💌</span>
+          <span class="unseal-sparkle">✦</span>
+        </button>
+        <div class="unseal-subcaption" id="unseal-subcaption">A carrier dove has delivered a celestial letter for you ✨</div>
       </div>
     </div>
 
     <!-- Screen 2: Living ASCII Teddy Bear Universe with Up-Side Selector & Rich UI -->
     <div id="teddy-screen" class="scene teddy-screen">
 
-      <!-- Header Title Badge -->
-      <div class="experience-header-badge">✦ &nbsp;SPECIALLY CRAFTED FOR LOKI &nbsp;✦</div>
+      <!-- Header Title Badge with Multi-Language Ribbon -->
+      <div class="experience-header-badge" id="experience-header-badge">
+        <span class="badge-sparkle">✦</span>
+        <span>SPECIALLY CRAFTED FOR</span>
+        <span id="header-name-display" class="highlight-name">LOKI</span>
+        <span class="badge-separator">•</span>
+        <span id="header-multilang-ticker" class="multilang-ticker">லோகி • लोकी • ロキ • 로키 • 洛基 • لوكي</span>
+        <span class="badge-sparkle">✦</span>
+      </div>
 
       <!-- 1. Up-Side (Top) Multi-Teddy Selector Bar -->
       <div id="teddy-selector-bar" class="teddy-selector-bar" role="tablist" aria-label="Choose Teddy Bear">
@@ -131,23 +96,40 @@
       <div id="floating-polaroid" class="floating-polaroid" title="Click to view photo">
         <div class="polaroid-tape"></div>
         <div class="polaroid-inner">
-          <img id="polaroid-img" src="assets/loki-portrait.jpg?v=9.0" alt="Loki Portrait">
+          <img id="polaroid-img" src="assets/loki-portrait.jpg?v=12.0" alt="Loki Portrait">
           <label for="photo-upload-input" class="btn-change-photo" title="Upload custom photo" aria-label="Upload custom photo">
             <span>📷</span>
           </label>
           <input type="file" id="photo-upload-input" accept="image/*" class="sr-only">
         </div>
-        <p id="polaroid-caption" class="polaroid-caption">Best Friends Forever ❤️ loki</p>
+        <p id="polaroid-caption" class="polaroid-caption">
+          <span>Best Friends Forever</span>
+          <span class="caption-name-line">❤️ <span id="polaroid-name">Loki</span> <span id="polaroid-native-script" class="polaroid-native-script">லோகி</span></span>
+        </p>
       </div>
 
       <!-- 4. Interactive Frosted Glass Action Card -->
       <div id="gift-action-card" class="gift-action-card">
         <div class="card-sparkle-pill">✦ &nbsp;HEARTFELT DEDICATION &nbsp;✦</div>
         
-        <h2 id="gift-card-title" class="gift-card-title">Hey, loki! ✨</h2>
+        <h2 id="gift-card-title" class="gift-card-title">Hey, <span id="card-name">Loki</span>! ✨</h2>
         
         <p id="gift-card-sub1" class="gift-card-sub">This little teddy was made just for you.</p>
         <p id="gift-card-sub2" class="gift-card-sub highlight">Sending you warmth, comfort, and happiness. ❤️</p>
+
+        <!-- Multi-Language Name Showcase -->
+        <div class="multilang-showcase-box">
+          <div class="showcase-header">
+            <span class="showcase-title-group">
+              <span class="showcase-icon">🌍</span>
+              <span>Name in 10 World Languages</span>
+            </span>
+            <button id="btn-edit-name" class="btn-edit-name" type="button" title="Change Name">✎ Change</button>
+          </div>
+          <div id="lang-grid-display" class="lang-grid-display">
+            <!-- Dynamically populated 10 language cards -->
+          </div>
+        </div>
 
         <!-- Interactive Action Buttons -->
         <div class="gift-action-group">
@@ -209,6 +191,48 @@
 
   </main>
 
+  <!-- Interactive Name Entry & Multi-Language Generation Modal -->
+  <div id="name-modal" class="name-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="name-modal-backdrop"></div>
+    <div class="name-modal-card">
+      <div class="name-modal-icon">💌</div>
+      <div class="name-modal-badge">✦ &nbsp;A CELESTIAL LETTER FOR YOU &nbsp;✦</div>
+      <h2 class="name-modal-title">Who is this surprise for? ✨</h2>
+      <p class="name-modal-subtitle">Enter your name to break the wax seal and see your name transformed across 10+ world languages!</p>
+
+      <form id="name-form" class="name-form" onsubmit="return false;">
+        <div class="name-input-wrapper">
+          <span class="name-input-icon">❤️</span>
+          <input 
+            type="text" 
+            id="recipient-name-input" 
+            class="recipient-name-input" 
+            value="Loki" 
+            placeholder="Enter your name (e.g. Loki, Priya, Alex...)" 
+            maxlength="24" 
+            autocomplete="off" 
+            required 
+          />
+        </div>
+
+        <!-- Real-time Live Multi-Language Preview -->
+        <div class="live-multilang-preview">
+          <div class="preview-label">✨ Real-time Transliteration Preview:</div>
+          <div id="preview-chips" class="preview-chips">
+            <!-- Dynamically populated chips -->
+          </div>
+        </div>
+
+        <button id="btn-confirm-name" class="btn-confirm-name" type="submit">
+          <span class="btn-sparkle">✦</span>
+          <span>BREAK SEAL & REVEAL MY TEDDY</span>
+          <span class="btn-icon">💖</span>
+          <span class="btn-sparkle">✦</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
   <!-- Interactive Creative Portfolio Modal ("Explore My World") -->
   <div id="world-modal" class="world-modal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="world-modal-backdrop"></div>
@@ -256,6 +280,6 @@
   <!-- Toast Notification Feedback -->
   <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=11.0"></script>
+  <script type="module" src="js/app.js?v=12.0"></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 {
   "name": "teddy_bear",
+  "type": "module",
   "version": "1.0.0",
   "description": "A romantic, full-screen procedural ASCII art universe and interactive digital gift crafted with love, code, and mathematics for Loki.",
   "scripts": {
