@@ -15,13 +15,7 @@ import { AsciiPigeon } from './ascii-pigeon.js?v=12.0';
 import { AsciiEnvelope } from './ascii-envelope.js?v=13.0';
 import { AsciiTeddy } from './ascii-teddy.js?v=15.0';
 import { AudioManager } from './audio-fx.js?v=12.0';
-import { 
-  MultiLangNameProfile, 
-  generateMultiLangName, 
-  getLanguageList, 
-  detectScript 
-} from './name-multilang.js?v=14.0';
-import { i18n, SUPPORTED_LOCALES } from './i18n.js?v=13.0';
+import { MultiLangNameProfile } from './name-multilang.js?v=14.0';
 
 class PigeonTeddyApp {
   constructor() {
@@ -31,7 +25,6 @@ class PigeonTeddyApp {
     // Load or initialize Name Profile (Default: 'Loki')
     this.nameProfile = MultiLangNameProfile.load() || new MultiLangNameProfile('Loki');
     this.recipientName = this.nameProfile.originalName;
-    this.multiLangData = this.nameProfile.transliterations;
 
     // Atmosphere Themes
     this.themes = [
@@ -45,7 +38,6 @@ class PigeonTeddyApp {
     this.initElements();
     this.initAmbientParticles();
     this.initAudio();
-    this.initI18n();
     this.initRenderers();
     this.initInteractions();
     this.start();
@@ -55,13 +47,6 @@ class PigeonTeddyApp {
     this.ambientCanvas = document.getElementById('ambient-canvas');
     this.deliveryScreen = document.getElementById('delivery-screen');
     this.teddyScreen = document.getElementById('teddy-screen');
-
-    // Language Dropdown elements
-    this.langSelectorWrapper = document.getElementById('lang-selector-wrapper');
-    this.langSelectorBtn = document.getElementById('lang-selector-btn');
-    this.langFlag = document.getElementById('lang-flag');
-    this.langLabel = document.getElementById('lang-label');
-    this.langDropdown = document.getElementById('lang-dropdown');
 
     // Delivery Screen elements
     this.deliveryScreen = document.getElementById('delivery-screen');
@@ -112,105 +97,6 @@ class PigeonTeddyApp {
 
   initAudio() {
     this.audioManager = new AudioManager();
-  }
-
-  initI18n() {
-    // Populate Language dropdown
-    if (this.langDropdown) {
-      this.langDropdown.innerHTML = SUPPORTED_LOCALES.map(loc => `
-        <button class="lang-option ${loc.code === i18n.currentLocale ? 'active' : ''}" 
-                data-locale="${loc.code}" 
-                type="button" 
-                role="menuitem">
-          <span>${loc.flag} ${loc.name}</span>
-          <span class="lang-opt-native">${loc.native}</span>
-        </button>
-      `).join('');
-    }
-
-    // Subscribe to language changes
-    i18n.subscribe((locale) => {
-      this.updateLanguageUI(locale);
-      this.applyTranslations();
-    });
-
-    this.updateLanguageUI(i18n.currentLocale);
-    this.applyTranslations();
-  }
-
-  updateLanguageUI(localeCode) {
-    const loc = SUPPORTED_LOCALES.find(l => l.code === localeCode) || SUPPORTED_LOCALES[0];
-    if (this.langFlag) this.langFlag.textContent = loc.flag;
-    if (this.langLabel) this.langLabel.textContent = loc.native;
-
-    if (this.langDropdown) {
-      this.langDropdown.querySelectorAll('.lang-option').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('data-locale') === localeCode);
-      });
-    }
-  }
-
-  applyTranslations() {
-    // Top Header Badge
-    const headerTitleSpan = this.experienceHeaderBadge?.querySelector('span:nth-child(2)');
-    if (headerTitleSpan) headerTitleSpan.textContent = i18n.t('header_crafted_for');
-
-    // Action Card
-    const cardBadge = this.giftActionCard?.querySelector('.card-sparkle-pill');
-    if (cardBadge) cardBadge.textContent = i18n.t('card_badge');
-
-    const cardSub1 = document.getElementById('gift-card-sub1');
-    if (cardSub1) cardSub1.textContent = i18n.t('card_sub1');
-
-    const cardSub2 = document.getElementById('gift-card-sub2');
-    if (cardSub2) cardSub2.textContent = i18n.t('card_sub2');
-
-    // Action Buttons
-    if (this.btnSaveGift) this.btnSaveGift.querySelector('.btn-text').textContent = i18n.t('btn_save_gift');
-    if (this.btnMakeWave) this.btnMakeWave.querySelector('.btn-text').textContent = i18n.t('btn_make_wave');
-    if (this.btnPulseHeart) this.btnPulseHeart.querySelector('.btn-text').textContent = i18n.t('btn_pulse_heart');
-    if (this.btnExploreWorld) this.btnExploreWorld.querySelector('.btn-text').textContent = i18n.t('btn_explore_world');
-    if (this.replayBtn) this.replayBtn.textContent = i18n.t('btn_replay');
-
-    // Teddy Selector Tabs
-    if (this.teddySelectorBar) {
-      const tabs = this.teddySelectorBar.querySelectorAll('.teddy-tab-btn');
-      tabs.forEach((tab, idx) => {
-        const label = tab.querySelector('.tab-label');
-        if (label) label.textContent = i18n.t(`tab_teddy_${idx}`);
-      });
-    }
-
-    // Delivery Screen CTA
-    if (this.unsealBtn) {
-      const btnText = this.unsealBtn.querySelector('span:first-child');
-      if (btnText) btnText.textContent = i18n.t('envelope_touch_seal');
-    }
-    if (this.envelopeHint) this.envelopeHint.textContent = i18n.t('envelope_hint');
-    if (this.unsealSubcaption) this.unsealSubcaption.textContent = i18n.t('envelope_subcaption');
-
-    // Initial Name Modal
-    const modalBadge = document.querySelector('.name-modal-badge');
-    if (modalBadge) modalBadge.textContent = i18n.t('modal_badge');
-
-    const modalTitle = document.querySelector('.name-modal-title');
-    if (modalTitle) modalTitle.textContent = i18n.t('modal_title');
-
-    const modalSub = document.querySelector('.name-modal-subtitle');
-    if (modalSub) modalSub.textContent = i18n.t('modal_sub');
-
-    if (this.nameInput) this.nameInput.placeholder = i18n.t('modal_placeholder');
-
-    const previewLbl = document.querySelector('.preview-label');
-    if (previewLbl) previewLbl.textContent = i18n.t('modal_preview_label');
-
-    if (this.btnConfirmName) {
-      const span = this.btnConfirmName.querySelector('span:nth-child(2)');
-      if (span) span.textContent = i18n.t('modal_btn_confirm');
-    }
-
-    // Refresh recipient displays
-    this.refreshDisplays();
   }
 
   initRenderers() {
@@ -396,37 +282,6 @@ class PigeonTeddyApp {
   }
 
   initInteractions() {
-    // Language Dropdown open / close
-    if (this.langSelectorBtn && this.langSelectorWrapper) {
-      this.langSelectorBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        this.langSelectorWrapper.classList.toggle('open');
-      });
-
-      document.addEventListener('click', (e) => {
-        if (!this.langSelectorWrapper.contains(e.target)) {
-          this.langSelectorWrapper.classList.remove('open');
-        }
-      });
-    }
-
-    // Language Option click
-    if (this.langDropdown) {
-      this.langDropdown.addEventListener('click', (e) => {
-        const opt = e.target.closest('.lang-option');
-        if (!opt) return;
-        const code = opt.getAttribute('data-locale');
-        if (code) {
-          i18n.setLocale(code);
-          this.langSelectorWrapper?.classList.remove('open');
-          this.showToast(`Switched interface language to ${opt.textContent.trim()} 🌐`);
-          try {
-            this.audioManager.playClick();
-          } catch (err) {}
-        }
-      });
-    }
-
     // Click letter / envelope to ask name
     const handleLetterOpenRequest = () => {
       if (this.currentScreen !== 'delivery' || this.isTransitioning) return;
@@ -715,11 +570,6 @@ class PigeonTeddyApp {
       this.applyRecipientName(nameParam);
     } else {
       this.refreshDisplays();
-    }
-
-    const langParam = urlParams.get('lang');
-    if (langParam) {
-      i18n.setLocale(langParam);
     }
 
     if (urlParams.get('scene') === 'teddy' || urlParams.get('screen') === 'teddy' || urlParams.get('testScene') === 'reveal') {
