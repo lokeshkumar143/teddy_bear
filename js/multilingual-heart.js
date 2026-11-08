@@ -729,45 +729,11 @@ export class MultilingualHeart {
     ctx.closePath();
     ctx.stroke();
 
-    // Constellation lines linking perimeter nodes
-    if (this.nameNodes && this.nameNodes.length > 0) {
-      const periNodes = this.nameNodes.filter(n => n.isPerimeter);
-      if (periNodes.length > 2) {
-        ctx.globalAlpha = 0.35 * alpha;
-        ctx.strokeStyle = 'rgba(255, 220, 140, 0.6)';
-        ctx.lineWidth = 1.2;
-        ctx.shadowColor = '#ffd700';
-        ctx.shadowBlur = 8;
-        ctx.beginPath();
-        for (let i = 0; i < periNodes.length; i++) {
-          const n = periNodes[i];
-          if (i === 0) ctx.moveTo(n.x, n.y);
-          else ctx.lineTo(n.x, n.y);
-        }
-        ctx.closePath();
-        ctx.stroke();
-      }
-
-      // Constellation rays linking interior nodes to center
-      const innerNodes = this.nameNodes.filter(n => n.isInterior);
-      if (innerNodes.length > 0 && this.centerNode) {
-        ctx.globalAlpha = 0.18 * alpha;
-        ctx.strokeStyle = 'rgba(255, 170, 210, 0.45)';
-        ctx.lineWidth = 0.8;
-        ctx.beginPath();
-        innerNodes.forEach(n => {
-          ctx.moveTo(this.centerNode.x, this.centerNode.y);
-          ctx.lineTo(n.x, n.y);
-        });
-        ctx.stroke();
-      }
-    }
-
     ctx.restore();
   }
 
   /**
-   * Render an individual language name pill node along heart
+   * Render an individual language name word directly inside the heart (Pure Typography, NO BOXES)
    */
   renderNameNode(ctx, node, globalAlpha) {
     ctx.save();
@@ -775,9 +741,9 @@ export class MultilingualHeart {
     ctx.scale(node.scale, node.scale);
     ctx.globalAlpha = node.opacity * globalAlpha;
 
-    // Font responsive sizing
-    const baseFont = Math.max(8.5, Math.min(12.5, this.radius * 0.066 * (node.slotScale || 1.0)));
-    const scriptFont = Math.max(7, baseFont * 0.72);
+    // Responsive font size
+    const baseFont = Math.max(9.5, Math.min(15.5, this.radius * 0.080 * (node.slotScale || 1.0)));
+    const scriptFont = Math.max(7, baseFont * 0.64);
 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -785,40 +751,19 @@ export class MultilingualHeart {
     const text = node.text || '';
     const scriptLabel = node.script || '';
 
-    // Measure text
-    ctx.font = `600 ${baseFont}px "Noto Sans Tamil", "Noto Sans Devanagari", "Noto Sans Telugu", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans Arabic", "Inter", sans-serif`;
-    const metrics = ctx.measureText(text);
-
-    ctx.font = `500 ${scriptFont}px 'Inter', sans-serif`;
-    const metaMetrics = ctx.measureText(`${node.flag} ${scriptLabel}`);
-
-    const boxW = Math.max(38, Math.max(metrics.width, metaMetrics.width) + 12);
-    const boxH = baseFont + scriptFont + 8;
-
-    // Frosted glowing background capsule
-    ctx.fillStyle = 'rgba(12, 10, 28, 0.78)';
-    ctx.strokeStyle = `hsla(${node.hue}, 85%, 65%, 0.75)`;
-    ctx.lineWidth = 1.0;
-    ctx.shadowColor = `hsla(${node.hue}, 95%, 60%, 0.7)`;
-    ctx.shadowBlur = 6;
-
-    this.roundRect(ctx, -boxW * 0.5, -boxH * 0.5, boxW, boxH, 6);
-    ctx.fill();
-    ctx.stroke();
-
-    // Line 1: Flag + script label
+    // Line 1: Subtle celestial script tag floating above the word
     ctx.font = `600 ${scriptFont}px 'Inter', sans-serif`;
-    ctx.fillStyle = 'rgba(255, 220, 140, 0.9)';
-    ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
+    ctx.fillStyle = `hsla(${node.hue}, 90%, 82%, 0.75)`;
+    ctx.shadowColor = `hsla(${node.hue}, 100%, 70%, 0.6)`;
     ctx.shadowBlur = 4;
-    ctx.fillText(`${node.flag} ${scriptLabel}`, 0, -boxH * 0.5 + scriptFont * 0.7 + 2);
+    ctx.fillText(`${node.flag} ${scriptLabel}`, 0, -baseFont * 0.58);
 
-    // Line 2: The native translated user name
+    // Line 2: The native translated user name - Pure Radiant Glowing Typography (NO BOX!)
     ctx.font = `700 ${baseFont}px "Noto Sans Tamil", "Noto Sans Devanagari", "Noto Sans Telugu", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans Arabic", "Inter", sans-serif`;
     ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = `hsla(${node.hue}, 100%, 75%, 0.8)`;
-    ctx.shadowBlur = 6;
-    ctx.fillText(text, 0, boxH * 0.5 - baseFont * 0.65 - 1);
+    ctx.shadowColor = `hsla(${node.hue}, 100%, 65%, 0.95)`;
+    ctx.shadowBlur = 10;
+    ctx.fillText(text, 0, baseFont * 0.38);
 
     ctx.restore();
   }
