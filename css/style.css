@@ -2106,3 +2106,112 @@ body {
     gap: 4px;
   }
 }
+
+
+/* ==========================================================================
+   v14.0 — Multilingual Name Grid in Gift Action Card
+   ========================================================================== */
+
+.multilang-name-grid-wrapper {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 215, 120, 0.2);
+  border-radius: 14px;
+  padding: 10px 12px;
+  margin: 6px 0 10px;
+}
+
+.multilang-grid-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #ffd700;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.card-lang-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.card-lang-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 7px 10px;
+  min-height: 36px;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.card-lang-pill:hover {
+  background: rgba(255, 215, 0, 0.08);
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.card-lang-pill-meta {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  color: rgba(200, 210, 240, 0.7);
+  letter-spacing: 0.3px;
+  line-height: 1.1;
+  min-width: 32px;
+}
+
+.card-lang-pill-flag {
+  font-size: 12px;
+}
+
+.card-lang-pill-name {
+  color: rgba(180, 190, 220, 0.8);
+  font-size: 9px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50px;
+}
+
+.card-lang-pill-text {
+  font-family: 'Noto Sans Tamil', 'Noto Sans Devanagari', 'Noto Sans Telugu',
+               'Noto Sans JP', 'Noto Sans KR', 'Noto Sans SC',
+               'Noto Sans Arabic', 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffd700;
+  flex: 1;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  letter-spacing: 0.5px;
+}
+
+[dir="rtl"] .card-lang-pill-text {
+  text-align: left;
+  direction: rtl;
+}
+
+@media (max-width: 480px) {
+  .card-lang-grid {
+    grid-template-columns: 1fr;
+  }
+  .multilang-name-grid-wrapper {
+    padding: 8px 10px;
+    margin: 4px 0 8px;
+  }
+  .card-lang-pill {
+    padding: 6px 8px;
+  }
+}

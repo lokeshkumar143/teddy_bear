@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=13.0">
+  <link rel="stylesheet" href="css/style.css?v=14.0">
 </head>
 <body class="theme-aurora">
 
@@ -173,7 +173,7 @@
       <div id="floating-polaroid" class="floating-polaroid" title="Click to view photo">
         <div class="polaroid-tape"></div>
         <div class="polaroid-inner">
-          <img id="polaroid-img" src="assets/loki-portrait.jpg?v=12.0" alt="Loki Portrait">
+          <img id="polaroid-img" src="assets/loki-portrait.jpg?v=14.0" alt="Loki Portrait">
           <label for="photo-upload-input" class="btn-change-photo" title="Upload custom photo" aria-label="Upload custom photo">
             <span>📷</span>
           </label>
@@ -194,14 +194,24 @@
         <p id="gift-card-sub1" class="gift-card-sub">This little teddy was made just for you.</p>
         <p id="gift-card-sub2" class="gift-card-sub highlight">Sending you warmth, comfort, and happiness. ❤️</p>
 
-        <!-- Compact Multilingual Bar & Edit Name -->
+        <!-- Multilingual Name Grid -->
+        <div class="multilang-name-grid-wrapper">
+          <div class="multilang-grid-header">
+            <span>🌐 <strong>NAME IN 10 WORLD LANGUAGES</strong></span>
+            <button id="btn-edit-name" class="btn-edit-name-compact" type="button" title="Change Name">✎ Change</button>
+          </div>
+          <div id="card-lang-grid" class="card-lang-grid">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Compact Multilingual Ceremony Replay -->
         <div class="card-ceremony-bar">
           <button id="btn-re-ceremony" class="btn-ceremony-pill" type="button" title="Watch World Languages Celebration Again">
             <span class="ceremony-globe">🌍</span>
-            <span>Spoken in 10 Languages</span>
+            <span>Watch Language Ceremony</span>
             <span class="pill-sparkle">✦</span>
           </button>
-          <button id="btn-edit-name" class="btn-edit-name-compact" type="button" title="Change Name">✎ Change</button>
         </div>
 
         <!-- Interactive Action Buttons -->
@@ -398,6 +408,6 @@
   <!-- Toast Notification Feedback -->
   <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=13.0"></script>
+  <script type="module" src="js/app.js?v=14.0"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /**
- * Romantic Celestial Universe & Living ASCII Teddy Bear Experience (v13.0)
+ * Romantic Celestial Universe & Living ASCII Teddy Bear Experience (v14.0)
  * 
  * Complete Worldwide Multilingual & Internationalization Architecture:
  * - Unicode compliance across all major world writing systems.
@@ -7,6 +7,7 @@
  * - User-controlled transliteration manager with interactive editing.
  * - Dynamic UI language switching with Right-To-Left (RTL) support (Arabic, Hebrew).
  * - 24-bit True-Color Glowing ASCII Teddy Bear with complete standing posture & feet.
+ * - v14.0: Multilingual name grid in final dedication card.
  */
 
 import { AmbientParticles } from './ambient-particles.js?v=12.0';
@@ -19,7 +20,7 @@ import {
   generateMultiLangName, 
   getLanguageList, 
   detectScript 
-} from './name-multilang.js?v=13.0';
+} from './name-multilang.js?v=14.0';
 import { i18n, SUPPORTED_LOCALES } from './i18n.js?v=13.0';
 
 class PigeonTeddyApp {
@@ -116,6 +117,7 @@ class PigeonTeddyApp {
 
     this.giftActionCard = document.getElementById('gift-action-card');
     this.cardName = document.getElementById('card-name');
+    this.cardLangGrid = document.getElementById('card-lang-grid');
     this.btnReCeremony = document.getElementById('btn-re-ceremony');
     this.btnEditName = document.getElementById('btn-edit-name');
 
@@ -205,7 +207,10 @@ class PigeonTeddyApp {
     const showcaseTitle = document.querySelector('.showcase-title-group span:last-child');
     if (showcaseTitle) showcaseTitle.textContent = i18n.t('multilang_header');
 
-    if (this.btnEditName) this.btnEditName.textContent = i18n.t('btn_change_name');
+    if (this.btnEditName) {
+      const changeTxt = i18n.t('btn_change_name');
+      this.btnEditName.textContent = `✎ ${changeTxt}`;
+    }
 
     // Action Buttons
     if (this.btnSaveGift) this.btnSaveGift.querySelector('.btn-text').textContent = i18n.t('btn_save_gift');
@@ -464,6 +469,20 @@ class PigeonTeddyApp {
             <span>${item.script}</span>
           </div>
           <div class="lang-pill-text">${item.text}</div>
+        </div>
+      `).join('');
+    }
+
+    // 5b. Card Language Grid (new v14.0 — inline in gift action card)
+    if (this.cardLangGrid) {
+      const list = getLanguageList(this.multiLangData);
+      this.cardLangGrid.innerHTML = list.map(item => `
+        <div class="card-lang-pill" title="${item.label} — ${item.script} Script">
+          <div class="card-lang-pill-meta">
+            <span class="card-lang-pill-flag">${item.flag}</span>
+            <span class="card-lang-pill-name">${item.script}</span>
+          </div>
+          <div class="card-lang-pill-text" dir="${item.dir || 'ltr'}">${item.text}</div>
         </div>
       `).join('');
     }
