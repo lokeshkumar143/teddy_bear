@@ -12,7 +12,7 @@
  * 4. IMPACT BURST: The heart merges into the teddy's chest, waking the living teddy bear!
  */
 
-import { getLanguageList } from './name-multilang.js?v=14.0';
+import { getLanguageList, generateMultiLangName } from './name-multilang.js?v=20.0';
 
 export class MultilingualHeart {
   constructor(canvas, audioManager, onTransferComplete) {
@@ -119,51 +119,139 @@ export class MultilingualHeart {
   }
 
   /**
+   * 34 Balanced slots filling the entire heart geometry:
+   * 21 outer perimeter slots shaping the contour + 13 interior slots filling the heart volume
+   */
+  getHeartSlots() {
+    // 21 Perimeter slots tracing the exact heart silhouette in sequence
+    const perimeterSlots = [
+      { x:  0.52, y: -0.62, isPerimeter: true, scale: 1.05 },
+      { x:  0.72, y: -0.46, isPerimeter: true, scale: 1.0 },
+      { x:  0.85, y: -0.27, isPerimeter: true, scale: 1.0 },
+      { x:  0.88, y: -0.09, isPerimeter: true, scale: 1.0 },
+      { x:  0.80, y:  0.09, isPerimeter: true, scale: 1.0 },
+      { x:  0.68, y:  0.28, isPerimeter: true, scale: 1.0 },
+      { x:  0.52, y:  0.46, isPerimeter: true, scale: 1.0 },
+      { x:  0.32, y:  0.66, isPerimeter: true, scale: 0.95 },
+      { x:  0.16, y:  0.84, isPerimeter: true, scale: 0.90 },
+      { x:  0.00, y:  1.02, isPerimeter: true, scale: 0.92 },
+      { x: -0.16, y:  0.84, isPerimeter: true, scale: 0.90 },
+      { x: -0.32, y:  0.66, isPerimeter: true, scale: 0.95 },
+      { x: -0.52, y:  0.46, isPerimeter: true, scale: 1.0 },
+      { x: -0.68, y:  0.28, isPerimeter: true, scale: 1.0 },
+      { x: -0.80, y:  0.09, isPerimeter: true, scale: 1.0 },
+      { x: -0.88, y: -0.09, isPerimeter: true, scale: 1.0 },
+      { x: -0.85, y: -0.27, isPerimeter: true, scale: 1.0 },
+      { x: -0.72, y: -0.46, isPerimeter: true, scale: 1.0 },
+      { x: -0.52, y: -0.62, isPerimeter: true, scale: 1.05 },
+      { x: -0.20, y: -0.48, isPerimeter: true, scale: 0.98 },
+      { x:  0.20, y: -0.48, isPerimeter: true, scale: 0.98 }
+    ];
+
+    // 13 Interior slots completely filling the heart volume
+    const interiorSlots = [
+      { x: -0.36, y: -0.32, isPerimeter: false, scale: 0.92 },
+      { x:  0.36, y: -0.32, isPerimeter: false, scale: 0.92 },
+      { x: -0.52, y: -0.16, isPerimeter: false, scale: 0.92 },
+      { x: -0.22, y: -0.18, isPerimeter: false, scale: 0.90 },
+      { x:  0.22, y: -0.18, isPerimeter: false, scale: 0.90 },
+      { x:  0.52, y: -0.16, isPerimeter: false, scale: 0.92 },
+      { x: -0.46, y:  0.04, isPerimeter: false, scale: 0.92 },
+      { x:  0.46, y:  0.04, isPerimeter: false, scale: 0.92 },
+      { x: -0.34, y:  0.22, isPerimeter: false, scale: 0.90 },
+      { x:  0.34, y:  0.22, isPerimeter: false, scale: 0.90 },
+      { x: -0.20, y:  0.42, isPerimeter: false, scale: 0.88 },
+      { x:  0.20, y:  0.42, isPerimeter: false, scale: 0.88 },
+      { x:  0.00, y:  0.58, isPerimeter: false, scale: 0.88 }
+    ];
+
+    return [...perimeterSlots, ...interiorSlots];
+  }
+
+  /**
+   * Generates a rich catalog of 34 multilingual name tokens
+   * to fill both the perimeter and interior of the heart
+   */
+  buildMultilingualTokens(nameProfile) {
+    const orig = (nameProfile.displayName || nameProfile.originalName || 'Loki').trim();
+    const translit = nameProfile.transliterations || {};
+
+    const words = orig.split(/\s+/);
+    const shortName = words.length > 1 ? words[0] : (orig.toLowerCase() === 'lokesh kumar' ? 'Loki' : orig);
+    const shortTranslit = (typeof generateMultiLangName === 'function')
+      ? generateMultiLangName(shortName)
+      : translit;
+
+    // 1. Primary Full Name tokens in 13 major writing systems
+    const primary = [
+      { code: 'ta', label: 'Tamil', script: 'தமிழ்', text: translit.ta || orig, flag: '🇮🇳' },
+      { code: 'hi', label: 'Hindi', script: 'हिन्दी', text: translit.hi || orig, flag: '🇮🇳' },
+      { code: 'te', label: 'Telugu', script: 'తెలుగు', text: translit.te || orig, flag: '🇮🇳' },
+      { code: 'ja', label: 'Japanese', script: '日本語', text: translit.ja || orig, flag: '🇯🇵' },
+      { code: 'ko', label: 'Korean', script: '한국어', text: translit.ko || orig, flag: '🇰🇷' },
+      { code: 'zh', label: 'Chinese', script: '中文', text: translit.zh || orig, flag: '🇨🇳' },
+      { code: 'ar', label: 'Arabic', script: 'العربية', text: translit.ar || orig, flag: '🇸🇦', dir: 'rtl' },
+      { code: 'ru', label: 'Russian', script: 'Русский', text: translit.ru || orig, flag: '🇷🇺' },
+      { code: 'el', label: 'Greek', script: 'Ελληνικά', text: translit.el || orig, flag: '🇬🇷' },
+      { code: 'en', label: 'Latin', script: 'English', text: translit.en || orig, flag: '🌐' },
+      { code: 'kn', label: 'Kannada', script: 'ಕನ್ನಡ', text: translit.kn || orig, flag: '🇮🇳' },
+      { code: 'ml', label: 'Malayalam', script: 'മലയാളം', text: translit.ml || orig, flag: '🇮🇳' },
+      { code: 'bn', label: 'Bengali', script: 'বাংলা', text: translit.bn || orig, flag: '🇮🇳' }
+    ];
+
+    // 2. Extra Global & Indian Writing Systems
+    const globalTokens = [
+      { code: 'gu', label: 'Gujarati', script: 'ગુજરાતી', text: (orig.toLowerCase().includes('lokesh') ? 'લોકેશ કુમાર' : orig), flag: '🇮🇳' },
+      { code: 'pa', label: 'Punjabi', script: 'ਪੰਜਾਬੀ', text: (orig.toLowerCase().includes('lokesh') ? 'ਲੋਕੇਸ਼ ਕੁਮਾਰ' : orig), flag: '🇮🇳' },
+      { code: 'he', label: 'Hebrew', script: 'עברית', text: (orig.toLowerCase().includes('lokesh') ? 'לוקש קומאר' : orig), flag: '🇮🇱', dir: 'rtl' },
+      { code: 'th', label: 'Thai', script: 'ไทย', text: (orig.toLowerCase().includes('lokesh') ? 'โลเกศ กุมาร' : orig), flag: '🇹🇭' },
+      { code: 'fa', label: 'Persian', script: 'فارسی', text: (orig.toLowerCase().includes('lokesh') ? 'لوکیش کومار' : orig), flag: '🇮🇷', dir: 'rtl' },
+      { code: 'ur', label: 'Urdu', script: 'اردو', text: (orig.toLowerCase().includes('lokesh') ? 'لوکیش کمار' : orig), flag: '🇵🇰', dir: 'rtl' },
+      { code: 'fr', label: 'French', script: 'Français', text: orig, flag: '🇫🇷' },
+      { code: 'es', label: 'Spanish', script: 'Español', text: orig, flag: '🇪🇸' }
+    ];
+
+    // 3. Short / Affectionate Native Tokens for Interior Heart Filling
+    const shortList = [
+      { code: 'ta-s', label: 'Tamil', script: 'தமிழ்', text: shortTranslit.ta || (orig.toLowerCase().includes('lokesh') ? 'லோகி' : shortName), flag: '🇮🇳' },
+      { code: 'hi-s', label: 'Hindi', script: 'हिन्दी', text: shortTranslit.hi || (orig.toLowerCase().includes('lokesh') ? 'लोकी' : shortName), flag: '🇮🇳' },
+      { code: 'te-s', label: 'Telugu', script: 'తెలుగు', text: shortTranslit.te || (orig.toLowerCase().includes('lokesh') ? 'లోకి' : shortName), flag: '🇮🇳' },
+      { code: 'ja-s', label: 'Japanese', script: '日本語', text: shortTranslit.ja || (orig.toLowerCase().includes('lokesh') ? 'ロキ' : shortName), flag: '🇯🇵' },
+      { code: 'ko-s', label: 'Korean', script: '한국어', text: shortTranslit.ko || (orig.toLowerCase().includes('lokesh') ? '로키' : shortName), flag: '🇰🇷' },
+      { code: 'zh-s', label: 'Chinese', script: '中文', text: shortTranslit.zh || (orig.toLowerCase().includes('lokesh') ? '洛基' : shortName), flag: '🇨🇳' },
+      { code: 'ar-s', label: 'Arabic', script: 'العربية', text: shortTranslit.ar || (orig.toLowerCase().includes('lokesh') ? 'لوكي' : shortName), flag: '🇸🇦', dir: 'rtl' },
+      { code: 'ru-s', label: 'Russian', script: 'Русский', text: shortTranslit.ru || (orig.toLowerCase().includes('lokesh') ? 'Локи' : shortName), flag: '🇷🇺' },
+      { code: 'el-s', label: 'Greek', script: 'Ελληνικά', text: shortTranslit.el || (orig.toLowerCase().includes('lokesh') ? 'Λόκι' : shortName), flag: '🇬🇷' },
+      { code: 'kn-s', label: 'Kannada', script: 'ಕನ್ನಡ', text: shortTranslit.kn || (orig.toLowerCase().includes('lokesh') ? 'ಲೋಕಿ' : shortName), flag: '🇮🇳' },
+      { code: 'ml-s', label: 'Malayalam', script: 'മലയാളം', text: shortTranslit.ml || (orig.toLowerCase().includes('lokesh') ? 'ലോകി' : shortName), flag: '🇮🇳' },
+      { code: 'bn-s', label: 'Bengali', script: 'বাংলা', text: shortTranslit.bn || (orig.toLowerCase().includes('lokesh') ? 'লোকি' : shortName), flag: '🇮🇳' },
+      { code: 'it-s', label: 'Italian', script: 'Italiano', text: shortName, flag: '🇮🇹' }
+    ];
+
+    return [...primary, ...globalTokens, ...shortList];
+  }
+
+  /**
    * Initialize heart elements with user's name across world languages
    */
   initData(nameProfile) {
     this.nameProfile = nameProfile;
     this.originalName = (nameProfile.displayName || nameProfile.originalName || 'Loki').trim();
-    const list = getLanguageList(nameProfile.transliterations);
+    
+    // Build full set of multilingual name tokens
+    const tokens = this.buildMultilingualTokens(nameProfile);
 
-    // Complement with extra world languages if available
-    const translit = nameProfile.transliterations || {};
-    const extraLangs = [
-      { code: 'kn', label: 'Kannada', script: 'ಕನ್ನಡ', text: translit.kn, flag: '🇮🇳' },
-      { code: 'ml', label: 'Malayalam', script: 'മലയാളം', text: translit.ml, flag: '🇮🇳' },
-      { code: 'bn', label: 'Bengali', script: 'বাংলা', text: translit.bn, flag: '🇮🇳' }
-    ].filter(item => item.text && item.text !== this.originalName);
+    // 21 Perimeter slots + 13 Interior slots
+    const slots = this.getHeartSlots();
 
-    const fullList = [...list, ...extraLangs];
-
-    // Build Heart Perimeter and Interior Nodes
     this.nameNodes = [];
+    const numSlots = Math.min(slots.length, tokens.length);
 
-    // Parametric angles along the heart perimeter for language names
-    // 0 = top cleft, ~0.25*PI = right lobe top, ~0.5*PI = right side,
-    // ~1.5*PI = bottom tip, ~1.75*PI = left side, ~1.95*PI = left lobe top
-    const perimeterAngles = [
-      0.72 * Math.PI, // Top-left lobe crest (Tamil)
-      0.28 * Math.PI, // Top-right lobe crest (Hindi)
-      0.90 * Math.PI, // Upper left curve (Telugu)
-      0.10 * Math.PI, // Upper right curve (Japanese)
-      1.08 * Math.PI, // Left outer curve (Korean)
-      1.92 * Math.PI, // Right outer curve (Chinese)
-      1.22 * Math.PI, // Lower left curve (Arabic)
-      1.78 * Math.PI, // Lower right curve (Russian)
-      1.36 * Math.PI, // Bottom left taper (Greek)
-      1.64 * Math.PI, // Bottom right taper (English/Latin)
-      0.50 * Math.PI, // Right upper shoulder (Kannada)
-      0.50 * Math.PI, // Left upper shoulder (Malayalam)
-      1.45 * Math.PI, // Near bottom point left (Bengali)
-      1.55 * Math.PI  // Near bottom point right
-    ];
+    for (let idx = 0; idx < numSlots; idx++) {
+      const slot = slots[idx];
+      const item = tokens[idx];
 
-    fullList.forEach((item, idx) => {
-      const angle = perimeterAngles[idx % perimeterAngles.length];
-      const pt = this.getHeartPoint(angle);
-
-      // Random starting position far out in the cosmos
+      // Random starting position in outer space
       const spawnAngle = Math.random() * Math.PI * 2;
       const spawnDist = Math.max(this.w, this.h) * (0.6 + Math.random() * 0.4);
 
@@ -174,43 +262,41 @@ export class MultilingualHeart {
         text: item.text,
         flag: item.flag,
         dir: item.dir || 'ltr',
-        isCenter: false,
-        // Target relative heart offset
-        targetRelX: pt.x,
-        targetRelY: pt.y,
-        // Starting pos in outer space
+        isPerimeter: slot.isPerimeter,
+        isInterior: !slot.isPerimeter,
+        targetRelX: slot.x,
+        targetRelY: slot.y,
+        slotScale: slot.scale || 1.0,
         startX: this.cx + Math.cos(spawnAngle) * spawnDist,
         startY: this.cy + Math.sin(spawnAngle) * spawnDist,
-        // Current animated pos
         x: this.cx + Math.cos(spawnAngle) * spawnDist,
         y: this.cy + Math.sin(spawnAngle) * spawnDist,
         opacity: 0,
         scale: 0.5,
-        rotation: (Math.random() - 0.5) * 0.4,
-        hue: 35 + (idx * 28) % 320, // iridescent palette
-        delay: idx * 90 // staggered cascade arrival
+        hue: 35 + (idx * 26) % 330,
+        delay: idx * 55 // staggered celestial arrival
       });
-    });
+    }
 
-    // Central Radiant Name (The Core Heart Soul)
+    // Central Radiant Name (The Core Heart Soul at 0, 0.08)
     this.centerNode = {
       text: this.originalName,
       isCenter: true,
       targetRelX: 0,
-      targetRelY: 0.05,
+      targetRelY: 0.08,
       startX: this.cx,
       startY: this.cy,
       x: this.cx,
-      y: this.cy,
+      y: this.cy + this.radius * 0.08,
       opacity: 0,
       scale: 0.1,
       rotation: 0,
-      hue: 45 // Pure Brilliant Gold
+      hue: 45
     };
 
-    // Generate 90 glowing stardust particles tracing the heart boundary
+    // 96 glowing stardust particles tracing the heart boundary
     this.boundaryParticles = [];
-    const numBoundary = 88;
+    const numBoundary = 96;
     for (let i = 0; i < numBoundary; i++) {
       const t = (i / numBoundary) * Math.PI * 2;
       const pt = this.getHeartPoint(t);
@@ -221,7 +307,23 @@ export class MultilingualHeart {
         baseSize: 1.5 + Math.random() * 2.2,
         twinkleSpeed: 2.5 + Math.random() * 3.5,
         twinklePhase: Math.random() * Math.PI * 2,
-        hue: 340 + Math.random() * 50 // pink, rose, gold
+        hue: 340 + Math.random() * 50
+      });
+    }
+
+    // 42 interior floating stardust particles inside the heart volume
+    this.interiorStardust = [];
+    for (let i = 0; i < 42; i++) {
+      const s = 0.2 + Math.random() * 0.7;
+      const t = Math.random() * Math.PI * 2;
+      const pt = this.getHeartPoint(t);
+      this.interiorStardust.push({
+        relX: pt.x * s,
+        relY: pt.y * s,
+        baseSize: 1.0 + Math.random() * 1.8,
+        twinkleSpeed: 2.0 + Math.random() * 4.0,
+        twinklePhase: Math.random() * Math.PI * 2,
+        hue: 40 + Math.random() * 300
       });
     }
 
@@ -317,7 +419,7 @@ export class MultilingualHeart {
         node.x = node.startX + (targetX - node.startX) * ease;
         node.y = node.startY + (targetY - node.startY) * ease;
         node.opacity = ease;
-        node.scale = 0.4 + ease * 0.6;
+        node.scale = (node.slotScale || 1.0) * (0.3 + ease * 0.7);
 
         // Emit sparkling stardust trail as names fly inward
         if (nodeProg < 0.95 && Math.random() < 0.35) {
@@ -390,12 +492,12 @@ export class MultilingualHeart {
         node.x = this.cx + node.targetRelX * this.radius * heartScale;
         node.y = this.cy + node.targetRelY * this.radius * heartScale;
         node.opacity = 1.0;
-        node.scale = 1.0 + beatScale * 0.4;
+        node.scale = (node.slotScale || 1.0) * (1.0 + beatScale * 0.35);
       });
 
       this.centerNode.x = this.cx;
-      this.centerNode.y = this.cy + this.radius * 0.05;
-      this.centerNode.scale = 1.1 + beatScale * 0.6;
+      this.centerNode.y = this.cy + this.radius * 0.08 * heartScale;
+      this.centerNode.scale = 1.1 + beatScale * 0.5;
       this.centerNode.opacity = 1.0;
     }
 
@@ -430,12 +532,12 @@ export class MultilingualHeart {
       this.nameNodes.forEach(node => {
         node.x = heartCenterX + node.targetRelX * this.radius * heartScale;
         node.y = heartCenterY + node.targetRelY * this.radius * heartScale;
-        node.scale = heartScale;
+        node.scale = (node.slotScale || 1.0) * heartScale;
         node.opacity = Math.max(0.2, 1.0 - ease * 0.6);
       });
 
       this.centerNode.x = heartCenterX;
-      this.centerNode.y = heartCenterY + this.radius * 0.05 * heartScale;
+      this.centerNode.y = heartCenterY + this.radius * 0.08 * heartScale;
       this.centerNode.scale = (1.1 + (this.flightTarget.scale - 1.1) * ease);
 
       // Emit comet stardust trail streaming behind the moving heart
@@ -509,7 +611,7 @@ export class MultilingualHeart {
     }
 
     // ====================================================================
-    // RENDER: HEART BOUNDARY STARDUST PARTICLES
+    // RENDER: HEART BOUNDARY STARDUST PARTICLES & INTERIOR STARDUST
     // ====================================================================
     if (heartAlpha > 0.05) {
       ctx.save();
@@ -526,6 +628,22 @@ export class MultilingualHeart {
         ctx.arc(bx, by, bp.baseSize * heartScale * twinkle, 0, Math.PI * 2);
         ctx.fill();
       });
+
+      if (this.interiorStardust) {
+        this.interiorStardust.forEach(sp => {
+          const sx = heartCenterX + sp.relX * this.radius * heartScale;
+          const sy = heartCenterY + sp.relY * this.radius * heartScale;
+          const twinkle = 0.5 + 0.5 * Math.sin(now * 0.003 * sp.twinkleSpeed + sp.twinklePhase);
+
+          ctx.globalAlpha = twinkle * heartAlpha * 0.75;
+          ctx.fillStyle = `hsl(${sp.hue}, 90%, 75%)`;
+          ctx.shadowColor = `hsl(${sp.hue}, 100%, 65%)`;
+          ctx.shadowBlur = 4;
+          ctx.beginPath();
+          ctx.arc(sx, sy, sp.baseSize * heartScale * twinkle, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
       ctx.restore();
     }
 
@@ -611,6 +729,40 @@ export class MultilingualHeart {
     ctx.closePath();
     ctx.stroke();
 
+    // Constellation lines linking perimeter nodes
+    if (this.nameNodes && this.nameNodes.length > 0) {
+      const periNodes = this.nameNodes.filter(n => n.isPerimeter);
+      if (periNodes.length > 2) {
+        ctx.globalAlpha = 0.35 * alpha;
+        ctx.strokeStyle = 'rgba(255, 220, 140, 0.6)';
+        ctx.lineWidth = 1.2;
+        ctx.shadowColor = '#ffd700';
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        for (let i = 0; i < periNodes.length; i++) {
+          const n = periNodes[i];
+          if (i === 0) ctx.moveTo(n.x, n.y);
+          else ctx.lineTo(n.x, n.y);
+        }
+        ctx.closePath();
+        ctx.stroke();
+      }
+
+      // Constellation rays linking interior nodes to center
+      const innerNodes = this.nameNodes.filter(n => n.isInterior);
+      if (innerNodes.length > 0 && this.centerNode) {
+        ctx.globalAlpha = 0.18 * alpha;
+        ctx.strokeStyle = 'rgba(255, 170, 210, 0.45)';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        innerNodes.forEach(n => {
+          ctx.moveTo(this.centerNode.x, this.centerNode.y);
+          ctx.lineTo(n.x, n.y);
+        });
+        ctx.stroke();
+      }
+    }
+
     ctx.restore();
   }
 
@@ -624,40 +776,89 @@ export class MultilingualHeart {
     ctx.globalAlpha = node.opacity * globalAlpha;
 
     // Font responsive sizing
-    const fontSize = Math.max(10, Math.min(15, this.radius * 0.082));
-    ctx.font = `700 ${fontSize}px "Noto Sans Tamil", "Noto Sans Devanagari", "Noto Sans Telugu", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans Arabic", "Inter", sans-serif`;
+    const baseFont = Math.max(8.5, Math.min(12.5, this.radius * 0.066 * (node.slotScale || 1.0)));
+    const scriptFont = Math.max(7, baseFont * 0.72);
+
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
     const text = node.text || '';
     const scriptLabel = node.script || '';
+
+    // Measure text
+    ctx.font = `600 ${baseFont}px "Noto Sans Tamil", "Noto Sans Devanagari", "Noto Sans Telugu", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans Arabic", "Inter", sans-serif`;
     const metrics = ctx.measureText(text);
-    const boxW = Math.max(48, metrics.width + 16);
-    const boxH = fontSize + 12;
 
-    // Frosted glowing background pill
-    ctx.fillStyle = 'rgba(15, 12, 32, 0.75)';
-    ctx.strokeStyle = `hsla(${node.hue}, 90%, 65%, 0.65)`;
-    ctx.lineWidth = 1.2;
-    ctx.shadowColor = `hsla(${node.hue}, 100%, 60%, 0.8)`;
-    ctx.shadowBlur = 8;
+    ctx.font = `500 ${scriptFont}px 'Inter', sans-serif`;
+    const metaMetrics = ctx.measureText(`${node.flag} ${scriptLabel}`);
 
-    this.roundRect(ctx, -boxW * 0.5, -boxH * 0.5, boxW, boxH, 8);
+    const boxW = Math.max(38, Math.max(metrics.width, metaMetrics.width) + 12);
+    const boxH = baseFont + scriptFont + 8;
+
+    // Frosted glowing background capsule
+    ctx.fillStyle = 'rgba(12, 10, 28, 0.78)';
+    ctx.strokeStyle = `hsla(${node.hue}, 85%, 65%, 0.75)`;
+    ctx.lineWidth = 1.0;
+    ctx.shadowColor = `hsla(${node.hue}, 95%, 60%, 0.7)`;
+    ctx.shadowBlur = 6;
+
+    this.roundRect(ctx, -boxW * 0.5, -boxH * 0.5, boxW, boxH, 6);
     ctx.fill();
     ctx.stroke();
 
-    // Language mini-flag or script indicator
-    const flagSize = Math.max(8, fontSize * 0.65);
-    ctx.font = `600 ${flagSize}px 'Inter', sans-serif`;
-    ctx.fillStyle = 'rgba(255, 230, 160, 0.85)';
-    ctx.fillText(`${node.flag} ${scriptLabel}`, 0, -boxH * 0.5 - 6);
+    // Line 1: Flag + script label
+    ctx.font = `600 ${scriptFont}px 'Inter', sans-serif`;
+    ctx.fillStyle = 'rgba(255, 220, 140, 0.9)';
+    ctx.shadowColor = 'rgba(255, 215, 0, 0.5)';
+    ctx.shadowBlur = 4;
+    ctx.fillText(`${node.flag} ${scriptLabel}`, 0, -boxH * 0.5 + scriptFont * 0.7 + 2);
 
-    // Main translated native name
-    ctx.font = `700 ${fontSize}px "Noto Sans Tamil", "Noto Sans Devanagari", "Noto Sans Telugu", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans Arabic", "Inter", sans-serif`;
+    // Line 2: The native translated user name
+    ctx.font = `700 ${baseFont}px "Noto Sans Tamil", "Noto Sans Devanagari", "Noto Sans Telugu", "Noto Sans JP", "Noto Sans KR", "Noto Sans SC", "Noto Sans Arabic", "Inter", sans-serif`;
     ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = '#ffd700';
+    ctx.shadowColor = `hsla(${node.hue}, 100%, 75%, 0.8)`;
     ctx.shadowBlur = 6;
-    ctx.fillText(text, 0, 1);
+    ctx.fillText(text, 0, boxH * 0.5 - baseFont * 0.65 - 1);
+
+    ctx.restore();
+  }
+
+  /**
+   * Render central golden glowing soul name
+   */
+  renderCenterNode(ctx, node, globalAlpha, heartScale) {
+    ctx.save();
+    ctx.translate(node.x, node.y);
+    ctx.scale(node.scale, node.scale);
+    ctx.globalAlpha = node.opacity * globalAlpha;
+
+    const mainFontSize = Math.max(16, Math.min(30, this.radius * 0.14 * heartScale));
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Top small badge
+    const badgeFont = Math.max(7.5, mainFontSize * 0.30);
+    ctx.font = `700 ${badgeFont}px "Inter", sans-serif`;
+    ctx.fillStyle = '#ff7b9c';
+    ctx.letterSpacing = '1.5px';
+    ctx.shadowColor = '#ff3b68';
+    ctx.shadowBlur = 8;
+    ctx.fillText('✦ SACRED HEART ✦', 0, -mainFontSize * 0.75);
+
+    // Radiant User Name in Center
+    ctx.font = `800 ${mainFontSize}px "Alex Brush", "Cormorant Garamond", "Inter", serif`;
+    ctx.fillStyle = '#ffd700';
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 18;
+    ctx.fillText(node.text, 0, 0);
+
+    // Subtle heart icon underneath
+    const heartIconSize = Math.max(10, mainFontSize * 0.45);
+    ctx.font = `${heartIconSize}px sans-serif`;
+    ctx.fillStyle = '#ff3b68';
+    ctx.shadowColor = '#ff3b68';
+    ctx.shadowBlur = 8;
+    ctx.fillText('💖', 0, mainFontSize * 0.72);
 
     ctx.restore();
   }
