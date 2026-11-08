@@ -548,58 +548,6 @@ body {
   box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
 }
 
-/* Live Multi-Language Preview Area */
-.live-multilang-preview {
-  width: 100%;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  text-align: left;
-}
-
-.preview-label {
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #ffd700;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-}
-
-.preview-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  max-height: 96px;
-  overflow-y: auto;
-}
-
-.preview-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 8px;
-  padding: 3px 8px;
-  font-size: 11.5px;
-  color: #ffffff;
-  white-space: nowrap;
-}
-
-.preview-chip .chip-lang {
-  color: #a4afc7;
-  font-size: 10px;
-}
-
-.preview-chip .chip-text {
-  font-weight: 600;
-  color: #ff9fbe;
-}
-
 .btn-confirm-name {
   width: 100%;
   height: 52px;

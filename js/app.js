@@ -348,7 +348,6 @@ class PigeonTeddyApp {
     this.nameModal.removeAttribute('aria-hidden');
     if (this.nameInput) {
       this.nameInput.value = this.recipientName || 'Loki';
-      this.updateLivePreview(this.nameInput.value);
       setTimeout(() => this.nameInput.focus(), 150);
     }
   }
@@ -361,20 +360,6 @@ class PigeonTeddyApp {
     this.nameModal.classList.remove('visible');
     this.nameModal.setAttribute('aria-hidden', 'true');
     this.nameModal.setAttribute('inert', '');
-  }
-
-  updateLivePreview(nameStr) {
-    if (!this.previewChips) return;
-    const data = generateMultiLangName(nameStr || 'Loki');
-    const list = getLanguageList(data);
-
-    this.previewChips.innerHTML = list.map(item => `
-      <div class="preview-chip" title="${item.label} (${item.script})" dir="${item.dir || 'ltr'}">
-        <span class="chip-flag">${item.flag}</span>
-        <span class="chip-lang">${item.script}:</span>
-        <span class="chip-text">${item.text}</span>
-      </div>
-    `).join('');
   }
 
   openEditNamesModal() {
@@ -592,11 +577,8 @@ class PigeonTeddyApp {
       this.unsealBtn.addEventListener('click', handleLetterOpenRequest);
     }
 
-    // Real-time input typing transliteration
+    // Name input Enter key handler
     if (this.nameInput) {
-      this.nameInput.addEventListener('input', (e) => {
-        this.updateLivePreview(e.target.value);
-      });
       this.nameInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
