@@ -763,3 +763,4 @@ export class MultilingualHeart {
     } catch (e) {}
   }
 }
+
