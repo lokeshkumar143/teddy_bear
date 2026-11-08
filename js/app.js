@@ -13,7 +13,7 @@
 import { AmbientParticles } from './ambient-particles.js?v=12.0';
 import { AsciiPigeon } from './ascii-pigeon.js?v=12.0';
 import { AsciiEnvelope } from './ascii-envelope.js?v=13.0';
-import { AsciiTeddy } from './ascii-teddy.js?v=13.0';
+import { AsciiTeddy } from './ascii-teddy.js?v=15.0';
 import { AudioManager } from './audio-fx.js?v=12.0';
 import { 
   MultiLangNameProfile, 
