@@ -66,6 +66,71 @@
       </div>
     </div>
 
+    <!-- Screen 1.5: Interstitial Multi-Language Cosmic Name Showcase Ceremony -->
+    <div id="ceremony-screen" class="scene ceremony-screen" aria-label="Worldwide Multilingual Name Celebration Ceremony">
+      <!-- Dynamic Cosmic Aura & Constellation Ring -->
+      <div class="ceremony-portal-aura"></div>
+      <div class="ceremony-constellation-ring"></div>
+
+      <!-- Main Floating Prismatic Crystal Card -->
+      <div class="ceremony-card" id="ceremony-card">
+        
+        <!-- Top Ceremony Badge -->
+        <div class="ceremony-badge">
+          <span class="ceremony-sparkle">✦</span>
+          <span>A NAME CELEBRATED ACROSS THE WORLD</span>
+          <span class="ceremony-sparkle">✦</span>
+        </div>
+
+        <!-- Subtitle -->
+        <p class="ceremony-subtitle">Written in the celestial stars for <strong id="ceremony-raw-name">Loki</strong></p>
+
+        <!-- Active Language Information Pill -->
+        <div class="ceremony-lang-tag" id="ceremony-lang-tag">
+          <span id="ceremony-flag" class="ceremony-flag">🇬🇧</span>
+          <span id="ceremony-lang-name" class="ceremony-lang-name">English</span>
+          <span class="ceremony-tag-divider">•</span>
+          <span id="ceremony-script-name" class="ceremony-script-name">Latin Script</span>
+        </div>
+
+        <!-- The Grand Glowing Morphing Name Display -->
+        <div class="ceremony-name-stage">
+          <div id="ceremony-name-glow" class="ceremony-name-glow"></div>
+          <h1 id="ceremony-name-text" class="ceremony-name-text" dir="auto">Loki</h1>
+        </div>
+
+        <!-- Cultural & Direction Line -->
+        <div class="ceremony-meta-row">
+          <span id="ceremony-phonetic" class="ceremony-phonetic">Exact Native Script Preserved</span>
+          <span class="ceremony-meta-dot">•</span>
+          <span id="ceremony-bcp47" class="ceremony-bcp47">en-US</span>
+        </div>
+
+        <!-- Interactive Constellation Orbit: 10 Language Pills -->
+        <div class="ceremony-orbit-wrapper">
+          <div class="ceremony-orbit-label">✨ Touch any language to explore:</div>
+          <div id="ceremony-orbit-pills" class="ceremony-orbit-pills" role="tablist">
+            <!-- Dynamically populated 10 language tokens -->
+          </div>
+        </div>
+
+        <!-- Bottom Action & Auto-Advance Progress -->
+        <div class="ceremony-footer">
+          <div class="ceremony-progress-wrap">
+            <div id="ceremony-progress-bar" class="ceremony-progress-bar"></div>
+          </div>
+          
+          <button id="btn-reveal-teddy" class="btn-reveal-teddy" type="button" aria-label="Reveal your living ASCII Teddy Bear">
+            <span class="btn-sparkle">✦</span>
+            <span>REVEAL MY TEDDY BEAR</span>
+            <span class="btn-bear-icon">🧸</span>
+            <span class="btn-sparkle">✦</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
     <!-- Screen 2: Living ASCII Teddy Bear Universe with Up-Side Selector & Rich UI -->
     <div id="teddy-screen" class="scene teddy-screen">
 
@@ -129,18 +194,14 @@
         <p id="gift-card-sub1" class="gift-card-sub">This little teddy was made just for you.</p>
         <p id="gift-card-sub2" class="gift-card-sub highlight">Sending you warmth, comfort, and happiness. ❤️</p>
 
-        <!-- Multi-Language Name Showcase -->
-        <div class="multilang-showcase-box">
-          <div class="showcase-header">
-            <span class="showcase-title-group">
-              <span class="showcase-icon">🌍</span>
-              <span>Name in 10 World Languages</span>
-            </span>
-            <button id="btn-edit-name" class="btn-edit-name" type="button" title="Change Name">✎ Change</button>
-          </div>
-          <div id="lang-grid-display" class="lang-grid-display">
-            <!-- Dynamically populated 10 language cards -->
-          </div>
+        <!-- Compact Multilingual Bar & Edit Name -->
+        <div class="card-ceremony-bar">
+          <button id="btn-re-ceremony" class="btn-ceremony-pill" type="button" title="Watch World Languages Celebration Again">
+            <span class="ceremony-globe">🌍</span>
+            <span>Spoken in 10 Languages</span>
+            <span class="pill-sparkle">✦</span>
+          </button>
+          <button id="btn-edit-name" class="btn-edit-name-compact" type="button" title="Change Name">✎ Change</button>
         </div>
 
         <!-- Interactive Action Buttons -->

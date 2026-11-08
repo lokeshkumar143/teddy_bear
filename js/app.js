@@ -87,6 +87,20 @@ class PigeonTeddyApp {
     this.btnResetTranslit = document.getElementById('btn-reset-translit');
     this.btnSaveEditNames = document.getElementById('btn-save-edit-names');
 
+    // Screen 1.5: Ceremony elements
+    this.ceremonyScreen = document.getElementById('ceremony-screen');
+    this.ceremonyCard = document.getElementById('ceremony-card');
+    this.ceremonyRawName = document.getElementById('ceremony-raw-name');
+    this.ceremonyFlag = document.getElementById('ceremony-flag');
+    this.ceremonyLangName = document.getElementById('ceremony-lang-name');
+    this.ceremonyScriptName = document.getElementById('ceremony-script-name');
+    this.ceremonyNameText = document.getElementById('ceremony-name-text');
+    this.ceremonyPhonetic = document.getElementById('ceremony-phonetic');
+    this.ceremonyBcp47 = document.getElementById('ceremony-bcp47');
+    this.ceremonyOrbitPills = document.getElementById('ceremony-orbit-pills');
+    this.ceremonyProgressBar = document.getElementById('ceremony-progress-bar');
+    this.btnRevealTeddy = document.getElementById('btn-reveal-teddy');
+
     // Teddy Screen elements
     this.experienceHeaderBadge = document.getElementById('experience-header-badge');
     this.teddyCanvas = document.getElementById('teddy-canvas');
@@ -102,7 +116,7 @@ class PigeonTeddyApp {
 
     this.giftActionCard = document.getElementById('gift-action-card');
     this.cardName = document.getElementById('card-name');
-    this.langGridDisplay = document.getElementById('lang-grid-display');
+    this.btnReCeremony = document.getElementById('btn-re-ceremony');
     this.btnEditName = document.getElementById('btn-edit-name');
 
     this.btnSaveGift = document.getElementById('btn-save-gift');
@@ -270,7 +284,7 @@ class PigeonTeddyApp {
       this.envelopeRenderer = new AsciiEnvelope(
         this.envelopeCanvas,
         () => {
-          this.transitionToTeddy();
+          this.startMultilangCeremony();
         }
       );
       this.envelopeRenderer.setRecipientName(this.recipientName, this.multiLangData);
@@ -432,12 +446,15 @@ class PigeonTeddyApp {
       this.polaroidNativeScript.textContent = isLatin ? this.multiLangData.ta : this.multiLangData.en;
     }
 
-    // 4. Dedication Card Title
+    // 4. Dedication Card Title & Ceremony Name
     if (this.cardName) {
       this.cardName.textContent = displayName;
     }
+    if (this.ceremonyRawName) {
+      this.ceremonyRawName.textContent = displayName;
+    }
 
-    // 5. Multi-Language Showcase Grid in Dedication Card
+    // 5. Multi-Language Showcase Grid (if present)
     if (this.langGridDisplay) {
       const list = getLanguageList(this.multiLangData);
       this.langGridDisplay.innerHTML = list.map(item => `
@@ -570,6 +587,35 @@ class PigeonTeddyApp {
           this.audioManager.playClick();
         } catch (e) {}
         this.openEditNamesModal();
+      });
+    }
+
+    // Ceremony Screen: Reveal Teddy Bear button
+    if (this.btnRevealTeddy) {
+      this.btnRevealTeddy.addEventListener('click', () => {
+        this.finishCeremonyAndRevealTeddy();
+      });
+    }
+
+    // Dedication Card: Replay World Languages Ceremony button
+    if (this.btnReCeremony) {
+      this.btnReCeremony.addEventListener('click', () => {
+        if (this.isTransitioning) return;
+        this.isTransitioning = true;
+        try {
+          this.audioManager.playClick();
+        } catch (e) {}
+
+        if (this.teddyScreen) this.teddyScreen.classList.remove('active');
+        setTimeout(() => {
+          if (this.teddyScreen) this.teddyScreen.style.display = 'none';
+          if (this.ceremonyScreen) {
+            this.ceremonyScreen.style.display = 'flex';
+            this.ceremonyScreen.classList.add('active');
+          }
+          this.isTransitioning = false;
+          this.runCeremonyLoop();
+        }, 400);
       });
     }
 
@@ -734,7 +780,7 @@ class PigeonTeddyApp {
       if (this.envelopeRenderer) {
         this.envelopeRenderer.triggerClick();
       } else {
-        this.transitionToTeddy();
+        this.startMultilangCeremony();
       }
     } else {
       this.showToast(`Updated name to ${this.recipientName} across all languages! ✨`);
@@ -826,16 +872,16 @@ class PigeonTeddyApp {
     });
   }
 
-  transitionToTeddy() {
-    if (this.isTransitioning || this.currentScreen === 'teddy') return;
+  startMultilangCeremony() {
+    if (this.isTransitioning) return;
     this.isTransitioning = true;
-    this.currentScreen = 'teddy';
+    this.currentScreen = 'ceremony';
 
     try {
-      this.audioManager.playBloomChime();
+      this.audioManager.playHeartBurst();
     } catch (e) {}
 
-    // 1. Fade out delivery screen
+    // 1. Hide delivery screen
     if (this.deliveryScreen) {
       this.deliveryScreen.classList.remove('active');
     }
@@ -845,8 +891,195 @@ class PigeonTeddyApp {
       if (this.envelopeRenderer) this.envelopeRenderer.stop();
       if (this.deliveryScreen) this.deliveryScreen.style.display = 'none';
 
+      // 2. Show ceremony screen
+      if (this.ceremonyScreen) {
+        this.ceremonyScreen.style.display = 'flex';
+        this.ceremonyScreen.classList.add('active');
+      }
+
+      this.isTransitioning = false;
+      this.runCeremonyLoop();
+    }, 450);
+  }
+
+  runCeremonyLoop() {
+    const list = getLanguageList(this.nameProfile.transliterations);
+    if (!list || list.length === 0) {
+      this.finishCeremonyAndRevealTeddy();
+      return;
+    }
+
+    if (this.ceremonyRawName) {
+      this.ceremonyRawName.textContent = this.nameProfile.displayName || this.nameProfile.originalName;
+    }
+
+    // Populate the 10 language tokens in the orbit ring
+    if (this.ceremonyOrbitPills) {
+      this.ceremonyOrbitPills.innerHTML = list.map((item, idx) => `
+        <button class="ceremony-pill-token ${idx === 0 ? 'active' : ''}" 
+                data-idx="${idx}" 
+                type="button" 
+                title="${item.label} (${item.script})">
+          <span>${item.flag}</span>
+          <span>${item.script}</span>
+        </button>
+      `).join('');
+
+      // Add click listener to pills
+      this.ceremonyOrbitPills.querySelectorAll('.ceremony-pill-token').forEach(pill => {
+        pill.addEventListener('click', () => {
+          const idx = parseInt(pill.getAttribute('data-idx'), 10);
+          if (!isNaN(idx)) {
+            this.ceremonyCurrentIdx = idx;
+            this.renderCeremonyStep(idx, list);
+            this.pauseCeremonyTimer(3500);
+          }
+        });
+      });
+    }
+
+    this.ceremonyCurrentIdx = 0;
+    this.ceremonyTotalSteps = list.length;
+    this.renderCeremonyStep(0, list);
+
+    // Auto-advance loop: each step ~850ms
+    const stepDuration = 850;
+    clearInterval(this.ceremonyTimer);
+    
+    this.ceremonyTimer = setInterval(() => {
+      this.ceremonyCurrentIdx++;
+      if (this.ceremonyCurrentIdx >= this.ceremonyTotalSteps) {
+        clearInterval(this.ceremonyTimer);
+        // Wait 700ms on final state then reveal teddy
+        setTimeout(() => {
+          this.finishCeremonyAndRevealTeddy();
+        }, 700);
+      } else {
+        this.renderCeremonyStep(this.ceremonyCurrentIdx, list);
+      }
+    }, stepDuration);
+  }
+
+  pauseCeremonyTimer(ms = 3500) {
+    clearInterval(this.ceremonyTimer);
+    clearTimeout(this.ceremonyResumeTimer);
+    this.ceremonyResumeTimer = setTimeout(() => {
+      const list = getLanguageList(this.nameProfile.transliterations);
+      this.ceremonyTimer = setInterval(() => {
+        this.ceremonyCurrentIdx++;
+        if (this.ceremonyCurrentIdx >= this.ceremonyTotalSteps) {
+          clearInterval(this.ceremonyTimer);
+          setTimeout(() => {
+            this.finishCeremonyAndRevealTeddy();
+          }, 700);
+        } else {
+          this.renderCeremonyStep(this.ceremonyCurrentIdx, list);
+        }
+      }, 850);
+    }, ms);
+  }
+
+  renderCeremonyStep(idx, list) {
+    const item = list[idx];
+    if (!item) return;
+
+    // 1. Text update with scale pop animation
+    if (this.ceremonyNameText) {
+      this.ceremonyNameText.textContent = item.text;
+      this.ceremonyNameText.setAttribute('dir', item.dir || 'ltr');
+      this.ceremonyNameText.classList.remove('morphing');
+      void this.ceremonyNameText.offsetWidth;
+      this.ceremonyNameText.classList.add('morphing');
+    }
+
+    // 2. Language metadata tags
+    if (this.ceremonyFlag) this.ceremonyFlag.textContent = item.flag;
+    if (this.ceremonyLangName) this.ceremonyLangName.textContent = item.label;
+    if (this.ceremonyScriptName) this.ceremonyScriptName.textContent = `${item.script} Script`;
+    if (this.ceremonyBcp47) this.ceremonyBcp47.textContent = item.code;
+
+    if (this.ceremonyPhonetic) {
+      if (item.code === 'en' || item.code === this.nameProfile.detectedScript.id) {
+        this.ceremonyPhonetic.textContent = 'Exact Native Script Preserved';
+      } else {
+        this.ceremonyPhonetic.textContent = `${item.label} Phonetic Transliteration`;
+      }
+    }
+
+    // 3. Highlight active pill in orbit
+    if (this.ceremonyOrbitPills) {
+      const pills = this.ceremonyOrbitPills.querySelectorAll('.ceremony-pill-token');
+      pills.forEach((p, pIdx) => {
+        p.classList.toggle('active', pIdx === idx);
+      });
+    }
+
+    // 4. Update progress bar
+    if (this.ceremonyProgressBar) {
+      const pct = Math.min(100, Math.round(((idx + 1) / this.ceremonyTotalSteps) * 100));
+      this.ceremonyProgressBar.style.width = `${pct}%`;
+    }
+
+    // 5. Harmonic celestial tone
+    try {
+      this.audioManager.playCelestialTone(idx);
+    } catch (e) {}
+  }
+
+  finishCeremonyAndRevealTeddy() {
+    clearInterval(this.ceremonyTimer);
+    clearTimeout(this.ceremonyResumeTimer);
+
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
+
+    try {
+      this.audioManager.playBloomChime();
+    } catch (e) {}
+
+    // Fade out ceremony screen
+    if (this.ceremonyScreen) {
+      this.ceremonyScreen.classList.remove('active');
+    }
+
+    setTimeout(() => {
+      if (this.ceremonyScreen) {
+        this.ceremonyScreen.style.display = 'none';
+      }
+      this.isTransitioning = false;
+      this.transitionToTeddy();
+    }, 450);
+  }
+
+  transitionToTeddy() {
+    if (this.isTransitioning || this.currentScreen === 'teddy') return;
+    this.isTransitioning = true;
+    this.currentScreen = 'teddy';
+
+    clearInterval(this.ceremonyTimer);
+    clearTimeout(this.ceremonyResumeTimer);
+
+    try {
+      this.audioManager.playBloomChime();
+    } catch (e) {}
+
+    // 1. Fade out delivery screen & ceremony screen
+    if (this.deliveryScreen) {
+      this.deliveryScreen.classList.remove('active');
+    }
+    if (this.ceremonyScreen) {
+      this.ceremonyScreen.classList.remove('active');
+    }
+
+    setTimeout(() => {
+      if (this.pigeonRenderer) this.pigeonRenderer.stop();
+      if (this.envelopeRenderer) this.envelopeRenderer.stop();
+      if (this.deliveryScreen) this.deliveryScreen.style.display = 'none';
+      if (this.ceremonyScreen) this.ceremonyScreen.style.display = 'none';
+
       // 2. Fade in teddy screen
       if (this.teddyScreen) {
+        this.teddyScreen.style.display = 'flex';
         this.teddyScreen.classList.add('active');
       }
       if (this.giftActionCard) {
@@ -877,6 +1110,14 @@ class PigeonTeddyApp {
   restartExperience() {
     this.isTransitioning = true;
     this.currentScreen = 'delivery';
+
+    clearInterval(this.ceremonyTimer);
+    clearTimeout(this.ceremonyResumeTimer);
+
+    if (this.ceremonyScreen) {
+      this.ceremonyScreen.classList.remove('active');
+      this.ceremonyScreen.style.display = 'none';
+    }
 
     if (this.teddyRenderer) this.teddyRenderer.stop();
     if (this.teddyScreen) {
@@ -925,7 +1166,18 @@ class PigeonTeddyApp {
       i18n.setLocale(langParam);
     }
 
-    if (urlParams.get('scene') === 'teddy' || urlParams.get('testScene') === 'reveal') {
+    if (urlParams.get('scene') === 'ceremony') {
+      this.currentScreen = 'ceremony';
+      if (this.deliveryScreen) {
+        this.deliveryScreen.classList.remove('active');
+        this.deliveryScreen.style.display = 'none';
+      }
+      if (this.ceremonyScreen) {
+        this.ceremonyScreen.style.display = 'flex';
+        this.ceremonyScreen.classList.add('active');
+      }
+      this.runCeremonyLoop();
+    } else if (urlParams.get('scene') === 'teddy' || urlParams.get('testScene') === 'reveal') {
       this.currentScreen = 'teddy';
       if (this.deliveryScreen) {
         this.deliveryScreen.classList.remove('active');

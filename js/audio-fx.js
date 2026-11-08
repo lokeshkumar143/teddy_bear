@@ -91,6 +91,19 @@ export class AudioManager {
     });
   }
 
+  playCelestialTone(step = 0) {
+    if (this.isMuted) return;
+    this.init();
+    if (!this.ctx) return;
+    // Harmonic celestial frequencies (pentatonic ascending scale)
+    const scale = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50, 1174.66, 1318.51, 1567.98, 1760.00];
+    const freq = scale[step % scale.length];
+    this.playChime(freq, 'sine', 0.18, 1.1);
+    setTimeout(() => {
+      this.playChime(freq * 1.5, 'triangle', 0.05, 0.7);
+    }, 45);
+  }
+
   playTransformSound() {
     this.playHeartBurst();
   }
