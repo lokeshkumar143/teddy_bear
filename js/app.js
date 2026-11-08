@@ -1084,7 +1084,7 @@ class PigeonTeddyApp {
       i18n.setLocale(langParam);
     }
 
-    if (urlParams.get('scene') === 'ceremony') {
+    if (urlParams.get('scene') === 'ceremony' || urlParams.get('screen') === 'ceremony') {
       this.currentScreen = 'ceremony';
       if (this.deliveryScreen) {
         this.deliveryScreen.classList.remove('active');
@@ -1100,7 +1100,7 @@ class PigeonTeddyApp {
       if (this.multilingualHeart) {
         this.multilingualHeart.start(this.nameProfile);
       }
-    } else if (urlParams.get('scene') === 'teddy' || urlParams.get('testScene') === 'reveal') {
+    } else if (urlParams.get('scene') === 'teddy' || urlParams.get('screen') === 'teddy' || urlParams.get('testScene') === 'reveal') {
       this.currentScreen = 'teddy';
       if (this.deliveryScreen) {
         this.deliveryScreen.classList.remove('active');
