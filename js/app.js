@@ -1,42 +1,36 @@
 /**
- * Romantic Celestial Universe & Living ASCII Teddy Bear Experience (v12.0)
+ * Romantic Celestial Universe & Living ASCII Teddy Bear Experience (v13.0)
  * 
- * Interactive Flow:
- * 1. Carrier Pigeon Delivery:
- *    - Majestically flies in across the starry sky carrying a sealed romantic letter.
- *    - Drops the letter into the center of the screen, then swoops away into the cosmos.
- * 2. Interactive Name Entry & Multi-Language Generation:
- *    - When the user taps the letter / "TOUCH THE LETTER TO OPEN", an enchanting modal opens.
- *    - Asking: "Who is this surprise for? ✨"
- *    - User types their name (e.g. Loki, Priya, Rahul, Alex, etc.).
- *    - In real time, the multi-language transliteration engine translates and previews their name
- *      across 10+ languages: Tamil, Hindi, Telugu, Japanese, Korean, Chinese, Arabic, Russian, Greek, English!
- * 3. Sacred Wax Unsealing Ceremony:
- *    - 3D wax seal shatters into 80+ glowing crystal shards and light shockwaves.
- *    - The envelope unrolls with an illuminated love decree addressed to their name in multi-languages!
- *    - The letter dissolves into ascending golden stardust and hearts.
- * 4. Living ASCII Teddy Bear & Global Name Dedication:
- *    - The 24-bit True-Color ASCII Teddy Bear emerges slowly from the bottom upward.
- *    - Up-side (top) selector bar allows switching between 4 unique teddy bears.
- *    - Floating Polaroid photo of Loki framed with love and user's name in native script.
- *    - Top header badge features a dynamic rotating multi-language ribbon of their name.
- *    - Interactive dedication card showcases their name across all 10 world languages with an "Edit Name ✎" option.
- *    - Pure ASCII signature dynamically adapts to spell their name in ASCII keys and hex bytes.
+ * Complete Worldwide Multilingual & Internationalization Architecture:
+ * - Unicode compliance across all major world writing systems.
+ * - Exact user native name preservation (never replaced or stripped).
+ * - User-controlled transliteration manager with interactive editing.
+ * - Dynamic UI language switching with Right-To-Left (RTL) support (Arabic, Hebrew).
+ * - 24-bit True-Color Glowing ASCII Teddy Bear with complete standing posture & feet.
  */
 
 import { AmbientParticles } from './ambient-particles.js?v=12.0';
 import { AsciiPigeon } from './ascii-pigeon.js?v=12.0';
-import { AsciiEnvelope } from './ascii-envelope.js?v=12.0';
-import { AsciiTeddy } from './ascii-teddy.js?v=12.0';
+import { AsciiEnvelope } from './ascii-envelope.js?v=13.0';
+import { AsciiTeddy } from './ascii-teddy.js?v=13.0';
 import { AudioManager } from './audio-fx.js?v=12.0';
-import { generateMultiLangName, getLanguageList } from './name-multilang.js?v=12.0';
+import { 
+  MultiLangNameProfile, 
+  generateMultiLangName, 
+  getLanguageList, 
+  detectScript 
+} from './name-multilang.js?v=13.0';
+import { i18n, SUPPORTED_LOCALES } from './i18n.js?v=13.0';
 
 class PigeonTeddyApp {
   constructor() {
     this.currentScreen = 'delivery'; // 'delivery' or 'teddy'
     this.isTransitioning = false;
-    this.recipientName = 'Loki';
-    this.multiLangData = generateMultiLangName(this.recipientName);
+
+    // Load or initialize Name Profile (Default: 'Loki')
+    this.nameProfile = MultiLangNameProfile.load() || new MultiLangNameProfile('Loki');
+    this.recipientName = this.nameProfile.originalName;
+    this.multiLangData = this.nameProfile.transliterations;
 
     // Atmosphere Themes
     this.themes = [
@@ -50,6 +44,7 @@ class PigeonTeddyApp {
     this.initElements();
     this.initAmbientParticles();
     this.initAudio();
+    this.initI18n();
     this.initRenderers();
     this.initInteractions();
     this.start();
@@ -60,6 +55,13 @@ class PigeonTeddyApp {
     this.deliveryScreen = document.getElementById('delivery-screen');
     this.teddyScreen = document.getElementById('teddy-screen');
 
+    // Language Dropdown elements
+    this.langSelectorWrapper = document.getElementById('lang-selector-wrapper');
+    this.langSelectorBtn = document.getElementById('lang-selector-btn');
+    this.langFlag = document.getElementById('lang-flag');
+    this.langLabel = document.getElementById('lang-label');
+    this.langDropdown = document.getElementById('lang-dropdown');
+
     // Delivery Screen elements
     this.pigeonCanvas = document.getElementById('pigeon-canvas');
     this.envelopeCanvas = document.getElementById('envelope-canvas');
@@ -67,14 +69,26 @@ class PigeonTeddyApp {
     this.unsealBtn = document.getElementById('unseal-btn');
     this.unsealSubcaption = document.getElementById('unseal-subcaption');
 
-    // Name Entry & Multi-Language Modal
+    // First Screen: Name Prompt Modal
     this.nameModal = document.getElementById('name-modal');
     this.nameForm = document.getElementById('name-form');
     this.nameInput = document.getElementById('recipient-name-input');
     this.previewChips = document.getElementById('preview-chips');
     this.btnConfirmName = document.getElementById('btn-confirm-name');
 
+    // Full Multi-Language Customization Modal
+    this.editNamesModal = document.getElementById('edit-names-modal');
+    this.editNamesForm = document.getElementById('edit-names-form');
+    this.editOriginalName = document.getElementById('edit-original-name');
+    this.editDetectedScript = document.getElementById('edit-detected-script');
+    this.editLangsGrid = document.getElementById('edit-langs-grid');
+    this.btnCloseEditNames = document.getElementById('btn-close-edit-names');
+    this.btnCancelEditNames = document.getElementById('btn-cancel-edit-names');
+    this.btnResetTranslit = document.getElementById('btn-reset-translit');
+    this.btnSaveEditNames = document.getElementById('btn-save-edit-names');
+
     // Teddy Screen elements
+    this.experienceHeaderBadge = document.getElementById('experience-header-badge');
     this.teddyCanvas = document.getElementById('teddy-canvas');
     this.teddySelectorBar = document.getElementById('teddy-selector-bar');
     this.headerNameDisplay = document.getElementById('header-name-display');
@@ -119,6 +133,114 @@ class PigeonTeddyApp {
     this.audioManager = new AudioManager();
   }
 
+  initI18n() {
+    // Populate Language dropdown
+    if (this.langDropdown) {
+      this.langDropdown.innerHTML = SUPPORTED_LOCALES.map(loc => `
+        <button class="lang-option ${loc.code === i18n.currentLocale ? 'active' : ''}" 
+                data-locale="${loc.code}" 
+                type="button" 
+                role="menuitem">
+          <span>${loc.flag} ${loc.name}</span>
+          <span class="lang-opt-native">${loc.native}</span>
+        </button>
+      `).join('');
+    }
+
+    // Subscribe to language changes
+    i18n.subscribe((locale) => {
+      this.updateLanguageUI(locale);
+      this.applyTranslations();
+    });
+
+    this.updateLanguageUI(i18n.currentLocale);
+    this.applyTranslations();
+  }
+
+  updateLanguageUI(localeCode) {
+    const loc = SUPPORTED_LOCALES.find(l => l.code === localeCode) || SUPPORTED_LOCALES[0];
+    if (this.langFlag) this.langFlag.textContent = loc.flag;
+    if (this.langLabel) this.langLabel.textContent = loc.native;
+
+    if (this.langDropdown) {
+      this.langDropdown.querySelectorAll('.lang-option').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-locale') === localeCode);
+      });
+    }
+  }
+
+  applyTranslations() {
+    // Top Header Badge
+    const headerTitleSpan = this.experienceHeaderBadge?.querySelector('span:nth-child(2)');
+    if (headerTitleSpan) headerTitleSpan.textContent = i18n.t('header_crafted_for');
+
+    // Polaroid
+    const polaroidSpan = this.floatingPolaroid?.querySelector('.polaroid-caption > span:first-child');
+    if (polaroidSpan) polaroidSpan.textContent = i18n.t('polaroid_caption');
+
+    // Action Card
+    const cardBadge = this.giftActionCard?.querySelector('.card-sparkle-pill');
+    if (cardBadge) cardBadge.textContent = i18n.t('card_badge');
+
+    const cardSub1 = document.getElementById('gift-card-sub1');
+    if (cardSub1) cardSub1.textContent = i18n.t('card_sub1');
+
+    const cardSub2 = document.getElementById('gift-card-sub2');
+    if (cardSub2) cardSub2.textContent = i18n.t('card_sub2');
+
+    const showcaseTitle = document.querySelector('.showcase-title-group span:last-child');
+    if (showcaseTitle) showcaseTitle.textContent = i18n.t('multilang_header');
+
+    if (this.btnEditName) this.btnEditName.textContent = i18n.t('btn_change_name');
+
+    // Action Buttons
+    if (this.btnSaveGift) this.btnSaveGift.querySelector('.btn-text').textContent = i18n.t('btn_save_gift');
+    if (this.btnMakeWave) this.btnMakeWave.querySelector('.btn-text').textContent = i18n.t('btn_make_wave');
+    if (this.btnPulseHeart) this.btnPulseHeart.querySelector('.btn-text').textContent = i18n.t('btn_pulse_heart');
+    if (this.btnExploreWorld) this.btnExploreWorld.querySelector('.btn-text').textContent = i18n.t('btn_explore_world');
+    if (this.replayBtn) this.replayBtn.textContent = i18n.t('btn_replay');
+
+    // Teddy Selector Tabs
+    if (this.teddySelectorBar) {
+      const tabs = this.teddySelectorBar.querySelectorAll('.teddy-tab-btn');
+      tabs.forEach((tab, idx) => {
+        const label = tab.querySelector('.tab-label');
+        if (label) label.textContent = i18n.t(`tab_teddy_${idx}`);
+      });
+    }
+
+    // Delivery Screen CTA
+    if (this.unsealBtn) {
+      const btnText = this.unsealBtn.querySelector('span:first-child');
+      if (btnText) btnText.textContent = i18n.t('envelope_touch_seal');
+    }
+    if (this.envelopeHint) this.envelopeHint.textContent = i18n.t('envelope_hint');
+    if (this.unsealSubcaption) this.unsealSubcaption.textContent = i18n.t('envelope_subcaption');
+
+    // Initial Name Modal
+    const modalBadge = document.querySelector('.name-modal-badge');
+    if (modalBadge) modalBadge.textContent = i18n.t('modal_badge');
+
+    const modalTitle = document.querySelector('.name-modal-title');
+    if (modalTitle) modalTitle.textContent = i18n.t('modal_title');
+
+    const modalSub = document.querySelector('.name-modal-subtitle');
+    if (modalSub) modalSub.textContent = i18n.t('modal_sub');
+
+    if (this.nameInput) this.nameInput.placeholder = i18n.t('modal_placeholder');
+
+    const previewLbl = document.querySelector('.preview-label');
+    if (previewLbl) previewLbl.textContent = i18n.t('modal_preview_label');
+
+    if (this.btnConfirmName) {
+      const span = this.btnConfirmName.querySelector('span:nth-child(2)');
+      if (span) span.textContent = i18n.t('modal_btn_confirm');
+    }
+
+    // Refresh recipient displays
+    this.refreshDisplays();
+  }
+
   initRenderers() {
     // 1. ASCII Carrier Pigeon Dove
     if (this.pigeonCanvas) {
@@ -147,7 +269,6 @@ class PigeonTeddyApp {
     if (this.envelopeCanvas) {
       this.envelopeRenderer = new AsciiEnvelope(
         this.envelopeCanvas,
-        // On envelope unseal & burn complete:
         () => {
           this.transitionToTeddy();
         }
@@ -158,7 +279,6 @@ class PigeonTeddyApp {
     // 3. Living Colored ASCII Teddy Bear
     if (this.teddyCanvas) {
       this.teddyRenderer = new AsciiTeddy(this.teddyCanvas, () => {
-        // Once teddy finishes emerging, show action card and signature
         if (this.giftActionCard) {
           this.giftActionCard.classList.add('visible');
         }
@@ -219,7 +339,7 @@ class PigeonTeddyApp {
     const list = getLanguageList(data);
 
     this.previewChips.innerHTML = list.map(item => `
-      <div class="preview-chip" title="${item.label} (${item.script})">
+      <div class="preview-chip" title="${item.label} (${item.script})" dir="${item.dir || 'ltr'}">
         <span class="chip-flag">${item.flag}</span>
         <span class="chip-lang">${item.script}:</span>
         <span class="chip-text">${item.text}</span>
@@ -227,42 +347,101 @@ class PigeonTeddyApp {
     `).join('');
   }
 
-  applyRecipientName(nameStr) {
-    const cleanName = (nameStr || 'Loki').trim() || 'Loki';
-    this.recipientName = cleanName;
-    this.multiLangData = generateMultiLangName(cleanName);
+  openEditNamesModal() {
+    if (!this.editNamesModal) return;
+    this.editNamesModal.classList.add('visible');
+    this.editNamesModal.setAttribute('aria-hidden', 'false');
 
-    // 1. Update Envelope Renderer
+    if (this.editOriginalName) {
+      this.editOriginalName.value = this.nameProfile.originalName;
+    }
+    if (this.editDetectedScript) {
+      this.editDetectedScript.textContent = `${this.nameProfile.detectedScript.name} (${this.nameProfile.detectedScript.native})`;
+    }
+
+    this.populateEditLangsGrid();
+  }
+
+  closeEditNamesModal() {
+    if (!this.editNamesModal) return;
+    this.editNamesModal.classList.remove('visible');
+    this.editNamesModal.setAttribute('aria-hidden', 'true');
+  }
+
+  populateEditLangsGrid() {
+    if (!this.editLangsGrid) return;
+    const list = getLanguageList(this.nameProfile.transliterations);
+
+    this.editLangsGrid.innerHTML = list.map(item => `
+      <div class="edit-lang-row" dir="${item.dir || 'ltr'}">
+        <div class="edit-lang-meta">
+          <span>${item.flag}</span>
+          <span>${item.script}</span>
+        </div>
+        <input type="text" 
+               class="edit-lang-input" 
+               data-lang="${item.code}" 
+               value="${item.text || ''}" 
+               dir="${item.dir || 'ltr'}"
+               placeholder="${item.label}">
+      </div>
+    `).join('');
+  }
+
+  applyRecipientProfile(profile) {
+    this.nameProfile = profile;
+    this.recipientName = profile.originalName;
+    this.multiLangData = profile.transliterations;
+    this.nameProfile.save();
+    this.refreshDisplays();
+  }
+
+  applyRecipientName(rawName) {
+    const clean = String(rawName || 'Loki').normalize('NFC').trim() || 'Loki';
+    this.nameProfile = new MultiLangNameProfile(clean);
+    this.recipientName = this.nameProfile.originalName;
+    this.multiLangData = this.nameProfile.transliterations;
+    this.nameProfile.save();
+    this.refreshDisplays();
+  }
+
+  refreshDisplays() {
+    const displayName = this.nameProfile.displayName || this.nameProfile.originalName;
+
+    // 1. Envelope Renderer
     if (this.envelopeRenderer) {
       this.envelopeRenderer.setRecipientName(this.recipientName, this.multiLangData);
     }
 
-    // 2. Update Header Banner Display & Ticker
+    // 2. Header Banner & Ticker
     if (this.headerNameDisplay) {
-      this.headerNameDisplay.textContent = this.recipientName.toUpperCase();
+      this.headerNameDisplay.textContent = displayName;
     }
     if (this.headerMultilangTicker) {
-      this.headerMultilangTicker.textContent = `${this.multiLangData.ta} • ${this.multiLangData.hi} • ${this.multiLangData.ja} • ${this.multiLangData.ko} • ${this.multiLangData.zh} • ${this.multiLangData.ar}`;
+      this.headerMultilangTicker.textContent = 
+        `${this.multiLangData.ta} • ${this.multiLangData.hi} • ${this.multiLangData.ja} • ${this.multiLangData.ko} • ${this.multiLangData.zh} • ${this.multiLangData.ar}`;
     }
 
-    // 3. Update Polaroid Caption
+    // 3. Polaroid Caption
     if (this.polaroidName) {
-      this.polaroidName.textContent = this.recipientName;
+      this.polaroidName.textContent = displayName;
     }
     if (this.polaroidNativeScript) {
-      this.polaroidNativeScript.textContent = this.multiLangData.ta || this.multiLangData.hi;
+      // If Latin, show native Tamil/Hindi. If native, show English transliteration!
+      const isLatin = this.nameProfile.detectedScript.id === 'latin';
+      this.polaroidNativeScript.textContent = isLatin ? this.multiLangData.ta : this.multiLangData.en;
     }
 
-    // 4. Update Dedication Card
+    // 4. Dedication Card Title
     if (this.cardName) {
-      this.cardName.textContent = this.recipientName;
+      this.cardName.textContent = displayName;
     }
 
-    // 5. Update Multi-Language Showcase Grid in Dedication Card
+    // 5. Multi-Language Showcase Grid in Dedication Card
     if (this.langGridDisplay) {
       const list = getLanguageList(this.multiLangData);
       this.langGridDisplay.innerHTML = list.map(item => `
-        <div class="lang-pill" title="${item.label}">
+        <div class="lang-pill" title="${item.label}" dir="${item.dir || 'ltr'}">
           <div class="lang-pill-left">
             <span>${item.flag}</span>
             <span>${item.script}</span>
@@ -272,8 +451,8 @@ class PigeonTeddyApp {
       `).join('');
     }
 
-    // 6. Update ASCII Signature Key cluster
-    this.updateAsciiSignature(this.recipientName);
+    // 6. Unicode Dynamic Signature
+    this.updateAsciiSignature(displayName);
   }
 
   updateAsciiSignature(name) {
@@ -282,20 +461,65 @@ class PigeonTeddyApp {
     const bytesDiv = this.cornerSignature.querySelector('.ascii-sig-bytes');
     if (!cluster) return;
 
-    const upper = name.toUpperCase().replace(/[^A-Z]/g, '') || 'LOKI';
+    // Unicode safe grapheme cluster handling
+    let chars = [];
+    if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+      const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
+      chars = Array.from(segmenter.segment(name), s => s.segment);
+    } else {
+      chars = Array.from(name);
+    }
+
+    // Limit to max 16 clusters for graceful styling
+    chars = chars.slice(0, 16);
+
     cluster.innerHTML = `
-      <div class="ascii-key-word">
-        ${upper.split('').map(ch => `<span class="ascii-key">${ch}</span>`).join('')}
+      <div class="ascii-key-word" dir="auto">
+        ${chars.map(ch => `<span class="ascii-key">${ch}</span>`).join('')}
       </div>
     `;
 
     if (bytesDiv) {
-      const hexBytes = upper.split('').map(ch => ch.charCodeAt(0).toString(16).toUpperCase()).join(' ');
-      bytesDiv.innerHTML = `<span class="ascii-code">ASCII_KEY:</span> ${hexBytes} <span class="sig-star">✦</span>`;
+      const hexBytes = chars
+        .map(ch => ch.codePointAt(0).toString(16).toUpperCase().padStart(2, '0'))
+        .slice(0, 8)
+        .join(' ');
+      bytesDiv.innerHTML = `<span class="ascii-code">UNICODE_KEY:</span> ${hexBytes} <span class="sig-star">✦</span>`;
     }
   }
 
   initInteractions() {
+    // Language Dropdown open / close
+    if (this.langSelectorBtn && this.langSelectorWrapper) {
+      this.langSelectorBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.langSelectorWrapper.classList.toggle('open');
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!this.langSelectorWrapper.contains(e.target)) {
+          this.langSelectorWrapper.classList.remove('open');
+        }
+      });
+    }
+
+    // Language Option click
+    if (this.langDropdown) {
+      this.langDropdown.addEventListener('click', (e) => {
+        const opt = e.target.closest('.lang-option');
+        if (!opt) return;
+        const code = opt.getAttribute('data-locale');
+        if (code) {
+          i18n.setLocale(code);
+          this.langSelectorWrapper?.classList.remove('open');
+          this.showToast(`Switched interface language to ${opt.textContent.trim()} 🌐`);
+          try {
+            this.audioManager.playClick();
+          } catch (err) {}
+        }
+      });
+    }
+
     // Click letter / envelope to ask name
     const handleLetterOpenRequest = () => {
       if (this.currentScreen !== 'delivery' || this.isTransitioning) return;
@@ -321,28 +545,73 @@ class PigeonTeddyApp {
       this.nameInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           e.preventDefault();
-          this.submitName();
+          this.submitInitialName();
         }
       });
     }
 
-    // Confirm Name Form Submit
+    // Confirm Initial Name Form Submit
     if (this.nameForm) {
       this.nameForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        this.submitName();
+        this.submitInitialName();
       });
     }
     if (this.btnConfirmName) {
       this.btnConfirmName.addEventListener('click', () => {
-        this.submitName();
+        this.submitInitialName();
       });
     }
 
-    // Edit Name button in Dedication card
+    // Edit Name button in Dedication card -> Opens Multi-Language Name Manager
     if (this.btnEditName) {
       this.btnEditName.addEventListener('click', () => {
-        this.openNameModal();
+        try {
+          this.audioManager.playClick();
+        } catch (e) {}
+        this.openEditNamesModal();
+      });
+    }
+
+    // Edit Names Modal interactions
+    if (this.btnCloseEditNames) {
+      this.btnCloseEditNames.addEventListener('click', () => this.closeEditNamesModal());
+    }
+    if (this.btnCancelEditNames) {
+      this.btnCancelEditNames.addEventListener('click', () => this.closeEditNamesModal());
+    }
+
+    // When original name is typed in edit modal, update detected script in real-time
+    if (this.editOriginalName) {
+      this.editOriginalName.addEventListener('input', (e) => {
+        const scr = detectScript(e.target.value);
+        if (this.editDetectedScript) {
+          this.editDetectedScript.textContent = `${scr.name} (${scr.native})`;
+        }
+      });
+    }
+
+    // Reset transliterations to auto
+    if (this.btnResetTranslit) {
+      this.btnResetTranslit.addEventListener('click', () => {
+        const val = this.editOriginalName?.value || this.recipientName;
+        const freshProfile = new MultiLangNameProfile(val);
+        this.nameProfile = freshProfile;
+        this.populateEditLangsGrid();
+        this.showToast('Reset language transliterations to automatic calculation ↺');
+      });
+    }
+
+    // Save Edit Names Form
+    if (this.editNamesForm) {
+      this.editNamesForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.saveCustomizedNames();
+      });
+    }
+    if (this.btnSaveEditNames) {
+      this.btnSaveEditNames.addEventListener('click', () => {
+        this.saveCustomizedNames();
       });
     }
 
@@ -378,56 +647,66 @@ class PigeonTeddyApp {
         if (this.soundLabel) {
           this.soundLabel.textContent = isMuted ? 'Music' : 'Playing';
         }
-        this.showToast(isMuted ? 'Music paused 🔇' : 'Celestial music box playing 🎵');
       });
     }
 
-    // Interactive Action 1: Save Gift (Capture PNG Snapshot)
+    // Polaroid click -> enlarge
+    if (this.floatingPolaroid) {
+      this.floatingPolaroid.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-change-photo') || e.target.closest('input')) return;
+        this.floatingPolaroid.classList.toggle('enlarged');
+      });
+    }
+
+    // Photo file upload
+    if (this.photoUploadInput && this.polaroidImg) {
+      this.photoUploadInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            this.polaroidImg.src = evt.target.result;
+            this.showToast('Portrait photo updated! 📷✨');
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    // Action button handlers
     if (this.btnSaveGift) {
-      this.btnSaveGift.addEventListener('click', () => {
-        this.saveGiftSnapshot();
-      });
+      this.btnSaveGift.addEventListener('click', () => this.saveGiftSnapshot());
     }
-
-    // Interactive Action 2: Make Teddy Wave
     if (this.btnMakeWave) {
       this.btnMakeWave.addEventListener('click', () => {
         if (this.teddyRenderer) {
           this.teddyRenderer.triggerWave();
-          this.showToast(`Teddy waves happily to you, ${this.recipientName}! 👋✨`);
+          this.showToast('Teddy is waving happily at you! 👋🧸');
           try {
             this.audioManager.playBloomChime();
           } catch (e) {}
         }
       });
     }
-
-    // Interactive Action 3: Pulse Heart
     if (this.btnPulseHeart) {
       this.btnPulseHeart.addEventListener('click', () => {
         if (this.teddyRenderer) {
           this.teddyRenderer.triggerHeartPulse();
-          this.showToast(`Glowing heart pulses with love for ${this.recipientName}! 💖`);
+          this.showToast("Teddy's glowing heart is pulsing with love! 💖");
           try {
             this.audioManager.playHeartBurst();
           } catch (e) {}
         }
       });
     }
-
-    // Interactive Action 4: Explore Developer Portfolio Modal
     if (this.btnExploreWorld) {
       this.btnExploreWorld.addEventListener('click', () => {
         if (this.worldModal) {
           this.worldModal.classList.add('visible');
           this.worldModal.setAttribute('aria-hidden', 'false');
         }
-        try {
-          this.audioManager.playClick();
-        } catch (e) {}
       });
     }
-
     if (this.btnCloseWorld) {
       this.btnCloseWorld.addEventListener('click', () => {
         if (this.worldModal) {
@@ -436,63 +715,14 @@ class PigeonTeddyApp {
         }
       });
     }
-
-    // Replay Experience (Watch Again)
     if (this.replayBtn) {
-      this.replayBtn.addEventListener('click', () => {
-        this.restartExperience();
-      });
+      this.replayBtn.addEventListener('click', () => this.restartExperience());
     }
-
-    // Custom Photo Upload Input
-    if (this.photoUploadInput && this.polaroidImg) {
-      this.photoUploadInput.addEventListener('change', (e) => {
-        const file = e.target.files && e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = (loadEvt) => {
-            this.polaroidImg.src = loadEvt.target.result;
-            this.showToast('Custom photo framed with love! 📸✨');
-            try {
-              this.audioManager.playBloomChime();
-            } catch (err) {}
-          };
-          reader.readAsDataURL(file);
-        }
-      });
-    }
-
-    // Key accessibility navigation
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        if (this.nameModal && this.nameModal.classList.contains('visible')) {
-          this.closeNameModal();
-        } else if (this.worldModal && this.worldModal.classList.contains('visible')) {
-          this.worldModal.classList.remove('visible');
-        }
-      }
-      if (e.key === 'ArrowRight' && this.currentScreen === 'teddy' && this.teddyRenderer) {
-        const next = (this.teddyRenderer.currentIndex + 1) % 4;
-        this.teddyRenderer.setTeddy(next);
-        this.updateTeddySelectorUI(next);
-      }
-      if (e.key === 'ArrowLeft' && this.currentScreen === 'teddy' && this.teddyRenderer) {
-        const prev = (this.teddyRenderer.currentIndex + 3) % 4;
-        this.teddyRenderer.setTeddy(prev);
-        this.updateTeddySelectorUI(prev);
-      }
-    });
-
-    window.addEventListener('resize', () => {
-      if (this.pigeonRenderer) this.pigeonRenderer.resize();
-      if (this.envelopeRenderer) this.envelopeRenderer.resize();
-      if (this.teddyRenderer) this.teddyRenderer.resize();
-    });
   }
 
-  submitName() {
-    const nameVal = this.nameInput ? this.nameInput.value : 'Loki';
-    this.applyRecipientName(nameVal);
+  submitInitialName() {
+    const rawVal = this.nameInput ? this.nameInput.value : '';
+    this.applyRecipientName(rawVal || 'Loki');
     this.closeNameModal();
 
     if (this.currentScreen === 'delivery') {
@@ -501,7 +731,6 @@ class PigeonTeddyApp {
         this.audioManager.playBloomChime();
       } catch (e) {}
 
-      // Trigger spectacular envelope unsealing ceremony
       if (this.envelopeRenderer) {
         this.envelopeRenderer.triggerClick();
       } else {
@@ -510,6 +739,33 @@ class PigeonTeddyApp {
     } else {
       this.showToast(`Updated name to ${this.recipientName} across all languages! ✨`);
     }
+  }
+
+  saveCustomizedNames() {
+    if (!this.editOriginalName) return;
+    const newOrig = this.editOriginalName.value.trim() || 'Loki';
+    this.nameProfile.originalName = newOrig;
+    this.nameProfile.detectedScript = detectScript(newOrig);
+    this.nameProfile.displayName = newOrig;
+
+    // Collect all edited inputs
+    if (this.editLangsGrid) {
+      const inputs = this.editLangsGrid.querySelectorAll('.edit-lang-input');
+      inputs.forEach(input => {
+        const lang = input.getAttribute('data-lang');
+        const val = input.value.trim();
+        if (lang && val) {
+          this.nameProfile.setTransliteration(lang, val);
+        }
+      });
+    }
+
+    this.applyRecipientProfile(this.nameProfile);
+    this.closeEditNamesModal();
+    this.showToast('Customized names saved across all world languages! 🌍✨');
+    try {
+      this.audioManager.playBloomChime();
+    } catch (e) {}
   }
 
   saveGiftSnapshot() {
@@ -537,12 +793,12 @@ class PigeonTeddyApp {
 
       // Title & multi-language dedication overlay
       sCtx.fillStyle = '#ffd700';
-      sCtx.font = 'bold 36px serif';
+      sCtx.font = 'bold 36px "Inter", "Noto Sans Tamil", "Noto Sans Arabic", serif';
       sCtx.textAlign = 'center';
-      sCtx.fillText(`✦ SPECIALLY CRAFTED FOR ${this.recipientName.toUpperCase()} ✦`, w * 0.5, 90);
+      sCtx.fillText(`✦ SPECIALLY CRAFTED FOR ${this.recipientName} ✦`, w * 0.5, 90);
 
       sCtx.fillStyle = '#ff7b9c';
-      sCtx.font = '22px sans-serif';
+      sCtx.font = '22px "Inter", "Noto Sans Tamil", "Noto Sans Arabic", sans-serif';
       sCtx.fillText(`${this.multiLangData.ta} • ${this.multiLangData.hi} • ${this.multiLangData.ja} • ${this.multiLangData.ar}`, w * 0.5, 130);
 
       // Footer
@@ -656,12 +912,17 @@ class PigeonTeddyApp {
   }
 
   start() {
-    this.applyRecipientName('Loki');
-
     const urlParams = new URLSearchParams(window.location.search);
     const nameParam = urlParams.get('name');
     if (nameParam) {
       this.applyRecipientName(nameParam);
+    } else {
+      this.refreshDisplays();
+    }
+
+    const langParam = urlParams.get('lang');
+    if (langParam) {
+      i18n.setLocale(langParam);
     }
 
     if (urlParams.get('scene') === 'teddy' || urlParams.get('testScene') === 'reveal') {

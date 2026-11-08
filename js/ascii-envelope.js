@@ -219,13 +219,13 @@ export class AsciiEnvelope {
 
       // Inscribed Love Dedication
       ctx.fillStyle = '#b8860b';
-      ctx.font = 'bold 15px "Cinzel", "Cormorant Garamond", serif';
+      ctx.font = 'bold 15px "Cinzel", "Cormorant Garamond", system-ui, sans-serif';
       ctx.textAlign = 'center';
-      const nameUpper = (this.recipientName || 'LOKI').toUpperCase();
-      ctx.fillText(`✦  A SACRED MESSAGE FOR ${nameUpper}  ✦`, 0, -lH * 0.5 + 34);
+      const safeName = (this.recipientName || 'Loki');
+      ctx.fillText(`✦  A SACRED MESSAGE FOR ${safeName}  ✦`, 0, -lH * 0.5 + 34);
 
       if (this.multiLang) {
-        ctx.font = 'bold 12px "Inter", sans-serif';
+        ctx.font = 'bold 12px "Inter", "Noto Sans Tamil", "Noto Sans Arabic", "Noto Sans JP", sans-serif';
         ctx.fillStyle = '#c9184a';
         ctx.fillText(`${this.multiLang.ta || ''} • ${this.multiLang.hi || ''} • ${this.multiLang.ja || ''} • ${this.multiLang.ar || ''}`, 0, -lH * 0.5 + 52);
       }
@@ -360,12 +360,16 @@ export class AsciiEnvelope {
       ctx.fillText('✦  A  C E L E S T I A L   D E L I V E R Y  ✦', cx, y0 + 52);
       ctx.shadowBlur = 0;
 
-      ctx.font = 'bold 20px "Inter", sans-serif';
+      ctx.font = 'bold 18px "Inter", "Noto Sans Tamil", "Noto Sans Arabic", sans-serif';
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
       ctx.shadowBlur = 8;
-      const spacedName = (this.recipientName || 'LOKI').toUpperCase().split('').join(' ');
-      ctx.fillText(`S P E C I A L L Y   F O R   ${spacedName}`, cx, cy - 38);
+      const rawRecipient = (this.recipientName || 'Loki').trim();
+      const isPureLatin = /^[A-Za-z0-9 ]+$/.test(rawRecipient);
+      const formattedTitle = isPureLatin
+        ? `S P E C I A L L Y   F O R   ${rawRecipient.toUpperCase().split('').join(' ')}`
+        : `SPECIALLY FOR  ${rawRecipient}`;
+      ctx.fillText(formattedTitle, cx, cy - 38);
       ctx.shadowBlur = 0;
     }
 

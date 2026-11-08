@@ -76,7 +76,21 @@ body {
   background-color: var(--bg-color);
   background-image: var(--bg-gradient);
   color: var(--text-main);
-  font-family: 'Inter', -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Noto Sans",
+    "Noto Sans Tamil", "Latha", "Vijaya",
+    "Noto Sans Devanagari", "Mangal",
+    "Noto Sans Telugu", "Gautami",
+    "Noto Sans Kannada", "Tunga",
+    "Noto Sans Malayalam", "Kartika",
+    "Noto Sans Bengali", "Vrinda",
+    "Noto Sans Arabic", "Geeza Pro", "Segoe UI Arabic",
+    "Noto Sans Hebrew", "Arial Hebrew",
+    "Noto Sans SC", "PingFang SC", "Microsoft YaHei",
+    "Noto Sans JP", "Hiragino Sans", "Meiryo",
+    "Noto Sans KR", "Malgun Gothic",
+    "Noto Sans Thai", "Thonburi",
+    sans-serif;
   user-select: none;
   -webkit-font-smoothing: antialiased;
   transition: background 0.8s ease, color 0.5s ease;
@@ -139,6 +153,77 @@ body {
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-1px);
+}
+
+/* Language Selector Dropdown */
+.lang-selector-wrapper {
+  position: relative;
+}
+
+.pill-caret {
+  font-size: 9px;
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+}
+
+.lang-selector-wrapper.open .pill-caret {
+  transform: rotate(180deg);
+}
+
+.lang-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 210px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: rgba(14, 10, 26, 0.96);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 215, 120, 0.35);
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(255, 60, 110, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  z-index: 120;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.96);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lang-selector-wrapper.open .lang-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: #cdd5eb;
+  font-size: 11.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+}
+
+.lang-option:hover, .lang-option.active {
+  background: rgba(255, 60, 110, 0.25);
+  color: #ffffff;
+}
+
+.lang-opt-native {
+  font-weight: 700;
+  color: #ffd700;
+  font-size: 12px;
 }
 
 .sound-toggle-btn.active {
@@ -538,6 +623,319 @@ body {
 .btn-confirm-name:hover {
   transform: translateY(-2px);
   box-shadow: 0 14px 36px rgba(255, 42, 109, 0.65);
+}
+
+/* ==========================================================================
+   Multi-Language Name Customization & Approval Modal
+   ========================================================================== */
+.edit-names-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+
+.edit-names-modal.visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.edit-names-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 5, 14, 0.86);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.edit-names-card {
+  position: relative;
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: linear-gradient(150deg, rgba(22, 14, 34, 0.98) 0%, rgba(12, 7, 22, 0.99) 100%);
+  border: 1.5px solid rgba(255, 215, 120, 0.45);
+  border-radius: 24px;
+  padding: 30px 24px 24px;
+  box-shadow: 
+    0 24px 70px rgba(0, 0, 0, 0.95),
+    0 0 45px rgba(255, 60, 110, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.94) translateY(14px);
+  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.edit-names-modal.visible .edit-names-card {
+  transform: scale(1) translateY(0);
+}
+
+.edit-names-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ffd700;
+  margin-bottom: 6px;
+  text-align: center;
+}
+
+.edit-names-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #ffffff;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.edit-names-subtitle {
+  font-size: 12px;
+  color: #cad0e8;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.edit-names-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.edit-primary-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 12px;
+  align-items: flex-end;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.edit-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.edit-field-group label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #ff9ebb;
+  letter-spacing: 0.3px;
+}
+
+.edit-input {
+  height: 42px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 0 12px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.edit-input:focus {
+  border-color: #ffd700;
+  background: rgba(255, 255, 255, 0.14);
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.3);
+}
+
+.detected-script-pill {
+  height: 42px;
+  background: rgba(255, 215, 120, 0.12);
+  border: 1px solid rgba(255, 215, 120, 0.35);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffd700;
+  letter-spacing: 0.5px;
+}
+
+.edit-grid-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffd700;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+.edit-langs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.edit-lang-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 6px 10px;
+}
+
+.edit-lang-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 80px;
+  font-size: 11px;
+  color: #c8cede;
+  font-weight: 600;
+}
+
+.edit-lang-input {
+  flex: 1;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  padding: 0 10px;
+  color: #ffe680;
+  font-size: 13px;
+  font-weight: 700;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.edit-lang-input:focus {
+  border-color: #ff3b68;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 12px rgba(255, 59, 104, 0.4);
+}
+
+.edit-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-secondary-act {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: #cad0e8;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-act:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.btn-primary-save {
+  background: linear-gradient(135deg, #ff2a6d 0%, #ff6b35 100%);
+  border: none;
+  border-radius: 12px;
+  padding: 10px 22px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(255, 42, 109, 0.45);
+  transition: all 0.25s ease;
+}
+
+.btn-primary-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(255, 42, 109, 0.65);
+}
+
+/* ==========================================================================
+   RTL (Right-To-Left) Internationalization Rules
+   ========================================================================== */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .top-nav-bar {
+  right: auto;
+  left: 22px;
+}
+
+[dir="rtl"] .lang-dropdown {
+  right: auto;
+  left: 0;
+}
+
+[dir="rtl"] .experience-header-badge {
+  direction: ltr; /* keep centered badge balanced */
+}
+
+[dir="rtl"] .gift-card-title,
+[dir="rtl"] .gift-card-sub,
+[dir="rtl"] .card-sparkle-pill {
+  text-align: center;
+}
+
+[dir="rtl"] .lang-pill {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .lang-pill-left {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .showcase-header {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .name-input-icon {
+  left: auto;
+  right: 16px;
+}
+
+[dir="rtl"] .recipient-name-input {
+  padding-left: 20px;
+  padding-right: 48px;
+  text-align: right;
+}
+
+[dir="rtl"] .edit-primary-row {
+  grid-template-columns: 1fr 1.5fr;
+}
+
+[dir="rtl"] .edit-lang-row {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .edit-modal-actions {
+  flex-direction: row-reverse;
 }
 
 /* ==========================================================================

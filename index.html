@@ -10,17 +10,29 @@
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=12.0">
+  <link rel="stylesheet" href="css/style.css?v=13.0">
 </head>
 <body class="theme-aurora">
 
   <!-- Ambient Celestial ASCII Stardust & Rising Hearts Canvas -->
   <canvas id="ambient-canvas"></canvas>
 
-  <!-- Top Floating Controls: Theme Switcher & Music -->
+  <!-- Top Floating Controls: Language, Theme Switcher & Music -->
   <div class="top-nav-bar">
+    <!-- Language Selector Dropdown -->
+    <div class="lang-selector-wrapper" id="lang-selector-wrapper">
+      <button id="lang-selector-btn" class="top-pill-btn lang-selector-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Change Application Language" title="Change Language">
+        <span id="lang-flag" aria-hidden="true">🌐</span>
+        <span id="lang-label">English</span>
+        <span class="pill-caret" aria-hidden="true">▾</span>
+      </button>
+      <div id="lang-dropdown" class="lang-dropdown" role="menu" aria-label="Select Language">
+        <!-- Dynamically populated locales -->
+      </div>
+    </div>
+
     <button id="theme-toggle-btn" class="top-pill-btn" type="button" aria-label="Switch Theme Atmosphere" title="Switch Theme Atmosphere">
       <span id="theme-icon" aria-hidden="true">🌌</span>
       <span id="theme-label">Aurora</span>
@@ -209,7 +221,8 @@
             class="recipient-name-input" 
             value="Loki" 
             placeholder="Enter your name (e.g. Loki, Priya, Alex...)" 
-            maxlength="24" 
+            maxlength="120" 
+            dir="auto"
             autocomplete="off" 
             required 
           />
@@ -277,9 +290,53 @@
     </div>
   </div>
 
+  <!-- Universal Multi-Language Name & Transliteration Customization Modal -->
+  <div id="edit-names-modal" class="edit-names-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="edit-names-backdrop"></div>
+    <div class="edit-names-card">
+      <button id="btn-close-edit-names" class="btn-close-modal" aria-label="Close edit names modal">&times;</button>
+      
+      <div class="edit-names-badge" id="edit-modal-badge">🌍 &nbsp;NAME &amp; TRANSLITERATION MANAGER &nbsp;🌍</div>
+      <h2 class="edit-names-title" id="edit-modal-title">Personalize Your Name Across Languages ✨</h2>
+      <p class="edit-names-subtitle" id="edit-modal-sub">Your name is your identity. You have full control to edit and approve every language version:</p>
+
+      <form id="edit-names-form" class="edit-names-form" onsubmit="return false;">
+        <!-- Top Row: Original Name & Script Detection -->
+        <div class="edit-primary-row">
+          <div class="edit-field-group">
+            <label for="edit-original-name" id="label-original-name">Original Name (Exact Native Input):</label>
+            <input type="text" id="edit-original-name" class="edit-input primary-input" dir="auto" maxlength="120" required>
+          </div>
+          <div class="edit-field-group">
+            <label id="label-detected-script">Detected Writing System:</label>
+            <div id="edit-detected-script" class="detected-script-pill">Latin</div>
+          </div>
+        </div>
+
+        <!-- Transliteration Grid for World Languages -->
+        <div class="edit-grid-label">✏️ Edit / Approve Language Representations:</div>
+        <div id="edit-langs-grid" class="edit-langs-grid">
+          <!-- Dynamically populated 10+ language rows with inputs -->
+        </div>
+
+        <div class="edit-modal-actions">
+          <button type="button" id="btn-reset-translit" class="btn-secondary-act">
+            <span>↺ Reset to Auto</span>
+          </button>
+          <button type="button" id="btn-cancel-edit-names" class="btn-secondary-act">
+            <span>Cancel</span>
+          </button>
+          <button type="submit" id="btn-save-edit-names" class="btn-primary-save">
+            <span>Save &amp; Apply Changes 💖</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Toast Notification Feedback -->
   <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=12.0"></script>
+  <script type="module" src="js/app.js?v=13.0"></script>
 </body>
 </html>
