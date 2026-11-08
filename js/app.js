@@ -343,8 +343,9 @@ class PigeonTeddyApp {
 
   openNameModal() {
     if (!this.nameModal) return;
+    this.nameModal.removeAttribute('inert');
     this.nameModal.classList.add('visible');
-    this.nameModal.setAttribute('aria-hidden', 'false');
+    this.nameModal.removeAttribute('aria-hidden');
     if (this.nameInput) {
       this.nameInput.value = this.recipientName || 'Loki';
       this.updateLivePreview(this.nameInput.value);
@@ -354,8 +355,12 @@ class PigeonTeddyApp {
 
   closeNameModal() {
     if (!this.nameModal) return;
+    if (document.activeElement && this.nameModal.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
     this.nameModal.classList.remove('visible');
     this.nameModal.setAttribute('aria-hidden', 'true');
+    this.nameModal.setAttribute('inert', '');
   }
 
   updateLivePreview(nameStr) {
@@ -374,8 +379,9 @@ class PigeonTeddyApp {
 
   openEditNamesModal() {
     if (!this.editNamesModal) return;
+    this.editNamesModal.removeAttribute('inert');
     this.editNamesModal.classList.add('visible');
-    this.editNamesModal.setAttribute('aria-hidden', 'false');
+    this.editNamesModal.removeAttribute('aria-hidden');
 
     if (this.editOriginalName) {
       this.editOriginalName.value = this.nameProfile.originalName;
@@ -389,8 +395,29 @@ class PigeonTeddyApp {
 
   closeEditNamesModal() {
     if (!this.editNamesModal) return;
+    if (document.activeElement && this.editNamesModal.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
     this.editNamesModal.classList.remove('visible');
     this.editNamesModal.setAttribute('aria-hidden', 'true');
+    this.editNamesModal.setAttribute('inert', '');
+  }
+
+  openWorldModal() {
+    if (!this.worldModal) return;
+    this.worldModal.removeAttribute('inert');
+    this.worldModal.classList.add('visible');
+    this.worldModal.removeAttribute('aria-hidden');
+  }
+
+  closeWorldModal() {
+    if (!this.worldModal) return;
+    if (document.activeElement && this.worldModal.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
+    this.worldModal.classList.remove('visible');
+    this.worldModal.setAttribute('aria-hidden', 'true');
+    this.worldModal.setAttribute('inert', '');
   }
 
   populateEditLangsGrid() {
@@ -769,18 +796,12 @@ class PigeonTeddyApp {
     }
     if (this.btnExploreWorld) {
       this.btnExploreWorld.addEventListener('click', () => {
-        if (this.worldModal) {
-          this.worldModal.classList.add('visible');
-          this.worldModal.setAttribute('aria-hidden', 'false');
-        }
+        this.openWorldModal();
       });
     }
     if (this.btnCloseWorld) {
       this.btnCloseWorld.addEventListener('click', () => {
-        if (this.worldModal) {
-          this.worldModal.classList.remove('visible');
-          this.worldModal.setAttribute('aria-hidden', 'true');
-        }
+        this.closeWorldModal();
       });
     }
     if (this.replayBtn) {

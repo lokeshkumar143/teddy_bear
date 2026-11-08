@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=18.0">
+  <link rel="stylesheet" href="css/style.css?v=19.0">
 </head>
 <body class="theme-aurora">
 
@@ -135,7 +135,7 @@
       <div id="floating-polaroid" class="floating-polaroid" title="Click to view photo">
         <div class="polaroid-tape"></div>
         <div class="polaroid-inner">
-          <img id="polaroid-img" src="assets/loki-portrait.jpg?v=18.0" alt="Loki Portrait">
+          <img id="polaroid-img" src="assets/loki-portrait.jpg?v=19.0" alt="Loki Portrait">
           <label for="photo-upload-input" class="btn-change-photo" title="Upload custom photo" aria-label="Upload custom photo">
             <span>📷</span>
           </label>
@@ -227,7 +227,7 @@
   </main>
 
   <!-- Interactive Name Entry & Multi-Language Generation Modal -->
-  <div id="name-modal" class="name-modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div id="name-modal" class="name-modal" role="dialog" aria-modal="true" aria-hidden="true" inert>
     <div class="name-modal-backdrop"></div>
     <div class="name-modal-card">
       <div class="name-modal-icon">💌</div>
@@ -270,7 +270,7 @@
   </div>
 
   <!-- Interactive Creative Portfolio Modal ("Explore My World") -->
-  <div id="world-modal" class="world-modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div id="world-modal" class="world-modal" role="dialog" aria-modal="true" aria-hidden="true" inert>
     <div class="world-modal-backdrop"></div>
     <div class="world-modal-content">
       <button id="btn-close-world" class="btn-close-modal" aria-label="Close modal">&times;</button>
@@ -314,7 +314,7 @@
   </div>
 
   <!-- Universal Multi-Language Name & Transliteration Customization Modal -->
-  <div id="edit-names-modal" class="edit-names-modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div id="edit-names-modal" class="edit-names-modal" role="dialog" aria-modal="true" aria-hidden="true" inert>
     <div class="edit-names-backdrop"></div>
     <div class="edit-names-card">
       <button id="btn-close-edit-names" class="btn-close-modal" aria-label="Close edit names modal">&times;</button>
@@ -360,6 +360,6 @@
   <!-- Toast Notification Feedback -->
   <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=18.0"></script>
+  <script type="module" src="js/app.js?v=19.0"></script>
 </body>
 </html>
