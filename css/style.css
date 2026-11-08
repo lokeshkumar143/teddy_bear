@@ -619,32 +619,35 @@ body {
    Pure ASCII Key Design Signature of Lokesh Kumar
    ========================================================================== */
 .corner-signature {
-  position: fixed;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: static;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 1.2s ease 0.4s;
-  z-index: 25;
+  margin-top: 10px;
+  width: 100%;
+  opacity: 0.95;
+  pointer-events: auto;
+  user-select: none;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  transition: opacity 0.8s ease;
 }
 
+.gift-action-card.visible .corner-signature,
 .corner-signature.visible {
   opacity: 1;
-  pointer-events: auto;
 }
 
 .ascii-sig-box {
-  background: rgba(10, 6, 14, 0.85);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 140, 175, 0.28);
+  width: 100%;
+  max-width: 320px;
+  background: rgba(10, 6, 14, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 140, 175, 0.22);
   border-radius: 10px;
-  padding: 6px 14px;
+  padding: 6px 12px;
   font-family: "JetBrains Mono", Consolas, monospace;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -881,17 +884,46 @@ body {
    Full Responsive Layout (Mobile, Tablet & Portrait Mode)
    ========================================================================== */
 @media (max-width: 920px), (orientation: portrait), (max-aspect-ratio: 1/1) {
+  /* Screen 1: Delivery Screen & Unseal Call-to-Action */
+  .unseal-cta-wrapper {
+    bottom: 8%;
+    width: 92%;
+    max-width: 350px;
+    gap: 10px;
+  }
+
+  .unseal-cta-btn {
+    padding: 11px 22px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    max-width: 100%;
+    gap: 8px;
+    box-shadow: 
+      0 6px 24px rgba(255, 42, 109, 0.45),
+      0 0 16px rgba(255, 215, 0, 0.3);
+  }
+
+  .unseal-subcaption {
+    font-size: 11px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.4;
+    padding: 0 10px;
+  }
+
+  /* Screen 2: Top Header & Navigation */
   .experience-header-badge {
     top: 10px;
     left: 10px;
-    font-size: 8px;
-    padding: 3px 8px;
+    font-size: 8.5px;
+    padding: 4px 10px;
     letter-spacing: 1.2px;
-    max-width: 42vw;
+    max-width: 60vw;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     z-index: 40;
+    gap: 5px;
   }
 
   .top-nav-bar {
@@ -902,21 +934,26 @@ body {
   }
 
   .top-pill-btn {
-    padding: 4px 8px;
+    padding: 4px 9px;
     font-size: 9.5px;
     border-radius: 999px;
   }
 
   .teddy-selector-bar {
-    top: 44px;
+    top: 48px;
     left: 50%;
     transform: translateX(-50%) translateY(-10px) scale(0.95);
     padding: 3px 6px;
     gap: 3px;
     max-width: 96vw;
     overflow-x: auto;
+    scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
     z-index: 45;
+  }
+
+  .teddy-selector-bar::-webkit-scrollbar {
+    display: none;
   }
 
   .teddy-selector-bar.visible {
@@ -939,7 +976,7 @@ body {
     transform: translateX(-50%) translateY(20px) scale(0.96);
     width: 92%;
     max-width: 380px;
-    max-height: 44vh;
+    max-height: 46vh;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 12px 14px 10px;
@@ -992,9 +1029,42 @@ body {
     margin-top: 2px;
   }
 
-  /* Hide bottom corner signature on mobile portrait so it never overlaps the card */
+  /* Compact Pure ASCII Signature inside card on mobile */
   .corner-signature {
-    display: none;
+    display: flex;
+    margin-top: 6px;
+    width: 100%;
+  }
+
+  .ascii-sig-box {
+    padding: 4px 8px 3px;
+    gap: 1px;
+    border-radius: 8px;
+  }
+
+  .ascii-sig-head {
+    font-size: 7.5px;
+  }
+
+  .ascii-key-cluster {
+    gap: 4px;
+    margin: 1px 0;
+  }
+
+  .ascii-key {
+    font-size: 8px;
+    padding: 1px 3px;
+    min-width: 12px;
+    border-radius: 3px;
+  }
+
+  .ascii-sig-bytes {
+    font-size: 7px;
+  }
+
+  .ascii-sig-rule {
+    font-size: 6.5px;
+    letter-spacing: 0.3px;
   }
 
   .world-cards-grid {
@@ -1008,6 +1078,12 @@ body {
   .gift-action-card {
     bottom: 8px;
     padding: 10px 10px 8px;
-    max-height: 48vh;
+    max-height: 50vh;
+  }
+
+  .experience-header-badge {
+    max-width: 52vw;
+    font-size: 7.5px;
+    padding: 3px 6px;
   }
 }

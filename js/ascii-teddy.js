@@ -248,9 +248,9 @@ export class AsciiTeddy {
       const winW = window.innerWidth || 800;
       const winH = window.innerHeight || 800;
 
-      const targetHeightRatio = isPortrait ? 0.48 : 0.65;
+      const targetHeightRatio = isPortrait ? 0.42 : 0.65;
       const maxH = rows * targetHeightRatio;
-      const maxW = cols * (isPortrait ? 0.78 : 0.58);
+      const maxW = cols * (isPortrait ? 0.76 : 0.58);
 
       // Compensate for character font aspect ratio (0.55) so teddy retains 1:1 geometry
       const stageAspect = (drawImgH / drawImgW);
@@ -262,7 +262,7 @@ export class AsciiTeddy {
       const drawX = Math.round((cols - drawW) * 0.5);
 
       const drawY = isPortrait
-        ? Math.round(rows * (winH < 650 ? 0.07 : 0.09))
+        ? Math.round(rows * (winH < 650 ? 0.08 : 0.10))
         : Math.round((rows - drawH) * 0.35);
 
       // Sinuous gentle sway anchored at feet base
@@ -389,6 +389,7 @@ export class AsciiTeddy {
 
   start() {
     if (this.isRunning) return;
+    this.resize();
     this.isRunning = true;
     if (this.t0 === undefined || this.t0 === null) {
       this.t0 = performance.now();
@@ -421,6 +422,7 @@ export class AsciiTeddy {
 
   reset(skipEmergence = false) {
     this.stop();
+    this.resize();
     this.hasTriggeredReveal = false;
     this.t0 = skipEmergence ? performance.now() - 4500 : performance.now();
   }

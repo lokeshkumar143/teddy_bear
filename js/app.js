@@ -22,8 +22,8 @@ class PigeonTeddyApp {
     this.currentScreen = 'delivery'; // 'delivery' or 'teddy'
     this.isTransitioning = false;
 
-    // Load or initialize Name Profile (Default: 'Loki')
-    this.nameProfile = MultiLangNameProfile.load() || new MultiLangNameProfile('Loki');
+    // Load or initialize Name Profile (Default: 'Lokesh Kumar')
+    this.nameProfile = MultiLangNameProfile.load() || new MultiLangNameProfile('Lokesh Kumar');
     this.recipientName = this.nameProfile.originalName;
 
     // Atmosphere Themes
@@ -191,7 +191,7 @@ class PigeonTeddyApp {
   }
 
   applyRecipientName(rawName) {
-    const clean = String(rawName || 'Loki').normalize('NFC').trim() || 'Loki';
+    const clean = String(rawName || 'Lokesh Kumar').normalize('NFC').trim() || 'Lokesh Kumar';
     this.nameProfile = new MultiLangNameProfile(clean);
     this.recipientName = this.nameProfile.originalName;
     this.multiLangData = this.nameProfile.transliterations;
@@ -227,28 +227,21 @@ class PigeonTeddyApp {
     const bytesDiv = this.cornerSignature.querySelector('.ascii-sig-bytes');
     if (!cluster) return;
 
-    // Unicode safe grapheme cluster handling
-    let chars = [];
-    if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-      const segmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' });
-      chars = Array.from(segmenter.segment(name), s => s.segment);
-    } else {
-      chars = Array.from(name);
-    }
-
-    // Limit to max 16 clusters for graceful styling
-    chars = chars.slice(0, 16);
-
-    cluster.innerHTML = `
-      <div class="ascii-key-word" dir="auto">
-        ${chars.map(ch => `<span class="ascii-key">${ch}</span>`).join('')}
-      </div>
-    `;
+    // Split words so "LOKESH" and "KUMAR" are neatly grouped as separate key words
+    const words = String(name || 'Lokesh Kumar').trim().split(/\s+/).filter(Boolean);
+    cluster.innerHTML = words.map(word => {
+      const chars = Array.from(word).slice(0, 10);
+      return `
+        <div class="ascii-key-word" dir="auto">
+          ${chars.map(ch => `<span class="ascii-key">${ch.toUpperCase()}</span>`).join('')}
+        </div>
+      `;
+    }).join('');
 
     if (bytesDiv) {
+      const chars = Array.from(name || 'Lokesh Kumar').filter(c => c !== ' ').slice(0, 8);
       const hexBytes = chars
         .map(ch => ch.codePointAt(0).toString(16).toUpperCase().padStart(2, '0'))
-        .slice(0, 8)
         .join(' ');
       bytesDiv.innerHTML = `<span class="ascii-code">UNICODE_KEY:</span> ${hexBytes} <span class="sig-star">✦</span>`;
     }
@@ -276,7 +269,21 @@ class PigeonTeddyApp {
     }
     if (this.unsealBtn) {
       this.unsealBtn.addEventListener('click', handleLetterOpenRequest);
+      this.unsealBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        handleLetterOpenRequest();
+      });
     }
+
+    // Global Responsive Resize for mobile orientation changes & viewport updates
+    window.addEventListener('resize', () => {
+      if (this.currentScreen === 'delivery') {
+        if (this.pigeonRenderer) this.pigeonRenderer.resize();
+        if (this.envelopeRenderer) this.envelopeRenderer.resize();
+      } else if (this.currentScreen === 'teddy') {
+        if (this.teddyRenderer) this.teddyRenderer.resize();
+      }
+    }, { passive: true });
 
     // Up-side (top) Teddy Selector buttons
     if (this.teddySelectorBar) {
@@ -450,6 +457,7 @@ class PigeonTeddyApp {
 
       // 4. Start living teddy: reveals slowly from bottom upward!
       if (this.teddyRenderer) {
+        this.teddyRenderer.resize();
         this.teddyRenderer.reset(false);
         this.teddyRenderer.start();
         setTimeout(() => {
@@ -468,6 +476,16 @@ class PigeonTeddyApp {
     if (this.teddyRenderer) this.teddyRenderer.stop();
     if (this.teddyScreen) {
       this.teddyScreen.classList.remove('active');
+      this.teddyScreen.style.display = 'none';
+    }
+    if (this.teddySelectorBar) {
+      this.teddySelectorBar.classList.remove('visible');
+    }
+    if (this.giftActionCard) {
+      this.giftActionCard.classList.remove('visible');
+    }
+    if (this.cornerSignature) {
+      this.cornerSignature.classList.remove('visible');
     }
 
     setTimeout(() => {
@@ -514,6 +532,7 @@ class PigeonTeddyApp {
         this.deliveryScreen.style.display = 'none';
       }
       if (this.teddyScreen) {
+        this.teddyScreen.style.display = 'flex';
         this.teddyScreen.classList.add('active');
         this.teddyScreen.style.transition = 'none';
         this.teddyScreen.style.opacity = '1';
