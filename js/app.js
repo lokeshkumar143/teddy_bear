@@ -15,6 +15,7 @@ import { AsciiPigeon } from './ascii-pigeon.js?v=12.0';
 import { AsciiEnvelope } from './ascii-envelope.js?v=13.0';
 import { AsciiTeddy } from './ascii-teddy.js?v=15.0';
 import { AudioManager } from './audio-fx.js?v=12.0';
+import { MultilingualHeart } from './multilingual-heart.js?v=15.0';
 import { 
   MultiLangNameProfile, 
   generateMultiLangName, 
@@ -88,19 +89,13 @@ class PigeonTeddyApp {
     this.btnResetTranslit = document.getElementById('btn-reset-translit');
     this.btnSaveEditNames = document.getElementById('btn-save-edit-names');
 
-    // Screen 1.5: Ceremony elements
+    // Screen 1.5: Multilingual Heart Ceremony elements
     this.ceremonyScreen = document.getElementById('ceremony-screen');
-    this.ceremonyCard = document.getElementById('ceremony-card');
+    this.heartCeremonyCanvas = document.getElementById('heart-ceremony-canvas');
     this.ceremonyRawName = document.getElementById('ceremony-raw-name');
-    this.ceremonyFlag = document.getElementById('ceremony-flag');
-    this.ceremonyLangName = document.getElementById('ceremony-lang-name');
-    this.ceremonyScriptName = document.getElementById('ceremony-script-name');
-    this.ceremonyNameText = document.getElementById('ceremony-name-text');
-    this.ceremonyPhonetic = document.getElementById('ceremony-phonetic');
-    this.ceremonyBcp47 = document.getElementById('ceremony-bcp47');
-    this.ceremonyOrbitPills = document.getElementById('ceremony-orbit-pills');
-    this.ceremonyProgressBar = document.getElementById('ceremony-progress-bar');
     this.btnRevealTeddy = document.getElementById('btn-reveal-teddy');
+    this.btnFlyText = document.getElementById('btn-fly-text');
+    this.ceremonyFlightSub = document.getElementById('ceremony-flight-sub');
 
     // Teddy Screen elements
     this.experienceHeaderBadge = document.getElementById('experience-header-badge');
@@ -308,6 +303,17 @@ class PigeonTeddyApp {
           this.cornerSignature.classList.add('visible');
         }
       });
+    }
+
+    // 4. Multilingual Heart Engine & Flight Animation
+    if (this.heartCeremonyCanvas) {
+      this.multilingualHeart = new MultilingualHeart(
+        this.heartCeremonyCanvas,
+        this.audioManager,
+        () => {
+          this.finishCeremonyAndRevealTeddy();
+        }
+      );
     }
   }
 
@@ -609,14 +615,19 @@ class PigeonTeddyApp {
       });
     }
 
-    // Ceremony Screen: Reveal Teddy Bear button
+    // Ceremony Screen: Fly Heart to Teddy button
     if (this.btnRevealTeddy) {
       this.btnRevealTeddy.addEventListener('click', () => {
-        this.finishCeremonyAndRevealTeddy();
+        if (this.multilingualHeart && this.multilingualHeart.state !== 'flight' && this.multilingualHeart.state !== 'impact') {
+          if (this.btnFlyText) this.btnFlyText.textContent = 'FLYING TO TEDDY... ✨';
+          this.multilingualHeart.triggerHeartFlight();
+        } else {
+          this.finishCeremonyAndRevealTeddy();
+        }
       });
     }
 
-    // Dedication Card: Replay World Languages Ceremony button
+    // Dedication Card: Replay World Languages Heart Ceremony
     if (this.btnReCeremony) {
       this.btnReCeremony.addEventListener('click', () => {
         if (this.isTransitioning) return;
@@ -632,8 +643,14 @@ class PigeonTeddyApp {
             this.ceremonyScreen.style.display = 'flex';
             this.ceremonyScreen.classList.add('active');
           }
+          if (this.ceremonyRawName) {
+            this.ceremonyRawName.textContent = this.nameProfile.displayName || this.nameProfile.originalName;
+          }
+          if (this.btnFlyText) this.btnFlyText.textContent = 'FLY HEART TO TEDDY';
           this.isTransitioning = false;
-          this.runCeremonyLoop();
+          if (this.multilingualHeart) {
+            this.multilingualHeart.start(this.nameProfile);
+          }
         }, 400);
       });
     }
@@ -916,141 +933,30 @@ class PigeonTeddyApp {
         this.ceremonyScreen.classList.add('active');
       }
 
+      if (this.ceremonyRawName) {
+        this.ceremonyRawName.textContent = this.nameProfile.displayName || this.nameProfile.originalName;
+      }
+
+      if (this.btnFlyText) {
+        this.btnFlyText.textContent = 'FLY HEART TO TEDDY';
+      }
+
+      // 3. Start Multilingual Heart Engine
+      if (this.multilingualHeart) {
+        this.multilingualHeart.start(this.nameProfile);
+      }
+
       this.isTransitioning = false;
-      this.runCeremonyLoop();
     }, 450);
   }
 
-  runCeremonyLoop() {
-    const list = getLanguageList(this.nameProfile.transliterations);
-    if (!list || list.length === 0) {
-      this.finishCeremonyAndRevealTeddy();
-      return;
-    }
-
-    if (this.ceremonyRawName) {
-      this.ceremonyRawName.textContent = this.nameProfile.displayName || this.nameProfile.originalName;
-    }
-
-    // Populate the 10 language tokens in the orbit ring
-    if (this.ceremonyOrbitPills) {
-      this.ceremonyOrbitPills.innerHTML = list.map((item, idx) => `
-        <button class="ceremony-pill-token ${idx === 0 ? 'active' : ''}" 
-                data-idx="${idx}" 
-                type="button" 
-                title="${item.label} (${item.script})">
-          <span>${item.flag}</span>
-          <span>${item.script}</span>
-        </button>
-      `).join('');
-
-      // Add click listener to pills
-      this.ceremonyOrbitPills.querySelectorAll('.ceremony-pill-token').forEach(pill => {
-        pill.addEventListener('click', () => {
-          const idx = parseInt(pill.getAttribute('data-idx'), 10);
-          if (!isNaN(idx)) {
-            this.ceremonyCurrentIdx = idx;
-            this.renderCeremonyStep(idx, list);
-            this.pauseCeremonyTimer(3500);
-          }
-        });
-      });
-    }
-
-    this.ceremonyCurrentIdx = 0;
-    this.ceremonyTotalSteps = list.length;
-    this.renderCeremonyStep(0, list);
-
-    // Auto-advance loop: each step ~850ms
-    const stepDuration = 850;
-    clearInterval(this.ceremonyTimer);
-    
-    this.ceremonyTimer = setInterval(() => {
-      this.ceremonyCurrentIdx++;
-      if (this.ceremonyCurrentIdx >= this.ceremonyTotalSteps) {
-        clearInterval(this.ceremonyTimer);
-        // Wait 700ms on final state then reveal teddy
-        setTimeout(() => {
-          this.finishCeremonyAndRevealTeddy();
-        }, 700);
-      } else {
-        this.renderCeremonyStep(this.ceremonyCurrentIdx, list);
-      }
-    }, stepDuration);
-  }
-
-  pauseCeremonyTimer(ms = 3500) {
-    clearInterval(this.ceremonyTimer);
-    clearTimeout(this.ceremonyResumeTimer);
-    this.ceremonyResumeTimer = setTimeout(() => {
-      const list = getLanguageList(this.nameProfile.transliterations);
-      this.ceremonyTimer = setInterval(() => {
-        this.ceremonyCurrentIdx++;
-        if (this.ceremonyCurrentIdx >= this.ceremonyTotalSteps) {
-          clearInterval(this.ceremonyTimer);
-          setTimeout(() => {
-            this.finishCeremonyAndRevealTeddy();
-          }, 700);
-        } else {
-          this.renderCeremonyStep(this.ceremonyCurrentIdx, list);
-        }
-      }, 850);
-    }, ms);
-  }
-
-  renderCeremonyStep(idx, list) {
-    const item = list[idx];
-    if (!item) return;
-
-    // 1. Text update with scale pop animation
-    if (this.ceremonyNameText) {
-      this.ceremonyNameText.textContent = item.text;
-      this.ceremonyNameText.setAttribute('dir', item.dir || 'ltr');
-      this.ceremonyNameText.classList.remove('morphing');
-      void this.ceremonyNameText.offsetWidth;
-      this.ceremonyNameText.classList.add('morphing');
-    }
-
-    // 2. Language metadata tags
-    if (this.ceremonyFlag) this.ceremonyFlag.textContent = item.flag;
-    if (this.ceremonyLangName) this.ceremonyLangName.textContent = item.label;
-    if (this.ceremonyScriptName) this.ceremonyScriptName.textContent = `${item.script} Script`;
-    if (this.ceremonyBcp47) this.ceremonyBcp47.textContent = item.code;
-
-    if (this.ceremonyPhonetic) {
-      if (item.code === 'en' || item.code === this.nameProfile.detectedScript.id) {
-        this.ceremonyPhonetic.textContent = 'Exact Native Script Preserved';
-      } else {
-        this.ceremonyPhonetic.textContent = `${item.label} Phonetic Transliteration`;
-      }
-    }
-
-    // 3. Highlight active pill in orbit
-    if (this.ceremonyOrbitPills) {
-      const pills = this.ceremonyOrbitPills.querySelectorAll('.ceremony-pill-token');
-      pills.forEach((p, pIdx) => {
-        p.classList.toggle('active', pIdx === idx);
-      });
-    }
-
-    // 4. Update progress bar
-    if (this.ceremonyProgressBar) {
-      const pct = Math.min(100, Math.round(((idx + 1) / this.ceremonyTotalSteps) * 100));
-      this.ceremonyProgressBar.style.width = `${pct}%`;
-    }
-
-    // 5. Harmonic celestial tone
-    try {
-      this.audioManager.playCelestialTone(idx);
-    } catch (e) {}
-  }
-
   finishCeremonyAndRevealTeddy() {
-    clearInterval(this.ceremonyTimer);
-    clearTimeout(this.ceremonyResumeTimer);
-
     if (this.isTransitioning) return;
     this.isTransitioning = true;
+
+    if (this.multilingualHeart) {
+      this.multilingualHeart.stop();
+    }
 
     try {
       this.audioManager.playBloomChime();
@@ -1120,6 +1026,9 @@ class PigeonTeddyApp {
       if (this.teddyRenderer) {
         this.teddyRenderer.reset(false);
         this.teddyRenderer.start();
+        setTimeout(() => {
+          this.teddyRenderer.triggerHeartPulse();
+        }, 120);
       }
 
       this.isTransitioning = false;
@@ -1130,8 +1039,9 @@ class PigeonTeddyApp {
     this.isTransitioning = true;
     this.currentScreen = 'delivery';
 
-    clearInterval(this.ceremonyTimer);
-    clearTimeout(this.ceremonyResumeTimer);
+    if (this.multilingualHeart) {
+      this.multilingualHeart.stop();
+    }
 
     if (this.ceremonyScreen) {
       this.ceremonyScreen.classList.remove('active');
@@ -1195,7 +1105,12 @@ class PigeonTeddyApp {
         this.ceremonyScreen.style.display = 'flex';
         this.ceremonyScreen.classList.add('active');
       }
-      this.runCeremonyLoop();
+      if (this.ceremonyRawName) {
+        this.ceremonyRawName.textContent = this.nameProfile.displayName || this.nameProfile.originalName;
+      }
+      if (this.multilingualHeart) {
+        this.multilingualHeart.start(this.nameProfile);
+      }
     } else if (urlParams.get('scene') === 'teddy' || urlParams.get('testScene') === 'reveal') {
       this.currentScreen = 'teddy';
       if (this.deliveryScreen) {

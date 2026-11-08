@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=14.0">
+  <link rel="stylesheet" href="css/style.css?v=16.0">
 </head>
 <body class="theme-aurora">
 
@@ -66,68 +66,30 @@
       </div>
     </div>
 
-    <!-- Screen 1.5: Interstitial Multi-Language Cosmic Name Showcase Ceremony -->
-    <div id="ceremony-screen" class="scene ceremony-screen" aria-label="Worldwide Multilingual Name Celebration Ceremony">
-      <!-- Dynamic Cosmic Aura & Constellation Ring -->
-      <div class="ceremony-portal-aura"></div>
-      <div class="ceremony-constellation-ring"></div>
+    <!-- Screen 1.5: Interstitial Multi-Language Cosmic Heart Ceremony -->
+    <div id="ceremony-screen" class="scene ceremony-screen" aria-label="Worldwide Multilingual Name Heart Ceremony">
+      <!-- Full-screen Dynamic Canvas rendering the Multilingual Heart & Flight -->
+      <canvas id="heart-ceremony-canvas" class="heart-ceremony-canvas" aria-label="Glowing Multilingual Heart Assembled from World Languages"></canvas>
 
-      <!-- Main Floating Prismatic Crystal Card -->
-      <div class="ceremony-card" id="ceremony-card">
-        
-        <!-- Top Ceremony Badge -->
+      <!-- Celestial HUD Overlays -->
+      <div class="ceremony-top-hud">
         <div class="ceremony-badge">
           <span class="ceremony-sparkle">✦</span>
-          <span>A NAME CELEBRATED ACROSS THE WORLD</span>
+          <span>A SACRED HEART OF WORLD LANGUAGES</span>
           <span class="ceremony-sparkle">✦</span>
         </div>
+        <p class="ceremony-subtitle">Names from across the stars united in one heart for <strong id="ceremony-raw-name">Loki</strong></p>
+      </div>
 
-        <!-- Subtitle -->
-        <p class="ceremony-subtitle">Written in the celestial stars for <strong id="ceremony-raw-name">Loki</strong></p>
-
-        <!-- Active Language Information Pill -->
-        <div class="ceremony-lang-tag" id="ceremony-lang-tag">
-          <span id="ceremony-flag" class="ceremony-flag">🇬🇧</span>
-          <span id="ceremony-lang-name" class="ceremony-lang-name">English</span>
-          <span class="ceremony-tag-divider">•</span>
-          <span id="ceremony-script-name" class="ceremony-script-name">Latin Script</span>
-        </div>
-
-        <!-- The Grand Glowing Morphing Name Display -->
-        <div class="ceremony-name-stage">
-          <div id="ceremony-name-glow" class="ceremony-name-glow"></div>
-          <h1 id="ceremony-name-text" class="ceremony-name-text" dir="auto">Loki</h1>
-        </div>
-
-        <!-- Cultural & Direction Line -->
-        <div class="ceremony-meta-row">
-          <span id="ceremony-phonetic" class="ceremony-phonetic">Exact Native Script Preserved</span>
-          <span class="ceremony-meta-dot">•</span>
-          <span id="ceremony-bcp47" class="ceremony-bcp47">en-US</span>
-        </div>
-
-        <!-- Interactive Constellation Orbit: 10 Language Pills -->
-        <div class="ceremony-orbit-wrapper">
-          <div class="ceremony-orbit-label">✨ Touch any language to explore:</div>
-          <div id="ceremony-orbit-pills" class="ceremony-orbit-pills" role="tablist">
-            <!-- Dynamically populated 10 language tokens -->
-          </div>
-        </div>
-
-        <!-- Bottom Action & Auto-Advance Progress -->
-        <div class="ceremony-footer">
-          <div class="ceremony-progress-wrap">
-            <div id="ceremony-progress-bar" class="ceremony-progress-bar"></div>
-          </div>
-          
-          <button id="btn-reveal-teddy" class="btn-reveal-teddy" type="button" aria-label="Reveal your living ASCII Teddy Bear">
-            <span class="btn-sparkle">✦</span>
-            <span>REVEAL MY TEDDY BEAR</span>
-            <span class="btn-bear-icon">🧸</span>
-            <span class="btn-sparkle">✦</span>
-          </button>
-        </div>
-
+      <!-- Bottom Flight Action & Status Indicator -->
+      <div class="ceremony-bottom-hud">
+        <button id="btn-reveal-teddy" class="btn-reveal-teddy btn-fly-heart" type="button" aria-label="Fly the Multilingual Heart to the Teddy Bear">
+          <span class="btn-sparkle">✦</span>
+          <span id="btn-fly-text">FLY HEART TO TEDDY</span>
+          <span class="btn-bear-icon">🧸💖</span>
+          <span class="btn-sparkle">✦</span>
+        </button>
+        <div class="ceremony-flight-sub" id="ceremony-flight-sub">✨ Watch the glowing heart fly directly into your teddy bear's chest</div>
       </div>
     </div>
 
@@ -408,6 +370,6 @@
   <!-- Toast Notification Feedback -->
   <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=15.0"></script>
+  <script type="module" src="js/app.js?v=16.0"></script>
 </body>
 </html>
