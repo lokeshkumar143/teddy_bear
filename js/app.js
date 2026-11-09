@@ -313,48 +313,58 @@ class PigeonTeddyApp {
       });
     }
     if (this.btnPulseHeart) {
-      this.btnPulseHeart.addEventListener('click', () => {
-        // Auto-unmute if muted so the recipient hears the heartbeat symphony & harp
-        if (this.audioManager && this.audioManager.isMuted) {
-          this.audioManager.toggleMute();
-          if (this.soundToggleBtn) this.soundToggleBtn.classList.add('active');
-          if (this.soundIcon) this.soundIcon.textContent = '🎵';
-          if (this.soundLabel) this.soundLabel.textContent = 'Playing';
+      const handlePulse = (e) => {
+        if (e) {
+          e.stopPropagation();
         }
 
-        // 1. Play deep acoustic lub-dub heartbeat & celestial harp symphony
-        try {
-          this.audioManager.playHeartbeatSymphony();
-        } catch (e) {}
+        // Instant tactile visual feedback
+        this.btnPulseHeart.classList.add('pulse-active');
+        setTimeout(() => this.btnPulseHeart.classList.remove('pulse-active'), 400);
 
-        // 2. High-intensity heart pulse & happy bounce on Teddy
+        // Auto-unmute if muted so the recipient hears the heartbeat symphony & harp
+        try {
+          if (this.audioManager && this.audioManager.isMuted) {
+            this.audioManager.toggleMute();
+            if (this.soundToggleBtn) this.soundToggleBtn.classList.add('active');
+            if (this.soundIcon) this.soundIcon.textContent = '🎵';
+            if (this.soundLabel) this.soundLabel.textContent = 'Playing';
+          }
+          this.audioManager.playHeartbeatSymphony();
+        } catch (err) {
+          console.warn('Audio play error:', err);
+        }
+
+        // 1. High-intensity heart pulse & happy bounce on Teddy
         if (this.teddyRenderer) {
           this.teddyRenderer.triggerHeartPulse();
         }
 
-        // 3. Screen-wide cascade of rising glowing hearts & golden stardust
+        // 2. Screen-wide cascade of rising glowing hearts & golden stardust
         if (this.ambientParticles) {
           this.ambientParticles.burstLoveConfetti();
         }
 
         this.showToast(`Teddy's heart beats especially for ${this.recipientName}! 💖`);
 
-        // 4. Open the enchanted personalized love blessing modal after brief dramatic anticipation
-        setTimeout(() => {
-          this.openHeartBlessing();
-        }, 550);
-      });
+        // 3. Immediately bloom the enchanted personalized love blessing modal!
+        this.openHeartBlessing();
+      };
+
+      this.btnPulseHeart.addEventListener('click', handlePulse);
     }
 
     // Handlers for Personalized Blessing Modal
     if (this.btnDismissBlessing) {
-      this.btnDismissBlessing.addEventListener('click', () => {
+      this.btnDismissBlessing.addEventListener('click', (e) => {
+        e.stopPropagation();
         this.closeHeartBlessing();
       });
     }
 
     if (this.btnReceiveLove) {
-      this.btnReceiveLove.addEventListener('click', () => {
+      this.btnReceiveLove.addEventListener('click', (e) => {
+        e.stopPropagation();
         this.closeHeartBlessing();
         this.showToast(`Infinite love received! Teddy is giving you the biggest hug! 🧸💖`);
         if (this.teddyRenderer) {
@@ -362,11 +372,17 @@ class PigeonTeddyApp {
         }
         try {
           this.audioManager.playBloomChime();
-        } catch (e) {}
+        } catch (err) {}
         if (this.ambientParticles) {
-          this.ambientParticles.burstLoveConfetti(null, null, 35);
+          this.ambientParticles.burstLoveConfetti(null, null, 40);
         }
       });
+    }
+
+    // Close blessing modal on clicking outer backdrop
+    const blessingBackdrop = this.heartBlessingModal ? this.heartBlessingModal.querySelector('.blessing-backdrop') : null;
+    if (blessingBackdrop) {
+      blessingBackdrop.addEventListener('click', () => this.closeHeartBlessing());
     }
     if (this.btnToggleCard) {
       this.btnToggleCard.addEventListener('click', () => {
@@ -553,6 +569,19 @@ class PigeonTeddyApp {
   }
 
   start() {
+    // Start ambient floating stardust & love confetti physics loop (60 FPS)
+    if (this.ambientParticles) {
+      let lastTime = performance.now();
+      const ambientLoop = (now) => {
+        const dt = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
+        this.ambientParticles.update(dt);
+        this.ambientParticles.render();
+        requestAnimationFrame(ambientLoop);
+      };
+      requestAnimationFrame(ambientLoop);
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const nameParam = urlParams.get('name');
     if (nameParam) {

@@ -724,6 +724,9 @@ body {
   border-radius: 26px;
   padding: 34px 28px 28px;
   text-align: center;
+  max-height: 88vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   box-shadow: 
     0 24px 60px rgba(0, 0, 0, 0.85),
     0 0 45px rgba(255, 45, 100, 0.32),
@@ -733,6 +736,12 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.act-btn.pulse-active {
+  transform: scale(0.94);
+  box-shadow: 0 0 25px rgba(255, 30, 80, 0.9);
+  filter: brightness(1.25);
 }
 
 .heart-blessing-modal.visible .blessing-card {
