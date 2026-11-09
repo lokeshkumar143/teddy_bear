@@ -627,6 +627,8 @@ body {
   font-weight: 700;
   letter-spacing: 0.5px;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   user-select: none;
@@ -686,13 +688,13 @@ body {
 .heart-blessing-modal {
   position: fixed;
   inset: 0;
-  z-index: 120;
+  z-index: 150;
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .heart-blessing-modal.visible {
