@@ -16,7 +16,7 @@
     href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=37.0">
+  <link rel="stylesheet" href="css/style.css?v=38.0">
 </head>
 
 <body class="theme-aurora">
@@ -58,97 +58,66 @@
           <span class="unseal-heart-icon">💖</span>
           <span class="unseal-sparkle">✦</span>
         </button>
-        <div class="unseal-subcaption" id="unseal-subcaption">A carrier dove has delivered a celestial love letter for you ✨
+        <div class="unseal-subcaption" id="unseal-subcaption">A carrier dove has delivered a celestial love letter for
+          you ✨
         </div>
       </div>
     </div>
 
-    <!-- Screen 1.5: Magical Four Balloons Selection Stage -->
+    <!-- Screen 1.5: Magical Four Balloons Selection Stage (Living 24-Bit ASCII Art) -->
     <div id="balloon-screen" class="scene balloon-screen">
+      <!-- Living 24-Bit ASCII Balloons Canvas -->
+      <canvas id="balloon-canvas" aria-label="Magical Living 24-Bit ASCII Floating Balloons"></canvas>
+
       <!-- Header Badge & Prompt -->
       <div class="balloon-header-wrapper">
         <div class="balloon-sparkle-badge">✦ &nbsp;A CELESTIAL SURPRISE FOR YOU &nbsp;✦</div>
-        <h2 class="balloon-title">Choose a Balloon to Pop! 🎈</h2>
-        <p class="balloon-subtitle">Each floating balloon holds a surprise teddy bear. Tap one to pop &amp; reveal! ✨</p>
+        <h2 class="balloon-title">Choose an ASCII Balloon to Pop! 🎈</h2>
+        <p class="balloon-subtitle">Each living ASCII balloon holds a surprise teddy bear. Tap one to pop &amp; reveal!
+          ✨</p>
       </div>
 
-      <!-- 4 Floating Balloons Grid (Each containing that specific Teddy Bear inside) -->
+      <!-- 4 Floating Balloons Grid Hitboxes & Captions -->
       <div class="balloon-grid" id="balloon-grid">
         <!-- Balloon 0: Hugging Heart -->
-        <button class="balloon-item balloon-gold" data-balloon="0" type="button" aria-label="Pop gold balloon to reveal Hugging Heart Teddy">
-          <div class="balloon-wrapper">
-            <div class="balloon-body">
-              <div class="balloon-shine"></div>
-              <div class="balloon-inner-glow"></div>
-              <div class="balloon-teddy-container">
-                <img src="assets/teddy-1-clean.png?v=37.0" alt="Hugging Heart Teddy" class="balloon-teddy-img" loading="eager" draggable="false">
-              </div>
+          <button class="balloon-item balloon-gold" data-balloon="0" type="button"
+            aria-label="Pop gold ASCII balloon to reveal Hugging Heart Teddy">
+            <div class="balloon-hit-zone"></div>
+            <div class="balloon-caption">
+              <span class="balloon-name">Hugging Heart</span>
+              <span class="balloon-desc">Warm Hugs &amp; Love</span>
             </div>
-            <div class="balloon-knot"></div>
-            <div class="balloon-string"></div>
-          </div>
-          <div class="balloon-caption">
-            <span class="balloon-name">Hugging Heart</span>
-            <span class="balloon-desc">Warm Hugs &amp; Love</span>
-          </div>
-        </button>
+          </button>
 
-        <!-- Balloon 1: Sweet Dreams -->
-        <button class="balloon-item balloon-purple" data-balloon="1" type="button" aria-label="Pop lavender balloon to reveal Sweet Dreams Teddy">
-          <div class="balloon-wrapper">
-            <div class="balloon-body">
-              <div class="balloon-shine"></div>
-              <div class="balloon-inner-glow"></div>
-              <div class="balloon-teddy-container">
-                <img src="assets/teddy-2-clean.png?v=37.0" alt="Sweet Dreams Teddy" class="balloon-teddy-img" loading="eager" draggable="false">
+          <!-- Balloon 1: Sweet Dreams -->
+            <button class="balloon-item balloon-purple" data-balloon="1" type="button"
+              aria-label="Pop lavender ASCII balloon to reveal Sweet Dreams Teddy">
+              <div class="balloon-hit-zone"></div>
+              <div class="balloon-caption">
+                <span class="balloon-name">Sweet Dreams</span>
+                <span class="balloon-desc">Cozy Starry Peace</span>
               </div>
-            </div>
-            <div class="balloon-knot"></div>
-            <div class="balloon-string"></div>
-          </div>
-          <div class="balloon-caption">
-            <span class="balloon-name">Sweet Dreams</span>
-            <span class="balloon-desc">Cozy Starry Peace</span>
-          </div>
-        </button>
+            </button>
 
-        <!-- Balloon 2: Heart Balloon -->
-        <button class="balloon-item balloon-pink" data-balloon="2" type="button" aria-label="Pop pink balloon to reveal Heart Balloon Teddy">
-          <div class="balloon-wrapper">
-            <div class="balloon-body">
-              <div class="balloon-shine"></div>
-              <div class="balloon-inner-glow"></div>
-              <div class="balloon-teddy-container">
-                <img src="assets/teddy-3-clean.png?v=37.0" alt="Heart Balloon Teddy" class="balloon-teddy-img" loading="eager" draggable="false">
-              </div>
-            </div>
-            <div class="balloon-knot"></div>
-            <div class="balloon-string"></div>
-          </div>
-          <div class="balloon-caption">
-            <span class="balloon-name">Heart Balloon</span>
-            <span class="balloon-desc">Joyful Floating Smiles</span>
-          </div>
-        </button>
+            <!-- Balloon 2: Heart Balloon -->
+              <button class="balloon-item balloon-pink" data-balloon="2" type="button"
+                aria-label="Pop pink ASCII balloon to reveal Heart Balloon Teddy">
+                <div class="balloon-hit-zone"></div>
+                <div class="balloon-caption">
+                  <span class="balloon-name">Heart Balloon</span>
+                  <span class="balloon-desc">Joyful Floating Smiles</span>
+                </div>
+              </button>
 
-        <!-- Balloon 3: Love Balloon -->
-        <button class="balloon-item balloon-crimson" data-balloon="3" type="button" aria-label="Pop crimson balloon to reveal Love Balloon Teddy">
-          <div class="balloon-wrapper">
-            <div class="balloon-body">
-              <div class="balloon-shine"></div>
-              <div class="balloon-inner-glow"></div>
-              <div class="balloon-teddy-container">
-                <img src="assets/teddy-4-standing-clean.png?v=37.0" alt="Love Balloon Teddy" class="balloon-teddy-img" loading="eager" draggable="false">
-              </div>
-            </div>
-            <div class="balloon-knot"></div>
-            <div class="balloon-string"></div>
-          </div>
-          <div class="balloon-caption">
-            <span class="balloon-name">Love Balloon</span>
-            <span class="balloon-desc">Infinite Devotion</span>
-          </div>
-        </button>
+              <!-- Balloon 3: Love Balloon -->
+                <button class="balloon-item balloon-crimson" data-balloon="3" type="button"
+                  aria-label="Pop crimson ASCII balloon to reveal Love Balloon Teddy">
+                  <div class="balloon-hit-zone"></div>
+                  <div class="balloon-caption">
+                    <span class="balloon-name">Love Balloon</span>
+                    <span class="balloon-desc">Infinite Devotion</span>
+                  </div>
+                </button>
       </div>
     </div>
 
@@ -194,7 +163,8 @@
 
       <!-- 3. Interactive Frosted Glass Action Card -->
       <div id="gift-action-card" class="gift-action-card">
-        <button id="btn-toggle-card" class="card-toggle-btn" type="button" aria-label="Minimize or maximize card" title="Minimize card">
+        <button id="btn-toggle-card" class="card-toggle-btn" type="button" aria-label="Minimize or maximize card"
+          title="Minimize card">
           <span class="toggle-icon">✕</span>
         </button>
 
@@ -235,7 +205,8 @@
       </div>
 
       <!-- Collapsed Card Reopen Pill -->
-      <button id="btn-card-pill" class="card-reopen-pill" type="button" aria-label="Open heartfelt dedication card" title="Show dedication card">
+      <button id="btn-card-pill" class="card-reopen-pill" type="button" aria-label="Open heartfelt dedication card"
+        title="Show dedication card">
         <span>💌 Dedication Card</span>
       </button>
     </div>
@@ -247,8 +218,9 @@
     <div class="blessing-backdrop"></div>
     <div class="blessing-card-wrapper">
       <div class="blessing-card">
-        <button id="btn-dismiss-blessing" class="blessing-close-icon" type="button" aria-label="Close blessing" title="Close blessing">&times;</button>
-        
+        <button id="btn-dismiss-blessing" class="blessing-close-icon" type="button" aria-label="Close blessing"
+          title="Close blessing">&times;</button>
+
         <div class="blessing-badge">✦ &nbsp;A SACRED HEARTBEAT &nbsp;✦</div>
 
         <!-- Radiant Beating Heart with Animated Halo Shockwaves -->
@@ -266,7 +238,8 @@
           </p>
           <div class="blessing-divider">❤ &nbsp;✦ &nbsp;❤</div>
           <p class="blessing-text-sub">
-            May you always feel cherished, deeply cared for, and filled with peaceful joy. Every heartbeat carries infinite love, comfort, and sweet teddy bear hugs to your soul.
+            May you always feel cherished, deeply cared for, and filled with peaceful joy. Every heartbeat carries
+            infinite love, comfort, and sweet teddy bear hugs to your soul.
           </p>
         </div>
 
@@ -282,7 +255,7 @@
   <!-- Toast Notification Feedback -->
   <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=37.0"></script>
+  <script type="module" src="js/app.js?v=38.0"></script>
 </body>
 
 </html>

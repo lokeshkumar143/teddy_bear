@@ -10,12 +10,13 @@
  * - v14.0: Multilingual name grid in final dedication card.
  */
 
-import { AmbientParticles } from './ambient-particles.js?v=37.0';
-import { AsciiPigeon } from './ascii-pigeon.js?v=37.0';
-import { AsciiEnvelope } from './ascii-envelope.js?v=37.0';
-import { AsciiTeddy } from './ascii-teddy.js?v=37.0';
-import { AudioManager } from './audio-fx.js?v=37.0';
-import { MultiLangNameProfile } from './name-multilang.js?v=37.0';
+import { AmbientParticles } from './ambient-particles.js?v=38.0';
+import { AsciiPigeon } from './ascii-pigeon.js?v=38.0';
+import { AsciiEnvelope } from './ascii-envelope.js?v=38.0';
+import { AsciiBalloons } from './ascii-balloons.js?v=38.0';
+import { AsciiTeddy } from './ascii-teddy.js?v=38.0';
+import { AudioManager } from './audio-fx.js?v=38.0';
+import { MultiLangNameProfile } from './name-multilang.js?v=38.0';
 
 class PigeonTeddyApp {
   constructor() {
@@ -94,6 +95,7 @@ class PigeonTeddyApp {
 
     // Balloon Selection Stage elements
     this.balloonScreen = document.getElementById('balloon-screen');
+    this.balloonCanvas = document.getElementById('balloon-canvas');
     this.balloonGrid = document.getElementById('balloon-grid');
     this.btnRepopBalloon = document.getElementById('btn-repop-balloon');
   }
@@ -122,7 +124,7 @@ class PigeonTeddyApp {
           }
           try {
             this.audioManager.playDrop();
-          } catch (e) {}
+          } catch (e) { }
         },
         // On pigeon departed into stars:
         () => {
@@ -150,6 +152,16 @@ class PigeonTeddyApp {
         }
       });
     }
+
+    // 4. Living 24-Bit ASCII Floating Balloons
+    if (this.balloonCanvas) {
+      this.balloonRenderer = new AsciiBalloons(
+        this.balloonCanvas,
+        (balloonIndex) => {
+          this.popAndRevealTeddy(balloonIndex);
+        }
+      );
+    }
   }
 
   showToast(text) {
@@ -173,7 +185,7 @@ class PigeonTeddyApp {
     this.showToast(`Switched atmosphere to ${theme.name} ${theme.icon}`);
     try {
       this.audioManager.playClick();
-    } catch (e) {}
+    } catch (e) { }
   }
 
   applyRecipientProfile(profile) {
@@ -255,7 +267,7 @@ class PigeonTeddyApp {
         this.audioManager.init();
         this.audioManager.playHeartBurst();
         this.audioManager.playBloomChime();
-      } catch (e) {}
+      } catch (e) { }
 
       // Immediately hide the CTA button so user gets instant visual confirmation
       if (this.envelopeHint) {
@@ -307,6 +319,8 @@ class PigeonTeddyApp {
       if (this.currentScreen === 'delivery') {
         if (this.pigeonRenderer) this.pigeonRenderer.resize();
         if (this.envelopeRenderer) this.envelopeRenderer.resize();
+      } else if (this.currentScreen === 'balloon') {
+        if (this.balloonRenderer) this.balloonRenderer.resize();
       } else if (this.currentScreen === 'teddy') {
         if (this.teddyRenderer) this.teddyRenderer.resize();
       }
@@ -323,7 +337,7 @@ class PigeonTeddyApp {
           this.updateTeddySelectorUI(index);
           try {
             this.audioManager.playBloomChime();
-          } catch (err) {}
+          } catch (err) { }
         }
       });
     }
@@ -362,11 +376,11 @@ class PigeonTeddyApp {
         if (this.teddyRenderer) {
           try {
             this.teddyRenderer.triggerWave();
-          } catch (err) {}
+          } catch (err) { }
           this.showToast('Teddy is waving happily at you! 👋🧸');
           try {
             this.audioManager.playBloomChime();
-          } catch (e) {}
+          } catch (e) { }
         }
       };
       this.btnMakeWave.addEventListener('click', handleWave);
@@ -417,19 +431,19 @@ class PigeonTeddyApp {
           if (this.teddyRenderer && typeof this.teddyRenderer.triggerHeartPulse === 'function') {
             this.teddyRenderer.triggerHeartPulse();
           }
-        } catch (err) {}
+        } catch (err) { }
 
         // 4. Screen-wide cascade of rising glowing hearts & golden stardust
         try {
           if (this.ambientParticles && typeof this.ambientParticles.burstLoveConfetti === 'function') {
             this.ambientParticles.burstLoveConfetti();
           }
-        } catch (err) {}
+        } catch (err) { }
 
         // 5. Toast notification
         try {
           this.showToast(`Teddy's heart beats especially for ${this.recipientName}! 💖`);
-        } catch (err) {}
+        } catch (err) { }
       };
 
       this.btnPulseHeart.addEventListener('click', handlePulse);
@@ -457,17 +471,17 @@ class PigeonTeddyApp {
           if (this.teddyRenderer && typeof this.teddyRenderer.triggerWave === 'function') {
             this.teddyRenderer.triggerWave();
           }
-        } catch (err) {}
+        } catch (err) { }
         try {
           if (this.audioManager && typeof this.audioManager.playBloomChime === 'function') {
             this.audioManager.playBloomChime();
           }
-        } catch (err) {}
+        } catch (err) { }
         try {
           if (this.ambientParticles && typeof this.ambientParticles.burstLoveConfetti === 'function') {
             this.ambientParticles.burstLoveConfetti(null, null, 40);
           }
-        } catch (err) {}
+        } catch (err) { }
       };
       this.btnReceiveLove.addEventListener('click', handleReceive);
       this.btnReceiveLove.addEventListener('touchend', handleReceive, { passive: false });
@@ -509,7 +523,11 @@ class PigeonTeddyApp {
         const handlePop = (e) => {
           if (e && e.type === 'touchend') e.preventDefault();
           const balloonIdx = parseInt(btn.getAttribute('data-balloon'), 10) || 0;
-          this.popAndRevealTeddy(balloonIdx, btn);
+          if (this.balloonRenderer) {
+            this.balloonRenderer.popBalloon(balloonIdx);
+          } else {
+            this.popAndRevealTeddy(balloonIdx);
+          }
         };
         btn.addEventListener('click', handlePop);
         btn.addEventListener('touchend', handlePop, { passive: false });
@@ -586,7 +604,7 @@ class PigeonTeddyApp {
     try {
       this.audioManager.init();
       this.audioManager.playBloomChime();
-    } catch (e) {}
+    } catch (e) { }
 
     if (this.pigeonRenderer) this.pigeonRenderer.stop();
     if (this.envelopeRenderer) this.envelopeRenderer.stop();
@@ -630,6 +648,13 @@ class PigeonTeddyApp {
       });
     }
 
+    // Start Living 24-Bit ASCII Balloons engine
+    if (this.balloonRenderer) {
+      this.balloonRenderer.reset();
+      this.balloonRenderer.resize();
+      this.balloonRenderer.start();
+    }
+
     // Immediately show Balloon Screen
     if (this.balloonScreen) {
       this.balloonScreen.style.display = 'flex';
@@ -638,121 +663,123 @@ class PigeonTeddyApp {
     }
   }
 
-  popAndRevealTeddy(balloonIndex, balloonElement) {
-    if (this.isTransitioning) return;
-    this.isTransitioning = true;
+    popAndRevealTeddy(balloonIndex) {
+      if (this.isTransitioning) return;
+      this.isTransitioning = true;
 
-    // 1. Audio pop sound
-    try {
-      if (this.audioManager) {
-        if (this.audioManager.isMuted) {
-          this.audioManager.toggleMute();
-          if (this.soundToggleBtn) this.soundToggleBtn.classList.add('active');
-          if (this.soundIcon) this.soundIcon.textContent = '🎵';
-          if (this.soundLabel) this.soundLabel.textContent = 'Playing';
+      // 1. Audio pop sound
+      try {
+        if (this.audioManager) {
+          if (this.audioManager.isMuted) {
+            this.audioManager.toggleMute();
+            if (this.soundToggleBtn) this.soundToggleBtn.classList.add('active');
+            if (this.soundIcon) this.soundIcon.textContent = '🎵';
+            if (this.soundLabel) this.soundLabel.textContent = 'Playing';
+          }
+          if (typeof this.audioManager.playBalloonPop === 'function') {
+            this.audioManager.playBalloonPop();
+          } else {
+            this.audioManager.playHeartBurst();
+          }
         }
-        if (typeof this.audioManager.playBalloonPop === 'function') {
-          this.audioManager.playBalloonPop();
-        } else {
-          this.audioManager.playHeartBurst();
-        }
+      } catch (err) { }
+
+      // 2. Ambient full-screen Stardust Confetti blast
+      if (this.ambientParticles && typeof this.ambientParticles.burstLoveConfetti === 'function') {
+        const bObj = this.balloonRenderer && this.balloonRenderer.balloons[balloonIndex];
+        const ox = bObj ? bObj.screenX : window.innerWidth * 0.5;
+        const oy = bObj ? bObj.screenY : window.innerHeight * 0.5;
+        this.ambientParticles.burstLoveConfetti(ox, oy, 75);
       }
-    } catch (err) {}
 
-    // 2. Physical blast coordinates
-    const rect = balloonElement.getBoundingClientRect();
-    const ox = rect.left + rect.width * 0.5;
-    const oy = rect.top + rect.height * 0.45;
+      // 3. Reveal Teddy Bear!
+      const teddyNames = ['Hugging Heart', 'Sweet Dreams', 'Heart Balloon', 'Love Balloon'];
+      const chosenName = teddyNames[balloonIndex] || 'Teddy Bear';
+      this.showToast(`✨ POP! Revealing your ${chosenName} Teddy! 🧸🎈`);
 
-    // 3. Popping visual blast on clicked balloon
-    balloonElement.classList.add('popping');
-
-    // 4. Shockwave ring expansion
-    const shockwave = document.createElement('div');
-    shockwave.className = 'balloon-shockwave';
-    shockwave.style.left = `${ox}px`;
-    shockwave.style.top = `${oy}px`;
-    const themeColor = getComputedStyle(balloonElement).getPropertyValue('--burst-color') || '#ff3366';
-    shockwave.style.setProperty('--burst-glow', themeColor);
-    document.body.appendChild(shockwave);
-    setTimeout(() => shockwave.remove(), 600);
-
-    // 5. Flying rubber shreds & stardust sparks
-    const shardColors = [themeColor, '#ffffff', '#ffd700', '#fbcfe8'];
-    for (let i = 0; i < 18; i++) {
-      const shard = document.createElement('div');
-      shard.className = 'balloon-shard';
-      const size = 6 + Math.random() * 8;
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 70 + Math.random() * 110;
-      const dx = Math.cos(angle) * dist;
-      const dy = Math.sin(angle) * dist;
-
-      shard.style.width = `${size}px`;
-      shard.style.height = `${size}px`;
-      shard.style.left = `${ox}px`;
-      shard.style.top = `${oy}px`;
-      shard.style.background = shardColors[Math.floor(Math.random() * shardColors.length)];
-      shard.style.boxShadow = `0 0 10px ${shard.style.background}`;
-      shard.style.setProperty('--dx', `${dx}px`);
-      shard.style.setProperty('--dy', `${dy}px`);
-      document.body.appendChild(shard);
-      setTimeout(() => shard.remove(), 650);
+      setTimeout(() => {
+        this.isTransitioning = false;
+        this.transitionToTeddy(balloonIndex);
+      }, 450);
     }
 
-    // 6. Ambient full-screen Stardust Confetti blast
-    if (this.ambientParticles && typeof this.ambientParticles.burstLoveConfetti === 'function') {
-      this.ambientParticles.burstLoveConfetti(ox, oy, 75);
-    }
+    transitionToTeddy(targetIndex = 0) {
+      if (this.isTransitioning && this.currentScreen === 'teddy') return;
+      this.isTransitioning = true;
+      this.currentScreen = 'teddy';
 
-    // 7. Float other balloons away into the stars
-    if (this.balloonGrid) {
-      const allBalloons = this.balloonGrid.querySelectorAll('.balloon-item');
-      allBalloons.forEach((b) => {
-        if (b !== balloonElement) {
-          b.classList.add('floating-away');
+      try {
+        this.audioManager.playBloomChime();
+      } catch (e) { }
+
+      if (this.balloonRenderer) {
+        this.balloonRenderer.stop();
+      }
+
+      // Fade out delivery and balloon screens
+      if (this.deliveryScreen) {
+        this.deliveryScreen.classList.remove('active');
+      }
+      if (this.balloonScreen) {
+        this.balloonScreen.classList.remove('active');
+      }
+
+      setTimeout(() => {
+        if (this.pigeonRenderer) this.pigeonRenderer.stop();
+        if (this.envelopeRenderer) this.envelopeRenderer.stop();
+        if (this.deliveryScreen) this.deliveryScreen.style.display = 'none';
+        if (this.balloonScreen) this.balloonScreen.style.display = 'none';
+
+        // Fade in teddy screen
+        if (this.teddyScreen) {
+          this.teddyScreen.style.display = 'flex';
+          this.teddyScreen.classList.add('active');
         }
-      });
+        if (this.giftActionCard) {
+          this.giftActionCard.classList.remove('visible');
+          this.giftActionCard.classList.remove('minimized');
+        }
+        if (this.btnCardPill) {
+          this.btnCardPill.classList.remove('visible');
+        }
+
+        // Show up-side (top) teddy selector bar with active tab highlighted
+        if (this.teddySelectorBar) {
+          this.teddySelectorBar.classList.add('visible');
+          this.updateTeddySelectorUI(targetIndex);
+        }
+
+        // Start living teddy: reveals slowly from bottom upward!
+        if (this.teddyRenderer) {
+          this.teddyRenderer.setTeddy(targetIndex);
+          this.teddyRenderer.resize();
+          this.teddyRenderer.reset(false);
+          this.teddyRenderer.start();
+          setTimeout(() => {
+            this.teddyRenderer.triggerHeartPulse();
+          }, 120);
+        }
+
+        this.isTransitioning = false;
+      }, 450);
     }
 
-    // 8. Reveal Teddy Bear!
-    const teddyNames = ['Hugging Heart', 'Sweet Dreams', 'Heart Balloon', 'Love Balloon'];
-    const chosenName = teddyNames[balloonIndex] || 'Teddy Bear';
-    this.showToast(`✨ POP! Revealing your ${chosenName} Teddy! 🧸🎈`);
+    restartExperience() {
+      this.isTransitioning = true;
+      this.currentScreen = 'delivery';
 
-    setTimeout(() => {
-      this.isTransitioning = false;
-      this.transitionToTeddy(balloonIndex);
-    }, 450);
-  }
-
-  transitionToTeddy(targetIndex = 0) {
-    if (this.isTransitioning && this.currentScreen === 'teddy') return;
-    this.isTransitioning = true;
-    this.currentScreen = 'teddy';
-
-    try {
-      this.audioManager.playBloomChime();
-    } catch (e) {}
-
-    // Fade out delivery and balloon screens
-    if (this.deliveryScreen) {
-      this.deliveryScreen.classList.remove('active');
-    }
-    if (this.balloonScreen) {
-      this.balloonScreen.classList.remove('active');
-    }
-
-    setTimeout(() => {
-      if (this.pigeonRenderer) this.pigeonRenderer.stop();
-      if (this.envelopeRenderer) this.envelopeRenderer.stop();
-      if (this.deliveryScreen) this.deliveryScreen.style.display = 'none';
-      if (this.balloonScreen) this.balloonScreen.style.display = 'none';
-
-      // Fade in teddy screen
+      if (this.teddyRenderer) this.teddyRenderer.stop();
+      if (this.balloonRenderer) this.balloonRenderer.stop();
       if (this.teddyScreen) {
-        this.teddyScreen.style.display = 'flex';
-        this.teddyScreen.classList.add('active');
+        this.teddyScreen.classList.remove('active');
+        this.teddyScreen.style.display = 'none';
+      }
+      if (this.balloonScreen) {
+        this.balloonScreen.classList.remove('active');
+        this.balloonScreen.style.display = 'none';
+      }
+      if (this.teddySelectorBar) {
+        this.teddySelectorBar.classList.remove('visible');
       }
       if (this.giftActionCard) {
         this.giftActionCard.classList.remove('visible');
@@ -762,150 +789,105 @@ class PigeonTeddyApp {
         this.btnCardPill.classList.remove('visible');
       }
 
-      // Show up-side (top) teddy selector bar with active tab highlighted
-      if (this.teddySelectorBar) {
-        this.teddySelectorBar.classList.add('visible');
-        this.updateTeddySelectorUI(targetIndex);
-      }
+      setTimeout(() => {
+        if (this.pigeonRenderer) {
+          this.pigeonRenderer.reset();
+          this.pigeonRenderer.start();
+        }
 
-      // Start living teddy: reveals slowly from bottom upward!
-      if (this.teddyRenderer) {
-        this.teddyRenderer.setTeddy(targetIndex);
-        this.teddyRenderer.resize();
-        this.teddyRenderer.reset(false);
-        this.teddyRenderer.start();
-        setTimeout(() => {
-          this.teddyRenderer.triggerHeartPulse();
-        }, 120);
-      }
+        if (this.envelopeRenderer) {
+          this.envelopeRenderer.reset();
+          this.envelopeRenderer.start();
+        }
 
-      this.isTransitioning = false;
-    }, 450);
-  }
+        if (this.envelopeHint) {
+          this.envelopeHint.classList.remove('visible');
+        }
 
-  restartExperience() {
-    this.isTransitioning = true;
-    this.currentScreen = 'delivery';
+        if (this.envelopeCanvas) {
+          this.envelopeCanvas.classList.remove('visible');
+        }
 
-    if (this.teddyRenderer) this.teddyRenderer.stop();
-    if (this.teddyScreen) {
-      this.teddyScreen.classList.remove('active');
-      this.teddyScreen.style.display = 'none';
-    }
-    if (this.balloonScreen) {
-      this.balloonScreen.classList.remove('active');
-      this.balloonScreen.style.display = 'none';
-    }
-    if (this.teddySelectorBar) {
-      this.teddySelectorBar.classList.remove('visible');
-    }
-    if (this.giftActionCard) {
-      this.giftActionCard.classList.remove('visible');
-      this.giftActionCard.classList.remove('minimized');
-    }
-    if (this.btnCardPill) {
-      this.btnCardPill.classList.remove('visible');
+        if (this.deliveryScreen) {
+          this.deliveryScreen.style.display = '';
+          this.deliveryScreen.classList.add('active');
+        }
+
+        this.isTransitioning = false;
+      }, 400);
     }
 
-    setTimeout(() => {
-      if (this.pigeonRenderer) {
-        this.pigeonRenderer.reset();
-        this.pigeonRenderer.start();
-      }
-
-      if (this.envelopeRenderer) {
-        this.envelopeRenderer.reset();
-        this.envelopeRenderer.start();
-      }
-
-      if (this.envelopeHint) {
-        this.envelopeHint.classList.remove('visible');
-      }
-
-      if (this.envelopeCanvas) {
-        this.envelopeCanvas.classList.remove('visible');
-      }
-
-      if (this.deliveryScreen) {
-        this.deliveryScreen.style.display = '';
-        this.deliveryScreen.classList.add('active');
-      }
-
-      this.isTransitioning = false;
-    }, 400);
-  }
-
-  start() {
-    // Start ambient floating stardust & love confetti physics loop (60 FPS)
-    if (this.ambientParticles) {
-      let lastTime = performance.now();
-      const ambientLoop = (now) => {
-        const dt = Math.min((now - lastTime) / 1000, 0.1);
-        lastTime = now;
-        this.ambientParticles.update(dt);
-        this.ambientParticles.render();
+    start() {
+      // Start ambient floating stardust & love confetti physics loop (60 FPS)
+      if (this.ambientParticles) {
+        let lastTime = performance.now();
+        const ambientLoop = (now) => {
+          const dt = Math.min((now - lastTime) / 1000, 0.1);
+          lastTime = now;
+          this.ambientParticles.update(dt);
+          this.ambientParticles.render();
+          requestAnimationFrame(ambientLoop);
+        };
         requestAnimationFrame(ambientLoop);
-      };
-      requestAnimationFrame(ambientLoop);
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const nameParam = urlParams.get('name');
-    if (nameParam) {
-      this.applyRecipientName(nameParam);
-    } else {
-      this.refreshDisplays();
-    }
-
-    if (urlParams.get('scene') === 'balloon' || urlParams.get('screen') === 'balloon') {
-      this.transitionToBalloonStage();
-    } else if (urlParams.get('scene') === 'teddy' || urlParams.get('screen') === 'teddy' || urlParams.get('testScene') === 'reveal') {
-      this.currentScreen = 'teddy';
-      if (this.deliveryScreen) {
-        this.deliveryScreen.classList.remove('active');
-        this.deliveryScreen.style.display = 'none';
-      }
-      if (this.teddyScreen) {
-        this.teddyScreen.style.display = 'flex';
-        this.teddyScreen.classList.add('active');
-        this.teddyScreen.style.transition = 'none';
-        this.teddyScreen.style.opacity = '1';
-      }
-      if (this.teddySelectorBar) {
-        this.teddySelectorBar.classList.add('visible');
-        this.teddySelectorBar.style.transition = 'none';
-        this.teddySelectorBar.style.opacity = '1';
-      }
-      if (this.giftActionCard) {
-        this.giftActionCard.classList.add('visible');
-        this.giftActionCard.style.transition = 'none';
-        this.giftActionCard.style.opacity = '1';
       }
 
-      const teddyParam = parseInt(urlParams.get('teddy'), 10);
-      if (!isNaN(teddyParam) && this.teddyRenderer) {
-        this.teddyRenderer.currentIndex = Math.max(0, Math.min(3, teddyParam));
-        this.updateTeddySelectorUI(this.teddyRenderer.currentIndex);
+      const urlParams = new URLSearchParams(window.location.search);
+      const nameParam = urlParams.get('name');
+      if (nameParam) {
+        this.applyRecipientName(nameParam);
+      } else {
+        this.refreshDisplays();
       }
 
-      if (this.teddyRenderer) {
-        this.teddyRenderer.reset(true);
-        this.teddyRenderer.start();
-      }
-    } else {
-      // Start Carrier Pigeon flight & envelope engine
-      if (this.pigeonRenderer) {
-        this.pigeonRenderer.start();
-      }
-      if (this.envelopeRenderer) {
-        this.envelopeRenderer.start();
+      if (urlParams.get('scene') === 'balloon' || urlParams.get('screen') === 'balloon') {
+        this.transitionToBalloonStage();
+      } else if (urlParams.get('scene') === 'teddy' || urlParams.get('screen') === 'teddy' || urlParams.get('testScene') === 'reveal') {
+        this.currentScreen = 'teddy';
+        if (this.deliveryScreen) {
+          this.deliveryScreen.classList.remove('active');
+          this.deliveryScreen.style.display = 'none';
+        }
+        if (this.teddyScreen) {
+          this.teddyScreen.style.display = 'flex';
+          this.teddyScreen.classList.add('active');
+          this.teddyScreen.style.transition = 'none';
+          this.teddyScreen.style.opacity = '1';
+        }
+        if (this.teddySelectorBar) {
+          this.teddySelectorBar.classList.add('visible');
+          this.teddySelectorBar.style.transition = 'none';
+          this.teddySelectorBar.style.opacity = '1';
+        }
+        if (this.giftActionCard) {
+          this.giftActionCard.classList.add('visible');
+          this.giftActionCard.style.transition = 'none';
+          this.giftActionCard.style.opacity = '1';
+        }
+
+        const teddyParam = parseInt(urlParams.get('teddy'), 10);
+        if (!isNaN(teddyParam) && this.teddyRenderer) {
+          this.teddyRenderer.currentIndex = Math.max(0, Math.min(3, teddyParam));
+          this.updateTeddySelectorUI(this.teddyRenderer.currentIndex);
+        }
+
+        if (this.teddyRenderer) {
+          this.teddyRenderer.reset(true);
+          this.teddyRenderer.start();
+        }
+      } else {
+        // Start Carrier Pigeon flight & envelope engine
+        if (this.pigeonRenderer) {
+          this.pigeonRenderer.start();
+        }
+        if (this.envelopeRenderer) {
+          this.envelopeRenderer.start();
+        }
       }
     }
   }
-}
 
-// Bootstrap once DOM is ready
-if (typeof window !== 'undefined') {
+  // Bootstrap once DOM is ready
+  if(typeof window !== 'undefined') {
   window.addEventListener('DOMContentLoaded', () => {
     window.__pigeonTeddyApp = new PigeonTeddyApp();
   });
