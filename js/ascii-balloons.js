@@ -2,13 +2,15 @@
  * Majestic Living 24-Bit ASCII Floating Balloons Engine
  * 
  * Features:
- * - 4 floating 3D spheres rendered entirely out of colored ASCII characters.
- * - Each balloon houses its corresponding ASCII Teddy Bear inside.
- * - Dynamic harmonic floating bobbing physics (sine waves + string sway).
+ * - 4 floating 3D spheres rendered directly in Living 24-Bit Monospace ASCII characters.
+ * - Each balloon contains its corresponding Living ASCII Teddy Bear inside.
+ * - Character palette matching the Living Teddy Bear:
+ *   ✦, *, +, %, &, @, #, ♥ (zero-gap dense true-color typography).
  * - High-DPR true-color 24-bit ASCII rasterization matching the Carrier Dove and Teddy Bear.
- * - Interactive cursor/touch hover: ASCII stardust aura and buoyant lift.
- * - Explosive ASCII pop blast on tap: shattered glowing crystal shards (✦ ✧ ⋆ ♥),
- *   shockwave rings, and other balloons floating into the night sky.
+ * - Sinuous sinusoidal floating bobbing physics + swaying ASCII strings (| / \ :).
+ * - Interactive cursor/touch hover: ASCII stardust aura (✦ ✧ ⋆ ·) and buoyant lift.
+ * - Explosive ASCII pop blast on tap: 80+ glowing crystal characters (✦ ✧ ⋆ ♥ % # @),
+ *   shockwave rings, and other balloons floating away into the stars.
  * - Seamless handoff to full Living ASCII Teddy Bear stage.
  */
 
@@ -22,10 +24,11 @@ export class AsciiBalloons {
     this.animId = null;
     this.hasTriggeredSelect = false;
 
-    // Simulation & Staging Canvases
+    // Simulation Canvas (exact ASCII columns x rows grid)
     this.simCanvas = typeof document !== 'undefined' ? document.createElement('canvas') : null;
     this.simCtx = this.simCanvas ? this.simCanvas.getContext('2d', { willReadFrequently: true }) : null;
 
+    // High-Resolution Staging Canvas for crisp vector rendering
     this.stageCanvas = typeof document !== 'undefined' ? document.createElement('canvas') : null;
     this.stageCtx = this.stageCanvas ? this.stageCanvas.getContext('2d') : null;
 
@@ -34,17 +37,12 @@ export class AsciiBalloons {
     this.mouseY = -1000;
     this.hoveredIdx = -1;
 
-    // ASCII Shading Character Ramp
-    this.densityChars = "  ·.:~=+*✦#%@&";
-    this.bodyChars = "+*#%@$&";
-    this.sparkleChars = ['✦', '✧', '⋆', '·', '♥', '♡'];
-
     // Preload all 4 Teddy Bear images
     this.teddyAssets = [
-      'assets/teddy-1-clean.png?v=37.0',
-      'assets/teddy-2-clean.png?v=37.0',
-      'assets/teddy-3-clean.png?v=37.0',
-      'assets/teddy-4-standing-clean.png?v=37.0'
+      'assets/teddy-1-clean.png?v=39.0',
+      'assets/teddy-2-clean.png?v=39.0',
+      'assets/teddy-3-clean.png?v=39.0',
+      'assets/teddy-4-standing-clean.png?v=39.0'
     ];
     this.teddyImages = [];
     this.imagesLoaded = [false, false, false, false];
@@ -66,7 +64,7 @@ export class AsciiBalloons {
         desc: 'Warm Hugs & Love',
         baseColor: [245, 158, 11],
         shineColor: [255, 235, 160],
-        darkColor: [120, 53, 15],
+        darkColor: [140, 60, 15],
         knotColor: [180, 83, 9],
         phase: 0.0,
         popping: false,
@@ -80,7 +78,7 @@ export class AsciiBalloons {
         desc: 'Cozy Starry Peace',
         baseColor: [168, 85, 247],
         shineColor: [243, 232, 255],
-        darkColor: [76, 29, 149],
+        darkColor: [90, 35, 160],
         knotColor: [126, 34, 206],
         phase: 1.2,
         popping: false,
@@ -94,7 +92,7 @@ export class AsciiBalloons {
         desc: 'Joyful Floating Smiles',
         baseColor: [236, 72, 153],
         shineColor: [253, 242, 248],
-        darkColor: [131, 24, 67],
+        darkColor: [150, 30, 80],
         knotColor: [190, 24, 93],
         phase: 2.4,
         popping: false,
@@ -108,7 +106,7 @@ export class AsciiBalloons {
         desc: 'Infinite Devotion',
         baseColor: [244, 63, 94],
         shineColor: [255, 228, 230],
-        darkColor: [112, 11, 37],
+        darkColor: [140, 15, 45],
         knotColor: [159, 18, 57],
         phase: 3.6,
         popping: false,
@@ -119,7 +117,6 @@ export class AsciiBalloons {
     ];
 
     // Particle systems
-    this.stardustParticles = [];
     this.popShards = [];
     this.shockwaves = [];
 
@@ -194,10 +191,9 @@ export class AsciiBalloons {
     this.cssH = cssH;
     this.charAspect = 0.55;
 
-    // High density grid for crisp readable ASCII art
-    const isMobile = cssW < 768;
-    const targetCellH = isMobile ? Math.max(7.0, cssH / 115) : Math.max(7.5, cssH / 130);
-    this.rows = Math.max(80, Math.min(140, Math.round(cssH / targetCellH)));
+    // Density grid matching AsciiTeddy (~7.2 - 8.2 px cell height)
+    const targetCellH = Math.max(7.2, Math.min(8.5, cssH / 110));
+    this.rows = Math.max(80, Math.min(130, Math.round(cssH / targetCellH)));
     this.columns = Math.round(this.rows * (w / h) / this.charAspect);
 
     if (this.simCanvas) {
@@ -206,11 +202,10 @@ export class AsciiBalloons {
     }
 
     if (this.stageCanvas) {
-      this.stageCanvas.width = this.columns * 2;
-      this.stageCanvas.height = this.rows * 2;
+      this.stageCanvas.width = 1200;
+      this.stageCanvas.height = 900;
     }
 
-    // Compute Balloon Target Screen Layout
     this.updateBalloonPositions();
   }
 
@@ -222,9 +217,9 @@ export class AsciiBalloons {
     if (isMobile) {
       // 2x2 Grid on Mobile
       const cols = [w * 0.28, w * 0.72];
-      const rows = [h * 0.36, h * 0.68];
-      const radX = Math.min(w * 0.16, 52);
-      const radY = radX * 1.25;
+      const rows = [h * 0.33, h * 0.65];
+      const radX = Math.min(w * 0.17, 60);
+      const radY = radX * 1.30;
 
       this.balloons[0].screenX = cols[0];
       this.balloons[0].screenY = rows[0];
@@ -241,10 +236,10 @@ export class AsciiBalloons {
       });
     } else {
       // 4 Horizontal Row on Desktop / Tablets
-      const cy = h * 0.48;
+      const cy = h * 0.44;
       const spacing = w / 5;
-      const radX = Math.min(w * 0.08, 62);
-      const radY = radX * 1.28;
+      const radX = Math.min(w * 0.082, 70);
+      const radY = radX * 1.30;
 
       for (let i = 0; i < 4; i++) {
         this.balloons[i].screenX = spacing * (i + 1);
@@ -263,7 +258,7 @@ export class AsciiBalloons {
       const dx = this.mouseX - b.screenX;
       const dy = this.mouseY - (b.screenY + b.floatYOffset);
       const distSq = (dx * dx) / (b.radX * b.radX) + (dy * dy) / (b.radY * b.radY);
-      if (distSq <= 1.35) {
+      if (distSq <= 1.40) {
         newHover = i;
         break;
       }
@@ -281,7 +276,7 @@ export class AsciiBalloons {
       const dx = x - b.screenX;
       const dy = y - (b.screenY + b.floatYOffset);
       const distSq = (dx * dx) / (b.radX * b.radX) + (dy * dy) / (b.radY * b.radY);
-      if (distSq <= 1.45) {
+      if (distSq <= 1.55) {
         return i;
       }
     }
@@ -300,39 +295,39 @@ export class AsciiBalloons {
     const bx = balloon.screenX;
     const by = balloon.screenY + balloon.floatYOffset;
 
-    // 1. Shatter into 70+ radiant ASCII crystal shards
-    for (let i = 0; i < 75; i++) {
+    // 1. Shatter into 80+ glowing ASCII crystal shards
+    for (let i = 0; i < 85; i++) {
       const ang = Math.random() * Math.PI * 2;
-      const speed = 80 + Math.random() * 260;
-      const symbols = ['✦', '✧', '⋆', '♥', '♡', '•', '*', '+', '#'];
-      const isGold = Math.random() > 0.5;
+      const speed = 90 + Math.random() * 280;
+      const symbols = ['✦', '✧', '⋆', '♥', '♡', '•', '*', '+', '%', '#', '@', '&'];
+      const isGold = Math.random() > 0.45;
       const shardColor = isGold ? balloon.shineColor : balloon.baseColor;
 
       this.popShards.push({
         x: bx,
         y: by,
         vx: Math.cos(ang) * speed,
-        vy: Math.sin(ang) * speed - 30,
+        vy: Math.sin(ang) * speed - 40,
         life: 0,
-        maxLife: 0.65 + Math.random() * 0.45,
+        maxLife: 0.70 + Math.random() * 0.45,
         char: symbols[Math.floor(Math.random() * symbols.length)],
         color: shardColor,
-        size: 11 + Math.random() * 7
+        size: 12 + Math.random() * 8
       });
     }
 
-    // 2. Expanding shockwave ring
+    // 2. Expanding Shockwave Ring
     this.shockwaves.push({
       x: bx,
       y: by,
-      r: 8,
-      maxR: Math.max(balloon.radX, balloon.radY) * 3.2,
+      r: 10,
+      maxR: Math.max(balloon.radX, balloon.radY) * 3.4,
       life: 0,
-      maxLife: 0.6,
+      maxLife: 0.65,
       color: balloon.baseColor
     });
 
-    // 3. Float other balloons away into the starry sky
+    // 3. Float other balloons away upwards into the night sky
     this.balloons.forEach((b, idx) => {
       if (idx !== index) {
         b.floatingAway = true;
@@ -348,7 +343,7 @@ export class AsciiBalloons {
   }
 
   // =========================================================================
-  // Vector Stage Drawing: 4 ASCII Balloon Spheres & Miniature Teddy Bears
+  // Vector Staging: Draw 3D Spherical Balloons & Living Teddy Bears
   // =========================================================================
   drawBalloonsStage(ctx, tNow) {
     const sW = this.stageCanvas.width;
@@ -361,16 +356,11 @@ export class AsciiBalloons {
     for (let i = 0; i < this.balloons.length; i++) {
       const b = this.balloons[i];
 
-      // Handle Popping
-      if (b.popping) {
-        continue;
-      }
+      if (b.popping) continue;
 
-      // Handle Floating Away
       if (b.floatingAway) {
-        b.floatYOffset -= 240 * 0.016;
+        b.floatYOffset -= 260 * 0.016;
       } else {
-        // Natural harmonic bobbing
         b.floatYOffset = Math.sin(tNow * 1.8 + b.phase) * (b.radY * 0.16);
       }
 
@@ -387,53 +377,51 @@ export class AsciiBalloons {
       ctx.scale(hoverScale, hoverScale);
 
       // A. Swaying curved string in pure ASCII line
-      const stringLen = ry * 0.75;
-      const sway = Math.sin(tNow * 2.2 + b.phase) * 6;
+      const stringLen = ry * 0.85;
+      const sway = Math.sin(tNow * 2.2 + b.phase) * 10;
       ctx.beginPath();
       ctx.moveTo(0, ry);
       ctx.quadraticCurveTo(sway * 0.5, ry + stringLen * 0.5, sway, ry + stringLen);
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
-      ctx.lineWidth = 2.4;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.lineWidth = 3.2;
       ctx.stroke();
 
       // B. Knot polygon
       ctx.beginPath();
       const [kr, kg, kb] = b.knotColor;
       ctx.fillStyle = `rgb(${kr}, ${kg}, ${kb})`;
-      ctx.moveTo(-rx * 0.12, ry - 2);
-      ctx.lineTo(rx * 0.12, ry - 2);
-      ctx.lineTo(rx * 0.18, ry + 7);
-      ctx.lineTo(-rx * 0.18, ry + 7);
+      ctx.moveTo(-rx * 0.14, ry - 3);
+      ctx.lineTo(rx * 0.14, ry - 3);
+      ctx.lineTo(rx * 0.20, ry + 9);
+      ctx.lineTo(-rx * 0.20, ry + 9);
       ctx.closePath();
       ctx.fill();
 
-      // C. 3D Spherical Balloon Body with specular highlights
+      // C. 3D Spherical Balloon Body
       ctx.beginPath();
-      // Egg shape (curved rounded balloon)
       ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
 
       const [br, bg, bb] = b.baseColor;
       const [sr, sg, sb] = b.shineColor;
       const [dr, dg, db] = b.darkColor;
 
-      // Radial 3D Sphere Shading
-      const grad = ctx.createRadialGradient(-rx * 0.32, -ry * 0.32, rx * 0.1, 0, 0, Math.max(rx, ry) * 1.15);
+      const grad = ctx.createRadialGradient(-rx * 0.35, -ry * 0.35, rx * 0.08, 0, 0, Math.max(rx, ry) * 1.15);
       grad.addColorStop(0, `rgb(${sr}, ${sg}, ${sb})`);
       grad.addColorStop(0.35, `rgb(${br}, ${bg}, ${bb})`);
       grad.addColorStop(0.78, `rgb(${dr}, ${dg}, ${db})`);
-      grad.addColorStop(1, `rgba(${dr * 0.7 | 0}, ${dg * 0.7 | 0}, ${db * 0.7 | 0}, 0.95)`);
+      grad.addColorStop(1, `rgba(${dr * 0.6 | 0}, ${dg * 0.6 | 0}, ${db * 0.6 | 0}, 0.98)`);
 
       ctx.fillStyle = grad;
       ctx.shadowColor = `rgba(${br}, ${bg}, ${bb}, ${isHovered ? 0.9 : 0.6})`;
-      ctx.shadowBlur = isHovered ? 24 : 14;
+      ctx.shadowBlur = isHovered ? 28 : 16;
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // D. Inner Specular Sheen Crescent
+      // D. Specular Sheen Arc
       ctx.save();
       ctx.beginPath();
-      ctx.ellipse(-rx * 0.35, -ry * 0.35, rx * 0.28, ry * 0.38, -0.6, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+      ctx.ellipse(-rx * 0.35, -ry * 0.35, rx * 0.28, ry * 0.36, -0.6, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.72)';
       ctx.fill();
       ctx.restore();
 
@@ -451,10 +439,10 @@ export class AsciiBalloons {
         }
 
         ctx.save();
-        ctx.globalAlpha = isHovered ? 0.98 : 0.90;
+        ctx.globalAlpha = isHovered ? 0.98 : 0.92;
         ctx.shadowColor = '#000000';
-        ctx.shadowBlur = 6;
-        ctx.drawImage(img, -dw * 0.5, -dh * 0.5 - ry * 0.05, dw, dh);
+        ctx.shadowBlur = 8;
+        ctx.drawImage(img, -dw * 0.5, -dh * 0.5 - ry * 0.04, dw, dh);
         ctx.restore();
       }
 
@@ -463,12 +451,13 @@ export class AsciiBalloons {
   }
 
   // =========================================================================
-  // Main True-Color 24-Bit ASCII Rasterization Render Loop
+  // Main True-Color 24-Bit ASCII Typography Render Loop
+  // Matches AsciiTeddy exactly: zero-gap typography with ✦, *, +, %, &, @, #, ♥
   // =========================================================================
   render(tNow, dt) {
     if (!this.canvas || !this.ctx || !this.simCanvas || !this.simCtx || !this.stageCanvas || !this.stageCtx) return;
 
-    // 1. Draw vectors & images to stageCanvas
+    // 1. Draw vectors & imagery to stageCanvas
     this.drawBalloonsStage(this.stageCtx, tNow);
 
     // 2. Transfer to simCanvas (columns x rows)
@@ -489,13 +478,14 @@ export class AsciiBalloons {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, W, H);
 
-    const fontSize = Math.max(8, Math.round(cellH * 1.18));
+    // Font size slightly exceeds cell height for tight zero-gap packing (matching AsciiTeddy)
+    const fontSize = Math.max(9, Math.round(cellH * 1.18));
     ctx.font = `bold ${fontSize}px Menlo, Consolas, "JetBrains Mono", monospace`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    const numChars = this.densityChars.length;
     const dpr = this.dpr || 1;
+    const stardustTime = Math.floor(tNow * 3.0);
 
     for (let r = 0; r < rows; r++) {
       const posY = r * cellH + cellH * 0.5;
@@ -503,30 +493,63 @@ export class AsciiBalloons {
 
       for (let c = 0; c < cols; c++) {
         const offset = rowOffset + c * 4;
+        let red = data[offset];
+        let grn = data[offset + 1];
+        let blu = data[offset + 2];
         const alpha = data[offset + 3] / 255;
-        if (alpha < 0.04) continue;
-
-        const red = data[offset];
-        const green = data[offset + 1];
-        const blue = data[offset + 2];
-
-        // Perceived luminance
-        const lum = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
-        let charIdx = Math.min(numChars - 1, Math.floor(lum * numChars));
-        let ch = this.densityChars[charIdx];
-
-        // Boost high-luminance specular highlights with special sparkle glyphs
-        if (lum > 0.92) {
-          ch = '✦';
-        } else if (lum > 0.82) {
-          ch = '*';
-        }
 
         const posX = c * cellW + cellW * 0.5;
 
+        // Ambient floating golden stardust fireflies
+        let isStardust = false;
+        if (alpha < 0.08) {
+          const hash = Math.sin(c * 17.1 + (r + stardustTime) * 31.7) * 43758.5453;
+          if ((hash - Math.floor(hash)) < 0.0035) {
+            isStardust = true;
+            red = 255;
+            grn = 220;
+            blu = 120;
+          }
+        }
+
+        if (alpha < 0.12 && !isStardust) continue;
+
+        const maxC = Math.max(red, grn, blu);
+        const lum = (0.55 * (maxC / 255) + 0.45 * (0.299 * red + 0.587 * grn + 0.114 * blu) / 255);
+
+        // Heart detection inside teddy bears (Teddy 0, 2, 3)
+        const isHeartColor = (red - grn >= 46) && (red - blu >= 42) && (grn - blu <= 16) && (red > 125);
+
+        // Character selection matching AsciiTeddy: ✦, *, +, %, &, @, #, ♥
+        let char = '#';
+        if (isStardust) {
+          char = '✦';
+        } else if (isHeartColor) {
+          char = '♥';
+        } else if (lum > 0.88) {
+          char = '✦';
+        } else if (lum > 0.74) {
+          char = '*';
+        } else if (lum > 0.60) {
+          char = '+';
+        } else if (lum > 0.44) {
+          char = '%';
+        } else if (lum > 0.30) {
+          char = '&';
+        } else if (lum > 0.16) {
+          char = '@';
+        } else {
+          char = '#';
+        }
+
         // True 24-bit glow
-        ctx.fillStyle = `rgba(${red}, ${green}, ${blue}, ${alpha.toFixed(2)})`;
-        ctx.fillText(ch, posX, posY);
+        if (isStardust) {
+          ctx.fillStyle = `rgba(255, 225, 130, ${0.7 + 0.3 * Math.sin(tNow * 4 + r)})`;
+        } else {
+          ctx.fillStyle = `rgba(${red}, ${green || grn}, ${blue || blu}, ${Math.min(1.0, alpha * 1.05).toFixed(2)})`;
+        }
+
+        ctx.fillText(char, posX, posY);
       }
     }
 
@@ -541,7 +564,7 @@ export class AsciiBalloons {
 
       p.x += p.vx * dt;
       p.y += p.vy * dt;
-      p.vy += 120 * dt; // gravity
+      p.vy += 130 * dt; // gravity
 
       const k = 1.0 - (p.life / p.maxLife);
       const [pr, pg, pb] = p.color;
@@ -551,8 +574,8 @@ export class AsciiBalloons {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillStyle = `rgba(${pr}, ${pg}, ${pb}, ${k.toFixed(2)})`;
-      ctx.shadowColor = `rgba(${pr}, ${pg}, ${pb}, 0.9)`;
-      ctx.shadowBlur = 10;
+      ctx.shadowColor = `rgba(${pr}, ${pg}, ${pb}, 0.95)`;
+      ctx.shadowBlur = 12;
       ctx.fillText(p.char, p.x * dpr, p.y * dpr);
       ctx.restore();
     }
@@ -621,4 +644,3 @@ export class AsciiBalloons {
     this.updateBalloonPositions();
   }
 }
-
