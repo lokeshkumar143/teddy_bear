@@ -259,9 +259,9 @@ export class AsciiTeddy {
       const winW = window.innerWidth || 800;
       const winH = window.innerHeight || 800;
 
-      const targetHeightRatio = isPortrait ? 0.42 : 0.65;
+      const targetHeightRatio = isPortrait ? (winH < 700 ? 0.48 : 0.53) : 0.65;
       const maxH = rows * targetHeightRatio;
-      const maxW = cols * (isPortrait ? 0.76 : 0.58);
+      const maxW = cols * (isPortrait ? 0.88 : 0.58);
 
       // Compensate for character font aspect ratio (0.55) so teddy retains 1:1 geometry
       const stageAspect = (drawImgH / drawImgW);
@@ -272,8 +272,9 @@ export class AsciiTeddy {
       // Perfectly centered horizontally on all screens
       const drawX = Math.round((cols - drawW) * 0.5);
 
+      // In portrait: gracefully centered between top tabs and bottom dedication card
       const drawY = isPortrait
-        ? Math.round(rows * (winH < 650 ? 0.08 : 0.10))
+        ? Math.max(Math.round(rows * 0.10), Math.round((rows * 0.72 - drawH) * 0.5 + rows * 0.05))
         : Math.round((rows - drawH) * 0.35);
 
       // Sinuous gentle sway anchored at feet base

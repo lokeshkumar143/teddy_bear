@@ -1006,9 +1006,9 @@ body {
     top: 48px;
     left: 50%;
     transform: translateX(-50%) translateY(-10px) scale(0.95);
-    padding: 3px 6px;
-    gap: 3px;
-    max-width: 96vw;
+    padding: 2px 4px;
+    gap: 2px;
+    max-width: 98vw;
     overflow-x: auto;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
@@ -1024,8 +1024,8 @@ body {
   }
 
   .teddy-tab-btn {
-    padding: 4px 8px;
-    font-size: 9px;
+    padding: 3px 6px;
+    font-size: 8.5px;
     gap: 3px;
     white-space: nowrap;
     flex-shrink: 0;

@@ -10,12 +10,12 @@
  * - v14.0: Multilingual name grid in final dedication card.
  */
 
-import { AmbientParticles } from './ambient-particles.js?v=32.0';
-import { AsciiPigeon } from './ascii-pigeon.js?v=32.0';
-import { AsciiEnvelope } from './ascii-envelope.js?v=32.0';
-import { AsciiTeddy } from './ascii-teddy.js?v=32.0';
-import { AudioManager } from './audio-fx.js?v=32.0';
-import { MultiLangNameProfile } from './name-multilang.js?v=32.0';
+import { AmbientParticles } from './ambient-particles.js?v=33.0';
+import { AsciiPigeon } from './ascii-pigeon.js?v=33.0';
+import { AsciiEnvelope } from './ascii-envelope.js?v=33.0';
+import { AsciiTeddy } from './ascii-teddy.js?v=33.0';
+import { AudioManager } from './audio-fx.js?v=33.0';
+import { MultiLangNameProfile } from './name-multilang.js?v=33.0';
 
 class PigeonTeddyApp {
   constructor() {
@@ -23,8 +23,13 @@ class PigeonTeddyApp {
     this.isTransitioning = false;
 
     // Load or initialize Name Profile (Default: 'Lokesh Kumar')
-    this.nameProfile = MultiLangNameProfile.load() || new MultiLangNameProfile('Lokesh Kumar');
-    this.recipientName = this.nameProfile.originalName;
+    let loadedProfile = MultiLangNameProfile.load();
+    if (loadedProfile && (loadedProfile.originalName === 'Loki' || !loadedProfile.originalName)) {
+      loadedProfile = new MultiLangNameProfile('Lokesh Kumar');
+      loadedProfile.save();
+    }
+    this.nameProfile = loadedProfile || new MultiLangNameProfile('Lokesh Kumar');
+    this.recipientName = this.nameProfile.originalName || 'Lokesh Kumar';
 
     // Atmosphere Themes
     this.themes = [

@@ -47,7 +47,7 @@ export class AsciiEnvelope {
     this.dissolveParticles = [];
 
     // Dynamic recipient name
-    this.recipientName = 'Loki';
+    this.recipientName = 'Lokesh Kumar';
     this.multiLang = null;
 
     // ASCII Density Characters (high fidelity)
@@ -58,7 +58,7 @@ export class AsciiEnvelope {
   }
 
   setRecipientName(name, multiLangObj = null) {
-    this.recipientName = (name || 'Loki').trim();
+    this.recipientName = (name || 'Lokesh Kumar').trim();
     this.multiLang = multiLangObj;
   }
 
