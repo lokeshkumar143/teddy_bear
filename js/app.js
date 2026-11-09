@@ -10,12 +10,12 @@
  * - v14.0: Multilingual name grid in final dedication card.
  */
 
-import { AmbientParticles } from './ambient-particles.js?v=33.0';
-import { AsciiPigeon } from './ascii-pigeon.js?v=33.0';
-import { AsciiEnvelope } from './ascii-envelope.js?v=33.0';
-import { AsciiTeddy } from './ascii-teddy.js?v=33.0';
-import { AudioManager } from './audio-fx.js?v=33.0';
-import { MultiLangNameProfile } from './name-multilang.js?v=33.0';
+import { AmbientParticles } from './ambient-particles.js?v=35.0';
+import { AsciiPigeon } from './ascii-pigeon.js?v=35.0';
+import { AsciiEnvelope } from './ascii-envelope.js?v=35.0';
+import { AsciiTeddy } from './ascii-teddy.js?v=35.0';
+import { AudioManager } from './audio-fx.js?v=35.0';
+import { MultiLangNameProfile } from './name-multilang.js?v=35.0';
 
 class PigeonTeddyApp {
   constructor() {
@@ -477,36 +477,24 @@ class PigeonTeddyApp {
       snapCanvas.height = h;
       const sCtx = snapCanvas.getContext('2d');
 
-      // Gradient background
-      const grad = sCtx.createRadialGradient(w * 0.5, h * 0.5, 100, w * 0.5, h * 0.5, 700);
-      grad.addColorStop(0, '#15132d');
-      grad.addColorStop(0.5, '#0b0c1c');
-      grad.addColorStop(1, '#05050d');
-      sCtx.fillStyle = grad;
-      sCtx.fillRect(0, 0, w, h);
-
-      // Draw living ASCII teddy
-      if (this.teddyCanvas) {
-        sCtx.drawImage(this.teddyCanvas, 100, 100, 1000, 1000);
+      // Use dedicated master keepsake renderer for 100% unclipped, unsquashed 1200x1200 quality
+      if (this.teddyRenderer && typeof this.teddyRenderer.renderKeepsakeSnapshot === 'function') {
+        this.teddyRenderer.renderKeepsakeSnapshot(sCtx, w, h, this.recipientName);
+      } else {
+        // Fallback
+        const grad = sCtx.createRadialGradient(w * 0.5, h * 0.5, 100, w * 0.5, h * 0.5, 700);
+        grad.addColorStop(0, '#15132d');
+        grad.addColorStop(0.5, '#0b0c1c');
+        grad.addColorStop(1, '#05050d');
+        sCtx.fillStyle = grad;
+        sCtx.fillRect(0, 0, w, h);
+        if (this.teddyCanvas) {
+          sCtx.drawImage(this.teddyCanvas, 100, 100, 1000, 1000);
+        }
       }
 
-      // Title & dedication overlay
-      sCtx.fillStyle = '#ffd700';
-      sCtx.font = 'bold 36px "Inter", "Cinzel", serif';
-      sCtx.textAlign = 'center';
-      sCtx.fillText(`✦ SPECIALLY CRAFTED FOR ${this.recipientName} ✦`, w * 0.5, 90);
-
-      sCtx.fillStyle = '#ff7b9c';
-      sCtx.font = '22px "Inter", sans-serif';
-      sCtx.fillText('Sending you warmth, comfort, and happiness. ❤️', w * 0.5, 135);
-
-      // Footer
-      sCtx.fillStyle = '#c5d0e8';
-      sCtx.font = 'italic 20px "Cormorant Garamond", serif';
-      sCtx.fillText('Living 24-Bit Procedural ASCII Art • Handcrafted with love by Lokesh Kumar', w * 0.5, h - 50);
-
       const link = document.createElement('a');
-      link.download = `Teddy_Gift_For_${this.recipientName}.png`;
+      link.download = `Teddy_Gift_For_${this.recipientName.replace(/\s+/g, '_')}.png`;
       link.href = snapCanvas.toDataURL('image/png');
       link.click();
 
