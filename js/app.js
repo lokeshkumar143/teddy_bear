@@ -132,9 +132,6 @@ class PigeonTeddyApp {
         if (this.giftActionCard) {
           this.giftActionCard.classList.add('visible');
         }
-        if (this.cornerSignature) {
-          this.cornerSignature.classList.add('visible');
-        }
       });
     }
   }
@@ -161,23 +158,6 @@ class PigeonTeddyApp {
     try {
       this.audioManager.playClick();
     } catch (e) {}
-  }
-
-  openWorldModal() {
-    if (!this.worldModal) return;
-    this.worldModal.removeAttribute('inert');
-    this.worldModal.classList.add('visible');
-    this.worldModal.removeAttribute('aria-hidden');
-  }
-
-  closeWorldModal() {
-    if (!this.worldModal) return;
-    if (document.activeElement && this.worldModal.contains(document.activeElement)) {
-      document.activeElement.blur();
-    }
-    this.worldModal.classList.remove('visible');
-    this.worldModal.setAttribute('aria-hidden', 'true');
-    this.worldModal.setAttribute('inert', '');
   }
 
   applyRecipientProfile(profile) {
@@ -213,35 +193,6 @@ class PigeonTeddyApp {
     // 3. Dedication Card Title
     if (this.cardName) {
       this.cardName.textContent = displayName;
-    }
-
-    // 4. Unicode Dynamic Signature
-    this.updateAsciiSignature(displayName);
-  }
-
-  updateAsciiSignature(name) {
-    if (!this.cornerSignature) return;
-    const cluster = this.cornerSignature.querySelector('.ascii-key-cluster');
-    const bytesDiv = this.cornerSignature.querySelector('.ascii-sig-bytes');
-    if (!cluster) return;
-
-    // Split words so "LOKESH" and "KUMAR" are neatly grouped as separate key words
-    const words = String(name || 'Lokesh Kumar').trim().split(/\s+/).filter(Boolean);
-    cluster.innerHTML = words.map(word => {
-      const chars = Array.from(word).slice(0, 10);
-      return `
-        <div class="ascii-key-word" dir="auto">
-          ${chars.map(ch => `<span class="ascii-key">${ch.toUpperCase()}</span>`).join('')}
-        </div>
-      `;
-    }).join('');
-
-    if (bytesDiv) {
-      const chars = Array.from(name || 'Lokesh Kumar').filter(c => c !== ' ').slice(0, 8);
-      const hexBytes = chars
-        .map(ch => ch.codePointAt(0).toString(16).toUpperCase().padStart(2, '0'))
-        .join(' ');
-      bytesDiv.innerHTML = `<span class="ascii-code">UNICODE_KEY:</span> ${hexBytes} <span class="sig-star">✦</span>`;
     }
   }
 
@@ -344,14 +295,26 @@ class PigeonTeddyApp {
         }
       });
     }
-    if (this.btnExploreWorld) {
-      this.btnExploreWorld.addEventListener('click', () => {
-        this.openWorldModal();
+    if (this.btnToggleCard) {
+      this.btnToggleCard.addEventListener('click', () => {
+        if (this.giftActionCard) {
+          this.giftActionCard.classList.add('minimized');
+        }
+        if (this.btnCardPill) {
+          this.btnCardPill.classList.add('visible');
+        }
+        this.showToast('Dedication card minimized. Tap pill to reopen anytime! ✨');
       });
     }
-    if (this.btnCloseWorld) {
-      this.btnCloseWorld.addEventListener('click', () => {
-        this.closeWorldModal();
+    if (this.btnCardPill) {
+      this.btnCardPill.addEventListener('click', () => {
+        if (this.giftActionCard) {
+          this.giftActionCard.classList.remove('minimized');
+          this.giftActionCard.classList.add('visible');
+        }
+        if (this.btnCardPill) {
+          this.btnCardPill.classList.remove('visible');
+        }
       });
     }
     if (this.replayBtn) {
@@ -443,9 +406,10 @@ class PigeonTeddyApp {
       }
       if (this.giftActionCard) {
         this.giftActionCard.classList.remove('visible');
+        this.giftActionCard.classList.remove('minimized');
       }
-      if (this.cornerSignature) {
-        this.cornerSignature.classList.remove('visible');
+      if (this.btnCardPill) {
+        this.btnCardPill.classList.remove('visible');
       }
 
       // 3. Show up-side (top) teddy selector bar
@@ -481,9 +445,10 @@ class PigeonTeddyApp {
     }
     if (this.giftActionCard) {
       this.giftActionCard.classList.remove('visible');
+      this.giftActionCard.classList.remove('minimized');
     }
-    if (this.cornerSignature) {
-      this.cornerSignature.classList.remove('visible');
+    if (this.btnCardPill) {
+      this.btnCardPill.classList.remove('visible');
     }
 
     setTimeout(() => {
@@ -544,11 +509,6 @@ class PigeonTeddyApp {
         this.giftActionCard.classList.add('visible');
         this.giftActionCard.style.transition = 'none';
         this.giftActionCard.style.opacity = '1';
-      }
-      if (this.cornerSignature) {
-        this.cornerSignature.classList.add('visible');
-        this.cornerSignature.style.transition = 'none';
-        this.cornerSignature.style.opacity = '1';
       }
 
       const teddyParam = parseInt(urlParams.get('teddy'), 10);
