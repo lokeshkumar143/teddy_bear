@@ -91,6 +91,11 @@ class PigeonTeddyApp {
     this.blessingRecipientName = document.querySelector('.blessing-recipient-name');
 
     this.toastMsg = document.getElementById('toast-msg');
+
+    // Balloon Selection Stage elements
+    this.balloonScreen = document.getElementById('balloon-screen');
+    this.balloonGrid = document.getElementById('balloon-grid');
+    this.btnRepopBalloon = document.getElementById('btn-repop-balloon');
   }
 
   initAmbientParticles() {
@@ -131,7 +136,7 @@ class PigeonTeddyApp {
       this.envelopeRenderer = new AsciiEnvelope(
         this.envelopeCanvas,
         () => {
-          this.transitionToTeddy();
+          this.transitionToBalloonStage();
         }
       );
       this.envelopeRenderer.setRecipientName(this.recipientName);
@@ -248,7 +253,7 @@ class PigeonTeddyApp {
       if (this.envelopeRenderer) {
         this.envelopeRenderer.triggerClick();
       } else {
-        this.transitionToTeddy();
+        this.transitionToBalloonStage();
       }
     };
 
@@ -462,6 +467,31 @@ class PigeonTeddyApp {
         }
       });
     }
+
+    // Balloon Selection Stage: Pop & Blast Handlers
+    if (this.balloonGrid) {
+      const balloonBtns = this.balloonGrid.querySelectorAll('.balloon-item');
+      balloonBtns.forEach((btn) => {
+        const handlePop = (e) => {
+          if (e && e.type === 'touchend') e.preventDefault();
+          const balloonIdx = parseInt(btn.getAttribute('data-balloon'), 10) || 0;
+          this.popAndRevealTeddy(balloonIdx, btn);
+        };
+        btn.addEventListener('click', handlePop);
+        btn.addEventListener('touchend', handlePop, { passive: false });
+      });
+    }
+
+    // Re-pop balloon button from dedication card
+    if (this.btnRepopBalloon) {
+      const handleRepop = (e) => {
+        if (e && e.type === 'touchend') e.preventDefault();
+        this.transitionToBalloonStage();
+      };
+      this.btnRepopBalloon.addEventListener('click', handleRepop);
+      this.btnRepopBalloon.addEventListener('touchend', handleRepop, { passive: false });
+    }
+
     if (this.replayBtn) {
       this.replayBtn.addEventListener('click', () => this.restartExperience());
     }
@@ -513,8 +543,151 @@ class PigeonTeddyApp {
     });
   }
 
-  transitionToTeddy() {
-    if (this.isTransitioning || this.currentScreen === 'teddy') return;
+  transitionToBalloonStage() {
+    if (this.isTransitioning || this.currentScreen === 'balloon') return;
+    this.isTransitioning = true;
+    this.currentScreen = 'balloon';
+
+    try {
+      this.audioManager.init();
+      this.audioManager.playBloomChime();
+    } catch (e) {}
+
+    // Hide delivery screen & teddy screen
+    if (this.deliveryScreen) {
+      this.deliveryScreen.classList.remove('active');
+    }
+    if (this.teddyScreen) {
+      this.teddyScreen.classList.remove('active');
+    }
+    if (this.teddySelectorBar) {
+      this.teddySelectorBar.classList.remove('visible');
+    }
+    if (this.giftActionCard) {
+      this.giftActionCard.classList.remove('visible');
+    }
+    if (this.btnCardPill) {
+      this.btnCardPill.classList.remove('visible');
+    }
+
+    setTimeout(() => {
+      if (this.pigeonRenderer) this.pigeonRenderer.stop();
+      if (this.envelopeRenderer) this.envelopeRenderer.stop();
+      if (this.deliveryScreen) this.deliveryScreen.style.display = 'none';
+      if (this.teddyScreen) this.teddyScreen.style.display = 'none';
+
+      // Reset all 4 balloons to pristine floating state
+      if (this.balloonGrid) {
+        const balloons = this.balloonGrid.querySelectorAll('.balloon-item');
+        balloons.forEach((b) => {
+          b.classList.remove('popping', 'floating-away');
+          b.style.pointerEvents = 'auto';
+          b.style.opacity = '1';
+          b.style.transform = '';
+        });
+      }
+
+      // Show Balloon Screen
+      if (this.balloonScreen) {
+        this.balloonScreen.style.display = 'flex';
+        void this.balloonScreen.offsetHeight; // force reflow
+        this.balloonScreen.classList.add('active');
+      }
+
+      this.isTransitioning = false;
+    }, 420);
+  }
+
+  popAndRevealTeddy(balloonIndex, balloonElement) {
+    if (this.isTransitioning) return;
+    this.isTransitioning = true;
+
+    // 1. Audio pop sound
+    try {
+      if (this.audioManager) {
+        if (this.audioManager.isMuted) {
+          this.audioManager.toggleMute();
+          if (this.soundToggleBtn) this.soundToggleBtn.classList.add('active');
+          if (this.soundIcon) this.soundIcon.textContent = '🎵';
+          if (this.soundLabel) this.soundLabel.textContent = 'Playing';
+        }
+        if (typeof this.audioManager.playBalloonPop === 'function') {
+          this.audioManager.playBalloonPop();
+        } else {
+          this.audioManager.playHeartBurst();
+        }
+      }
+    } catch (err) {}
+
+    // 2. Physical blast coordinates
+    const rect = balloonElement.getBoundingClientRect();
+    const ox = rect.left + rect.width * 0.5;
+    const oy = rect.top + rect.height * 0.45;
+
+    // 3. Popping visual blast on clicked balloon
+    balloonElement.classList.add('popping');
+
+    // 4. Shockwave ring expansion
+    const shockwave = document.createElement('div');
+    shockwave.className = 'balloon-shockwave';
+    shockwave.style.left = `${ox}px`;
+    shockwave.style.top = `${oy}px`;
+    const themeColor = getComputedStyle(balloonElement).getPropertyValue('--burst-color') || '#ff3366';
+    shockwave.style.setProperty('--burst-glow', themeColor);
+    document.body.appendChild(shockwave);
+    setTimeout(() => shockwave.remove(), 600);
+
+    // 5. Flying rubber shreds & stardust sparks
+    const shardColors = [themeColor, '#ffffff', '#ffd700', '#fbcfe8'];
+    for (let i = 0; i < 18; i++) {
+      const shard = document.createElement('div');
+      shard.className = 'balloon-shard';
+      const size = 6 + Math.random() * 8;
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 70 + Math.random() * 110;
+      const dx = Math.cos(angle) * dist;
+      const dy = Math.sin(angle) * dist;
+
+      shard.style.width = `${size}px`;
+      shard.style.height = `${size}px`;
+      shard.style.left = `${ox}px`;
+      shard.style.top = `${oy}px`;
+      shard.style.background = shardColors[Math.floor(Math.random() * shardColors.length)];
+      shard.style.boxShadow = `0 0 10px ${shard.style.background}`;
+      shard.style.setProperty('--dx', `${dx}px`);
+      shard.style.setProperty('--dy', `${dy}px`);
+      document.body.appendChild(shard);
+      setTimeout(() => shard.remove(), 650);
+    }
+
+    // 6. Ambient full-screen Stardust Confetti blast
+    if (this.ambientParticles && typeof this.ambientParticles.burstLoveConfetti === 'function') {
+      this.ambientParticles.burstLoveConfetti(ox, oy, 75);
+    }
+
+    // 7. Float other balloons away into the stars
+    if (this.balloonGrid) {
+      const allBalloons = this.balloonGrid.querySelectorAll('.balloon-item');
+      allBalloons.forEach((b) => {
+        if (b !== balloonElement) {
+          b.classList.add('floating-away');
+        }
+      });
+    }
+
+    // 8. Reveal Teddy Bear!
+    const teddyNames = ['Hugging Heart', 'Sweet Dreams', 'Heart Balloon', 'Love Balloon'];
+    const chosenName = teddyNames[balloonIndex] || 'Teddy Bear';
+    this.showToast(`✨ POP! Revealing your ${chosenName} Teddy! 🧸🎈`);
+
+    setTimeout(() => {
+      this.isTransitioning = false;
+      this.transitionToTeddy(balloonIndex);
+    }, 450);
+  }
+
+  transitionToTeddy(targetIndex = 0) {
+    if (this.isTransitioning && this.currentScreen === 'teddy') return;
     this.isTransitioning = true;
     this.currentScreen = 'teddy';
 
@@ -522,17 +695,21 @@ class PigeonTeddyApp {
       this.audioManager.playBloomChime();
     } catch (e) {}
 
-    // 1. Fade out delivery screen
+    // Fade out delivery and balloon screens
     if (this.deliveryScreen) {
       this.deliveryScreen.classList.remove('active');
+    }
+    if (this.balloonScreen) {
+      this.balloonScreen.classList.remove('active');
     }
 
     setTimeout(() => {
       if (this.pigeonRenderer) this.pigeonRenderer.stop();
       if (this.envelopeRenderer) this.envelopeRenderer.stop();
       if (this.deliveryScreen) this.deliveryScreen.style.display = 'none';
+      if (this.balloonScreen) this.balloonScreen.style.display = 'none';
 
-      // 2. Fade in teddy screen
+      // Fade in teddy screen
       if (this.teddyScreen) {
         this.teddyScreen.style.display = 'flex';
         this.teddyScreen.classList.add('active');
@@ -545,13 +722,15 @@ class PigeonTeddyApp {
         this.btnCardPill.classList.remove('visible');
       }
 
-      // 3. Show up-side (top) teddy selector bar
+      // Show up-side (top) teddy selector bar with active tab highlighted
       if (this.teddySelectorBar) {
         this.teddySelectorBar.classList.add('visible');
+        this.updateTeddySelectorUI(targetIndex);
       }
 
-      // 4. Start living teddy: reveals slowly from bottom upward!
+      // Start living teddy: reveals slowly from bottom upward!
       if (this.teddyRenderer) {
+        this.teddyRenderer.setTeddy(targetIndex);
         this.teddyRenderer.resize();
         this.teddyRenderer.reset(false);
         this.teddyRenderer.start();
@@ -572,6 +751,10 @@ class PigeonTeddyApp {
     if (this.teddyScreen) {
       this.teddyScreen.classList.remove('active');
       this.teddyScreen.style.display = 'none';
+    }
+    if (this.balloonScreen) {
+      this.balloonScreen.classList.remove('active');
+      this.balloonScreen.style.display = 'none';
     }
     if (this.teddySelectorBar) {
       this.teddySelectorBar.classList.remove('visible');

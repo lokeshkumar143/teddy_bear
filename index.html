@@ -63,6 +63,87 @@
       </div>
     </div>
 
+    <!-- Screen 1.5: Magical Four Balloons Selection Stage -->
+    <div id="balloon-screen" class="scene balloon-screen" style="display: none;">
+      <!-- Header Badge & Prompt -->
+      <div class="balloon-header-wrapper">
+        <div class="balloon-sparkle-badge">✦ &nbsp;A CELESTIAL SURPRISE FOR YOU &nbsp;✦</div>
+        <h2 class="balloon-title">Choose a Balloon to Pop! 🎈</h2>
+        <p class="balloon-subtitle">Each floating balloon holds a surprise teddy bear. Tap one to pop &amp; reveal! ✨</p>
+      </div>
+
+      <!-- 4 Floating Balloons Grid -->
+      <div class="balloon-grid" id="balloon-grid">
+        <!-- Balloon 0: Hugging Heart -->
+        <button class="balloon-item balloon-gold" data-balloon="0" type="button" aria-label="Pop gold balloon for Hugging Heart Teddy">
+          <div class="balloon-wrapper">
+            <div class="balloon-body">
+              <div class="balloon-shine"></div>
+              <div class="balloon-inner-glow"></div>
+              <span class="balloon-glyph">🧸</span>
+            </div>
+            <div class="balloon-knot"></div>
+            <div class="balloon-string"></div>
+          </div>
+          <div class="balloon-caption">
+            <span class="balloon-name">Hugging Heart</span>
+            <span class="balloon-desc">Warm Hugs &amp; Love</span>
+          </div>
+        </button>
+
+        <!-- Balloon 1: Sweet Dreams -->
+        <button class="balloon-item balloon-purple" data-balloon="1" type="button" aria-label="Pop lavender balloon for Sweet Dreams Teddy">
+          <div class="balloon-wrapper">
+            <div class="balloon-body">
+              <div class="balloon-shine"></div>
+              <div class="balloon-inner-glow"></div>
+              <span class="balloon-glyph">🌙</span>
+            </div>
+            <div class="balloon-knot"></div>
+            <div class="balloon-string"></div>
+          </div>
+          <div class="balloon-caption">
+            <span class="balloon-name">Sweet Dreams</span>
+            <span class="balloon-desc">Cozy Starry Peace</span>
+          </div>
+        </button>
+
+        <!-- Balloon 2: Heart Balloon -->
+        <button class="balloon-item balloon-pink" data-balloon="2" type="button" aria-label="Pop pink balloon for Heart Balloon Teddy">
+          <div class="balloon-wrapper">
+            <div class="balloon-body">
+              <div class="balloon-shine"></div>
+              <div class="balloon-inner-glow"></div>
+              <span class="balloon-glyph">🎈</span>
+            </div>
+            <div class="balloon-knot"></div>
+            <div class="balloon-string"></div>
+          </div>
+          <div class="balloon-caption">
+            <span class="balloon-name">Heart Balloon</span>
+            <span class="balloon-desc">Joyful Floating Smiles</span>
+          </div>
+        </button>
+
+        <!-- Balloon 3: Love Balloon -->
+        <button class="balloon-item balloon-crimson" data-balloon="3" type="button" aria-label="Pop crimson balloon for Love Balloon Teddy">
+          <div class="balloon-wrapper">
+            <div class="balloon-body">
+              <div class="balloon-shine"></div>
+              <div class="balloon-inner-glow"></div>
+              <span class="balloon-glyph">❤️</span>
+            </div>
+            <div class="balloon-knot"></div>
+            <div class="balloon-string"></div>
+          </div>
+          <div class="balloon-caption">
+            <span class="balloon-name">Love Balloon</span>
+            <span class="balloon-desc">Infinite Devotion</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
     <!-- Screen 2: Living ASCII Teddy Bear Universe with Up-Side Selector & Rich UI -->
     <div id="teddy-screen" class="scene teddy-screen">
 
@@ -132,6 +213,12 @@
             title="Make teddy's glowing heart pulse">
             <span class="btn-text">PULSE HEART</span>
             <span class="btn-icon">💖</span>
+          </button>
+
+          <button id="btn-repop-balloon" class="act-btn act-btn-balloon" type="button"
+            title="Pop another balloon to reveal a different teddy">
+            <span class="btn-text">POP BALLOON</span>
+            <span class="btn-icon">🎈</span>
           </button>
         </div>
 

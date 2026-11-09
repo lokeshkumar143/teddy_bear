@@ -64,6 +64,67 @@ export class AudioManager {
     osc.stop(this.ctx.currentTime + 0.06);
   }
 
+  playBalloonPop() {
+    this.init();
+    if (!this.ctx) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+    const t = this.ctx.currentTime;
+
+    // 1. Tactile Pressurized Air "POP!" Sound
+    try {
+      const bufferSize = Math.floor(this.ctx.sampleRate * 0.08);
+      const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.22));
+      }
+
+      const whiteNoise = this.ctx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(420, t);
+      filter.frequency.exponentialRampToValueAtTime(1200, t + 0.02);
+      filter.frequency.exponentialRampToValueAtTime(90, t + 0.08);
+      filter.Q.setValueAtTime(3.5, t);
+
+      const noiseGain = this.ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.65, t);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+
+      whiteNoise.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(this.ctx.destination);
+      whiteNoise.start(t);
+
+      // Low end rubber pop punch
+      const popOsc = this.ctx.createOscillator();
+      const popGain = this.ctx.createGain();
+      popOsc.type = 'triangle';
+      popOsc.frequency.setValueAtTime(280, t);
+      popOsc.frequency.exponentialRampToValueAtTime(40, t + 0.07);
+      popGain.gain.setValueAtTime(0.7, t);
+      popGain.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+      popOsc.connect(popGain);
+      popGain.connect(this.ctx.destination);
+      popOsc.start(t);
+      popOsc.stop(t + 0.07);
+    } catch (e) {}
+
+    // 2. Cascading Magical Sparkle Chime Cascade
+    const popNotes = [523.25, 659.25, 783.99, 1046.50, 1318.51]; // C5, E5, G5, C6, E6
+    popNotes.forEach((freq, idx) => {
+      setTimeout(() => {
+        try {
+          this.playChime(freq, 'sine', 0.16, 1.3);
+        } catch (err) {}
+      }, 35 + idx * 30);
+    });
+  }
+
   playHeartBurst() {
     if (this.isMuted) return;
     this.init();
