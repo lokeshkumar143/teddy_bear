@@ -16,7 +16,7 @@
     href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=29.0">
+  <link rel="stylesheet" href="css/style.css?v=30.0">
 </head>
 
 <body class="theme-aurora">
@@ -147,10 +147,47 @@
 
   </main>
 
+  <!-- Enchanted Personalized Love Blessing Modal ("Special for that person") -->
+  <div id="heart-blessing-modal" class="heart-blessing-modal" role="dialog" aria-modal="true" aria-hidden="true" inert>
+    <div class="blessing-backdrop"></div>
+    <div class="blessing-card-wrapper">
+      <div class="blessing-card">
+        <button id="btn-dismiss-blessing" class="blessing-close-icon" type="button" aria-label="Close blessing" title="Close blessing">&times;</button>
+        
+        <div class="blessing-badge">✦ &nbsp;A SACRED HEARTBEAT &nbsp;✦</div>
+
+        <!-- Radiant Beating Heart with Animated Halo Shockwaves -->
+        <div class="blessing-heart-halo">
+          <div class="heart-pulse-ring ring-1"></div>
+          <div class="heart-pulse-ring ring-2"></div>
+          <span class="blessing-heart-glyph">💖</span>
+        </div>
+
+        <h2 class="blessing-title">Specially For <span class="blessing-recipient-name">Lokesh Kumar</span> ✨</h2>
+
+        <div class="blessing-message-body">
+          <p class="blessing-text-lead">
+            In a universe of billions of stars, this little heart beats with boundless warmth just for you.
+          </p>
+          <div class="blessing-divider">❤ &nbsp;✦ &nbsp;❤</div>
+          <p class="blessing-text-sub">
+            May you always feel cherished, deeply cared for, and filled with peaceful joy. Every heartbeat carries infinite love, comfort, and sweet teddy bear hugs to your soul.
+          </p>
+        </div>
+
+        <button id="btn-receive-love" class="blessing-receive-btn" type="button">
+          <span class="receive-sparkle">✦</span>
+          <span>RECEIVE WITH LOVE</span>
+          <span class="receive-icon">💖</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Notification Feedback -->
   <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=29.0"></script>
+  <script type="module" src="js/app.js?v=30.0"></script>
 </body>
 
 </html>

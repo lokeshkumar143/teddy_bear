@@ -79,6 +79,12 @@ class PigeonTeddyApp {
     this.soundIcon = document.getElementById('sound-icon');
     this.soundLabel = document.getElementById('sound-label');
 
+    // Personalized Love Blessing Modal ("Special for that person")
+    this.heartBlessingModal = document.getElementById('heart-blessing-modal');
+    this.btnDismissBlessing = document.getElementById('btn-dismiss-blessing');
+    this.btnReceiveLove = document.getElementById('btn-receive-love');
+    this.blessingRecipientName = document.querySelector('.blessing-recipient-name');
+
     this.toastMsg = document.getElementById('toast-msg');
   }
 
@@ -194,6 +200,28 @@ class PigeonTeddyApp {
     if (this.cardName) {
       this.cardName.textContent = displayName;
     }
+
+    // 4. Personalized Love Blessing Modal Title
+    if (this.blessingRecipientName) {
+      this.blessingRecipientName.textContent = displayName;
+    }
+  }
+
+  openHeartBlessing() {
+    if (!this.heartBlessingModal) return;
+    this.heartBlessingModal.removeAttribute('inert');
+    this.heartBlessingModal.classList.add('visible');
+    this.heartBlessingModal.removeAttribute('aria-hidden');
+  }
+
+  closeHeartBlessing() {
+    if (!this.heartBlessingModal) return;
+    if (document.activeElement && this.heartBlessingModal.contains(document.activeElement)) {
+      document.activeElement.blur();
+    }
+    this.heartBlessingModal.classList.remove('visible');
+    this.heartBlessingModal.setAttribute('aria-hidden', 'true');
+    this.heartBlessingModal.setAttribute('inert', '');
   }
 
   initInteractions() {
@@ -286,12 +314,57 @@ class PigeonTeddyApp {
     }
     if (this.btnPulseHeart) {
       this.btnPulseHeart.addEventListener('click', () => {
+        // Auto-unmute if muted so the recipient hears the heartbeat symphony & harp
+        if (this.audioManager && this.audioManager.isMuted) {
+          this.audioManager.toggleMute();
+          if (this.soundToggleBtn) this.soundToggleBtn.classList.add('active');
+          if (this.soundIcon) this.soundIcon.textContent = '🎵';
+          if (this.soundLabel) this.soundLabel.textContent = 'Playing';
+        }
+
+        // 1. Play deep acoustic lub-dub heartbeat & celestial harp symphony
+        try {
+          this.audioManager.playHeartbeatSymphony();
+        } catch (e) {}
+
+        // 2. High-intensity heart pulse & happy bounce on Teddy
         if (this.teddyRenderer) {
           this.teddyRenderer.triggerHeartPulse();
-          this.showToast("Teddy's glowing heart is pulsing with love! 💖");
-          try {
-            this.audioManager.playHeartBurst();
-          } catch (e) {}
+        }
+
+        // 3. Screen-wide cascade of rising glowing hearts & golden stardust
+        if (this.ambientParticles) {
+          this.ambientParticles.burstLoveConfetti();
+        }
+
+        this.showToast(`Teddy's heart beats especially for ${this.recipientName}! 💖`);
+
+        // 4. Open the enchanted personalized love blessing modal after brief dramatic anticipation
+        setTimeout(() => {
+          this.openHeartBlessing();
+        }, 550);
+      });
+    }
+
+    // Handlers for Personalized Blessing Modal
+    if (this.btnDismissBlessing) {
+      this.btnDismissBlessing.addEventListener('click', () => {
+        this.closeHeartBlessing();
+      });
+    }
+
+    if (this.btnReceiveLove) {
+      this.btnReceiveLove.addEventListener('click', () => {
+        this.closeHeartBlessing();
+        this.showToast(`Infinite love received! Teddy is giving you the biggest hug! 🧸💖`);
+        if (this.teddyRenderer) {
+          this.teddyRenderer.triggerWave();
+        }
+        try {
+          this.audioManager.playBloomChime();
+        } catch (e) {}
+        if (this.ambientParticles) {
+          this.ambientParticles.burstLoveConfetti(null, null, 35);
         }
       });
     }

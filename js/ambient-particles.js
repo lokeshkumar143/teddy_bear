@@ -107,20 +107,61 @@ export class AmbientParticles {
     }, { passive: true });
   }
 
+  burstLoveConfetti(originX = null, originY = null, count = 55) {
+    const ox = originX !== null ? originX : this.width * 0.5;
+    const oy = originY !== null ? originY : this.height * 0.45;
+    const loveGlyphs = ['💖', '♥', '💕', '✦', '✨', '🌸', '❤️', '💝'];
+
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 70 + Math.random() * 220;
+      const glyph = loveGlyphs[Math.floor(Math.random() * loveGlyphs.length)];
+
+      this.particles.push({
+        x: ox + (Math.random() - 0.5) * 30,
+        y: oy + (Math.random() - 0.5) * 30,
+        baseX: ox,
+        glyph,
+        size: 14 + Math.random() * 18,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 80,
+        wobbleSpeed: 1.8 + Math.random() * 2.2,
+        wobbleAmp: 16 + Math.random() * 24,
+        wobbleOffset: Math.random() * Math.PI * 2,
+        opacity: 0.95,
+        colorPrefix: this.colors[Math.floor(Math.random() * this.colors.length)],
+        life: 0,
+        maxLife: 4.5 + Math.random() * 3.5,
+        isBurst: true
+      });
+    }
+  }
+
   update(dt) {
     this.time += dt;
     this.windX += (this.targetWindX - this.windX) * 0.04;
 
-    for (let i = 0; i < this.particles.length; i++) {
+    for (let i = this.particles.length - 1; i >= 0; i--) {
       const p = this.particles[i];
       p.life += dt;
 
-      // Gentle floating ascent
-      p.y += p.vy * dt;
-      p.x = p.baseX + Math.sin(this.time * p.wobbleSpeed + p.wobbleOffset) * p.wobbleAmp + this.windX;
+      if (p.isBurst) {
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vx *= Math.pow(0.92, dt * 60);
+        p.vy = (p.vy + 35 * dt) * Math.pow(0.94, dt * 60) - 25 * dt;
 
-      if (p.y < -30 || p.life > p.maxLife) {
-        this.particles[i] = this.createParticle(false);
+        if (p.life >= p.maxLife || p.y < -50) {
+          this.particles.splice(i, 1);
+        }
+      } else {
+        // Gentle floating ascent
+        p.y += p.vy * dt;
+        p.x = p.baseX + Math.sin(this.time * p.wobbleSpeed + p.wobbleOffset) * p.wobbleAmp + this.windX;
+
+        if (p.y < -30 || p.life > p.maxLife) {
+          this.particles[i] = this.createParticle(false);
+        }
       }
     }
   }

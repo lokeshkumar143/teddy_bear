@@ -680,6 +680,224 @@ body {
   text-decoration: underline;
 }
 
+/* ==========================================================================
+   Enchanted Personalized Love Blessing Modal ("Special for that person")
+   ========================================================================== */
+.heart-blessing-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.heart-blessing-modal.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.blessing-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 4, 14, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.blessing-card-wrapper {
+  position: relative;
+  z-index: 2;
+  width: 90%;
+  max-width: 440px;
+}
+
+.blessing-card {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(32px) saturate(190%);
+  -webkit-backdrop-filter: blur(32px) saturate(190%);
+  border: 1px solid rgba(255, 130, 170, 0.45);
+  border-radius: 26px;
+  padding: 34px 28px 28px;
+  text-align: center;
+  box-shadow: 
+    0 24px 60px rgba(0, 0, 0, 0.85),
+    0 0 45px rgba(255, 45, 100, 0.32),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  transform: translateY(24px) scale(0.92);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heart-blessing-modal.visible .blessing-card {
+  transform: translateY(0) scale(1);
+}
+
+.blessing-close-icon {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.blessing-close-icon:hover {
+  background: rgba(255, 40, 80, 0.3);
+  color: #ff9ebb;
+  transform: scale(1.1);
+}
+
+.blessing-badge {
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: #ff9ebb;
+  margin-bottom: 12px;
+  text-shadow: 0 0 12px rgba(255, 40, 90, 0.6);
+}
+
+/* Radiant Heart with Shockwave Ripple Rings */
+.blessing-heart-halo {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 6px 0 16px;
+}
+
+.heart-pulse-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 60, 110, 0.65);
+  animation: haloRipple 2.2s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.heart-pulse-ring.ring-2 {
+  animation-delay: 0.9s;
+  border-color: rgba(255, 215, 0, 0.6);
+}
+
+@keyframes haloRipple {
+  0% {
+    transform: scale(0.65);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.blessing-heart-glyph {
+  font-size: 42px;
+  line-height: 1;
+  filter: drop-shadow(0 0 16px #ff1e56);
+  animation: heartPump 1.4s infinite ease-in-out;
+}
+
+@keyframes heartPump {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.24); }
+  30% { transform: scale(1.04); }
+  45% { transform: scale(1.28); }
+}
+
+.blessing-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 21px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+  margin-bottom: 12px;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.blessing-recipient-name {
+  color: #ffd700;
+  text-shadow: 0 0 16px rgba(255, 215, 0, 0.65);
+}
+
+.blessing-message-body {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #f2e4ec;
+  margin-bottom: 22px;
+  max-width: 380px;
+}
+
+.blessing-text-lead {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.blessing-divider {
+  color: #ff547b;
+  font-size: 11px;
+  letter-spacing: 4px;
+  margin: 10px 0;
+  opacity: 0.9;
+}
+
+.blessing-text-sub {
+  color: #e5d5e2;
+  font-size: 12.5px;
+}
+
+.blessing-receive-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 320px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff2a6d, #ff5e3a);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  border: 1px solid rgba(255, 200, 220, 0.55);
+  box-shadow: 0 6px 24px rgba(255, 42, 109, 0.55), 0 0 20px rgba(255, 94, 58, 0.35);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.blessing-receive-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+  filter: brightness(1.15);
+  box-shadow: 0 8px 30px rgba(255, 42, 109, 0.7), 0 0 25px rgba(255, 94, 58, 0.5);
+}
+
+.blessing-receive-btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
 
 
 

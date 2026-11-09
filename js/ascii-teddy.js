@@ -184,10 +184,21 @@ export class AsciiTeddy {
 
     // Interactive heart pulse (if triggered or automatic rhythm)
     const pulseElapsed = (now - this.heartPulseTime) / 1000;
-    const isPulsing = (pulseElapsed >= 0 && pulseElapsed < 1.6);
-    const pulseIntensity = isPulsing 
-      ? Math.sin(pulseElapsed * 8) * (1 - pulseElapsed / 1.6) 
-      : 0.25 * Math.max(0, Math.sin(t * 2.8));
+    const isPulsing = (pulseElapsed >= 0 && pulseElapsed < 3.8);
+    let pulseIntensity = 0;
+    let pulseScale = 1.0;
+    if (isPulsing) {
+      // 1.4 beats per second with realistic lub-dub double thuds
+      const cycle = (pulseElapsed * 1.4) % 1.0;
+      const lubDub = cycle < 0.22 
+        ? Math.sin(cycle / 0.22 * Math.PI) * 1.0 
+        : (cycle < 0.44 ? Math.sin((cycle - 0.22) / 0.22 * Math.PI) * 0.75 : 0);
+      const fade = Math.max(0, 1.0 - pulseElapsed / 3.8);
+      pulseIntensity = lubDub * fade;
+      pulseScale = 1.0 + 0.045 * pulseIntensity;
+    } else {
+      pulseIntensity = 0.25 * Math.max(0, Math.sin(t * 2.8));
+    }
 
     // Multi-harmonic gentle breeze sway
     const windSway = Math.sin(t * 0.9) * 1.8 + Math.sin(t * 1.4) * 0.8;
@@ -348,11 +359,11 @@ export class AsciiTeddy {
         } else if (isHeartColor) {
           // Radiant Glowing Velvet Crimson Red Heart & Balloons
           isHeart = true;
-          const rBoost = Math.min(255, Math.floor(red * 1.15 + 25 + pulseIntensity * 40));
-          const gDrop = Math.floor(grn * 0.70);
-          const bDrop = Math.floor(blu * 0.70);
+          const rBoost = Math.min(255, Math.floor(red * 1.15 + 25 + pulseIntensity * 70));
+          const gDrop = Math.max(0, Math.floor(grn * 0.70 - pulseIntensity * 20));
+          const bDrop = Math.max(0, Math.floor(blu * 0.70 - pulseIntensity * 20));
           finalCol = `rgb(${rBoost}, ${gDrop}, ${bDrop})`;
-          char = (lum > 0.60 || isPulsing) ? '♥' : '♦';
+          char = (lum > 0.50 || isPulsing) ? (pulseIntensity > 0.4 ? '💖' : '♥') : '♦';
         } else if (isDarkEyes) {
           // Expressive eyes, nose & snout contours (Dark Chocolate)
           finalCol = 'rgb(30, 14, 6)';

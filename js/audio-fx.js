@@ -78,6 +78,60 @@ export class AudioManager {
     });
   }
 
+  playHeartbeatSymphony() {
+    this.init();
+    if (!this.ctx) return;
+    if (this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+
+    const t = this.ctx.currentTime;
+    // Double lub-dub acoustic heartbeat resonance
+    this.playHeartThud(t, 70, 0.55);
+    this.playHeartThud(t + 0.22, 58, 0.42);
+
+    this.playHeartThud(t + 0.75, 75, 0.60);
+    this.playHeartThud(t + 0.98, 62, 0.45);
+
+    this.playHeartThud(t + 1.50, 78, 0.65);
+    this.playHeartThud(t + 1.73, 64, 0.48);
+
+    // Sweet cascading celestial harp chords trailing the heartbeat
+    const harpNotes = [392.00, 493.88, 587.33, 659.25, 783.99, 987.77, 1046.50];
+    harpNotes.forEach((freq, idx) => {
+      setTimeout(() => {
+        this.playChime(freq, 'sine', 0.18, 2.2);
+      }, 300 + idx * 75);
+    });
+  }
+
+  playHeartThud(startTime, freq = 65, peakGain = 0.45) {
+    if (!this.ctx) return;
+    try {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const filter = this.ctx.createBiquadFilter();
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(140, startTime);
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, startTime);
+      osc.frequency.exponentialRampToValueAtTime(32, startTime + 0.18);
+
+      gain.gain.setValueAtTime(0.001, startTime);
+      gain.gain.linearRampToValueAtTime(peakGain, startTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.20);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + 0.20);
+    } catch (e) {}
+  }
+
   playBloomChime() {
     if (this.isMuted) return;
     this.init();
