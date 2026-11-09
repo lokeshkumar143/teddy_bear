@@ -49,7 +49,7 @@ export class AsciiTeddy {
       {
         id: 'love-balloon',
         title: 'Love Balloon',
-        src: 'assets/teddy-4-standing-clean.png?v=16.0'
+        src: 'assets/teddy-4-standing-clean.png?v=34.0'
       }
     ];
 
@@ -437,5 +437,165 @@ export class AsciiTeddy {
     this.resize();
     this.hasTriggeredReveal = false;
     this.t0 = skipEmergence ? performance.now() - 4500 : performance.now();
+  }
+
+  // =========================================================================
+  // Master High-Resolution Keepsake Art Export (Zero-Clip, Unsquashed 1200x1200)
+  // =========================================================================
+  renderKeepsakeSnapshot(targetCtx, w = 1200, h = 1200, recipientName = 'Lokesh Kumar') {
+    const curImg = this.teddyImages[this.currentIndex] || this.teddyImages[0];
+    if (!curImg) return;
+
+    // High density simulation grid for print-quality ASCII rasterization
+    const snapCols = 135;
+    const snapRows = 135;
+    const snapSim = document.createElement('canvas');
+    snapSim.width = snapCols;
+    snapSim.height = snapRows;
+    const simCtx = snapSim.getContext('2d', { willReadFrequently: true });
+
+    const snapStage = document.createElement('canvas');
+    snapStage.width = 800;
+    snapStage.height = 800;
+    const stageCtx = snapStage.getContext('2d');
+
+    // Draw active teddy 100% fully emerged (NO EMERGENCE CLIPPING!)
+    const imgW = curImg.naturalWidth || curImg.width || 800;
+    const imgH = curImg.naturalHeight || curImg.height || 800;
+    const scale = Math.min((800 * 0.90) / imgW, (800 * 0.90) / imgH);
+    const drawImgW = imgW * scale;
+    const drawImgH = imgH * scale;
+    const imgX = (800 - drawImgW) / 2;
+    const imgY = (800 - drawImgH) / 2;
+
+    stageCtx.clearRect(0, 0, 800, 800);
+    stageCtx.drawImage(curImg, imgX, imgY, drawImgW, drawImgH);
+
+    // Centered 1:1 true-aspect layout in simulation grid (NO SQUISHING!)
+    const targetH = snapRows * 0.68;
+    const drawW = Math.min(snapCols * 0.72, targetH / ((drawImgH / drawImgW) * this.charAspect));
+    const drawH = drawW * (drawImgH / drawImgW) * this.charAspect;
+    const drawX = Math.round((snapCols - drawW) * 0.5);
+    const drawY = Math.round((snapRows - drawH) * 0.52);
+
+    simCtx.clearRect(0, 0, snapCols, snapRows);
+    simCtx.drawImage(snapStage, imgX, imgY, drawImgW, drawImgH, drawX, drawY, drawW, drawH);
+
+    // Deep romantic celestial nebula background
+    const grad = targetCtx.createRadialGradient(w * 0.5, h * 0.5, 120, w * 0.5, h * 0.5, w * 0.72);
+    grad.addColorStop(0, '#161432');
+    grad.addColorStop(0.45, '#0b0c1c');
+    grad.addColorStop(1, '#05050e');
+    targetCtx.fillStyle = grad;
+    targetCtx.fillRect(0, 0, w, h);
+
+    // Ornate gold celestial border with corner stars
+    targetCtx.strokeStyle = 'rgba(255, 215, 100, 0.35)';
+    targetCtx.lineWidth = 2;
+    targetCtx.strokeRect(36, 36, w - 72, h - 72);
+    targetCtx.strokeStyle = 'rgba(255, 140, 180, 0.22)';
+    targetCtx.lineWidth = 1;
+    targetCtx.strokeRect(44, 44, w - 88, h - 88);
+
+    // Corner flourishes
+    targetCtx.fillStyle = '#ffd700';
+    targetCtx.font = '20px serif';
+    targetCtx.textAlign = 'center';
+    targetCtx.textBaseline = 'middle';
+    targetCtx.fillText('✦', 36, 36);
+    targetCtx.fillText('✦', w - 36, 36);
+    targetCtx.fillText('✦', 36, h - 36);
+    targetCtx.fillText('✦', w - 36, h - 36);
+
+    // Ambient twinkling stars
+    const starGlyphs = ['✦', '✧', '⋆', '·', '♡'];
+    for (let i = 0; i < 90; i++) {
+      const sx = 60 + ((i * 137.5) % (w - 120));
+      const sy = 60 + ((i * 243.1) % (h - 120));
+      const glyph = starGlyphs[i % starGlyphs.length];
+      targetCtx.fillStyle = (i % 3 === 0) ? 'rgba(255, 220, 120, 0.55)' : 'rgba(255, 160, 190, 0.45)';
+      targetCtx.font = (i % 4 === 0) ? '14px sans-serif' : '10px sans-serif';
+      targetCtx.fillText(glyph, sx, sy);
+    }
+
+    // Render 24-bit True-Color Glowing ASCII Teddy Bear
+    const simData = simCtx.getImageData(0, 0, snapCols, snapRows).data;
+    const cellW = w / snapCols;
+    const cellH = h / snapRows;
+    const fontPx = Math.ceil(cellH * 1.15);
+    targetCtx.font = `bold ${fontPx}px "JetBrains Mono", monospace`;
+    targetCtx.textAlign = 'center';
+    targetCtx.textBaseline = 'middle';
+
+    for (let r = 0; r < snapRows; r++) {
+      for (let c = 0; c < snapCols; c++) {
+        const idx = (r * snapCols + c) * 4;
+        const alpha = simData[idx + 3] / 255;
+        if (alpha < 0.16) continue;
+
+        const red = simData[idx];
+        const grn = simData[idx + 1];
+        const blu = simData[idx + 2];
+
+        const isHeartColor = (red - grn >= 46) && (red - blu >= 42) && (grn - blu <= 16) && (red > 125);
+        const isDarkEyes = (red < 65) && (grn < 65) && (blu < 65);
+        const isMuzzle = !isHeartColor && !isDarkEyes && (red > 220) && (grn > 195) && (blu > 165);
+
+        let char = '#';
+        let col = '#c89664';
+        let isGlow = false;
+
+        if (isHeartColor) {
+          isGlow = true;
+          col = `rgb(${Math.min(255, red + 30)}, ${Math.max(0, grn - 20)}, ${Math.max(0, blu - 20)})`;
+          char = (red > 180) ? '💖' : '♥';
+        } else if (isDarkEyes) {
+          col = 'rgb(24, 12, 6)';
+          char = '@';
+        } else if (isMuzzle) {
+          col = 'rgb(248, 226, 196)';
+          char = '%';
+        } else {
+          col = `rgb(${Math.min(255, red + 10)}, ${Math.min(240, grn)}, ${Math.max(0, blu - 8)})`;
+          const lum = (0.299 * red + 0.587 * grn + 0.114 * blu) / 255;
+          const cIdx = Math.min(this.bodyChars.length - 1, Math.floor(lum * this.bodyChars.length));
+          char = this.bodyChars[cIdx] || '#';
+        }
+
+        const px = c * cellW + cellW * 0.5;
+        const py = r * cellH + cellH * 0.5;
+
+        if (isGlow) {
+          targetCtx.shadowColor = 'rgba(255, 40, 90, 0.9)';
+          targetCtx.shadowBlur = 12;
+        } else {
+          targetCtx.shadowBlur = 0;
+        }
+
+        targetCtx.fillStyle = col;
+        targetCtx.fillText(char, px, py);
+      }
+    }
+
+    targetCtx.shadowBlur = 0;
+
+    // Header: Dedication Title with Golden Halo
+    targetCtx.shadowColor = 'rgba(255, 215, 0, 0.6)';
+    targetCtx.shadowBlur = 15;
+    targetCtx.fillStyle = '#ffd700';
+    targetCtx.font = 'bold 36px "Inter", "Cinzel", serif';
+    targetCtx.fillText(`✦ SPECIALLY CRAFTED FOR ${recipientName.toUpperCase()} ✦`, w * 0.5, 95);
+
+    targetCtx.shadowColor = 'rgba(255, 120, 160, 0.5)';
+    targetCtx.shadowBlur = 10;
+    targetCtx.fillStyle = '#ff9ebb';
+    targetCtx.font = '500 22px "Inter", sans-serif';
+    targetCtx.fillText('Sending you warmth, comfort, and happiness. ❤️', w * 0.5, 140);
+
+    // Footer: Royal Seal
+    targetCtx.shadowBlur = 0;
+    targetCtx.fillStyle = '#c5d0e8';
+    targetCtx.font = 'italic 19px "Cormorant Garamond", serif';
+    targetCtx.fillText('Living 24-Bit Procedural ASCII Art • Handcrafted with love by Lokesh Kumar', w * 0.5, h - 55);
   }
 }
