@@ -381,30 +381,47 @@ body {
   position: fixed;
   inset: 0;
   width: 100vw;
-  min-height: 100vh;
-  display: flex;
+  height: 100vh;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 30px 16px;
-  z-index: 25;
+  padding: 24px 16px;
+  z-index: 35;
   pointer-events: none;
   opacity: 0;
+  visibility: hidden;
   transform: scale(0.96);
-  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .balloon-screen.active {
-  opacity: 1;
-  transform: scale(1);
-  pointer-events: auto;
+  display: flex !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: scale(1) !important;
+}
+
+@keyframes fadeInDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .balloon-header-wrapper {
   text-align: center;
-  margin-bottom: clamp(18px, 3.5vh, 32px);
+  margin-bottom: clamp(16px, 3vh, 28px);
   max-width: 680px;
-  animation: fadeInDown 0.8s ease backwards;
+  animation: fadeInDown 0.7s ease backwards;
+  z-index: 2;
 }
 
 .balloon-sparkle-badge {
@@ -710,22 +727,55 @@ body {
   }
 }
 
-/* Mobile Responsiveness for 4 Balloons */
+/* Mobile & Compact Screen Responsiveness for 4 Balloons */
 @media (max-width: 680px) {
   .balloon-screen {
-    padding: 16px 12px;
+    padding: 20px 12px;
+    justify-content: center;
   }
   .balloon-header-wrapper {
-    margin-bottom: 14px;
+    margin-bottom: 12px;
+  }
+  .balloon-title {
+    font-size: 22px;
+  }
+  .balloon-subtitle {
+    font-size: 11.5px;
   }
   .balloon-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px 14px;
+    gap: 14px 14px;
     max-width: 320px;
   }
   .balloon-body {
-    width: 96px;
-    height: 124px;
+    width: 92px;
+    height: 118px;
+  }
+}
+
+@media (max-height: 620px) {
+  .balloon-screen {
+    padding: 10px 8px;
+    justify-content: flex-start;
+  }
+  .balloon-header-wrapper {
+    margin-top: 36px;
+    margin-bottom: 6px;
+  }
+  .balloon-title {
+    font-size: 18px;
+    margin: 2px 0;
+  }
+  .balloon-subtitle {
+    display: none;
+  }
+  .balloon-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .balloon-body {
+    width: 72px;
+    height: 94px;
   }
 }
 

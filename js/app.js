@@ -10,12 +10,12 @@
  * - v14.0: Multilingual name grid in final dedication card.
  */
 
-import { AmbientParticles } from './ambient-particles.js?v=35.0';
-import { AsciiPigeon } from './ascii-pigeon.js?v=35.0';
-import { AsciiEnvelope } from './ascii-envelope.js?v=35.0';
-import { AsciiTeddy } from './ascii-teddy.js?v=35.0';
-import { AudioManager } from './audio-fx.js?v=35.0';
-import { MultiLangNameProfile } from './name-multilang.js?v=35.0';
+import { AmbientParticles } from './ambient-particles.js?v=36.0';
+import { AsciiPigeon } from './ascii-pigeon.js?v=36.0';
+import { AsciiEnvelope } from './ascii-envelope.js?v=36.0';
+import { AsciiTeddy } from './ascii-teddy.js?v=36.0';
+import { AudioManager } from './audio-fx.js?v=36.0';
+import { MultiLangNameProfile } from './name-multilang.js?v=36.0';
 
 class PigeonTeddyApp {
   constructor() {
@@ -243,22 +243,56 @@ class PigeonTeddyApp {
   initInteractions() {
     // Click letter / envelope to open immediately without name prompting
     const handleLetterOpenRequest = () => {
-      if (this.currentScreen !== 'delivery' || this.isTransitioning) return;
+      if (this.currentScreen !== 'delivery') return;
+
+      // If user clicks again while unsealing is already underway, fast-forward directly to balloons!
+      if (this.envelopeRenderer && this.envelopeRenderer.isUnsealing) {
+        this.transitionToBalloonStage();
+        return;
+      }
+
       try {
         this.audioManager.init();
         this.audioManager.playHeartBurst();
         this.audioManager.playBloomChime();
       } catch (e) {}
 
+      // Immediately hide the CTA button so user gets instant visual confirmation
+      if (this.envelopeHint) {
+        this.envelopeHint.classList.remove('visible');
+        this.envelopeHint.style.opacity = '0';
+        this.envelopeHint.style.pointerEvents = 'none';
+      }
+
       if (this.envelopeRenderer) {
         this.envelopeRenderer.triggerClick();
+        // Safety fallback timer: guarantee transition to balloon stage within 1.5s
+        clearTimeout(this._unsealFallbackTimer);
+        this._unsealFallbackTimer = setTimeout(() => {
+          if (this.currentScreen === 'delivery') {
+            this.transitionToBalloonStage();
+          }
+        }, 1500);
       } else {
         this.transitionToBalloonStage();
       }
     };
 
+    if (this.deliveryScreen) {
+      this.deliveryScreen.addEventListener('click', (e) => {
+        if (e.target.closest('.top-nav-bar')) return;
+        if (this.currentScreen === 'delivery') {
+          handleLetterOpenRequest();
+        }
+      });
+    }
+
     if (this.envelopeCanvas) {
       this.envelopeCanvas.addEventListener('click', handleLetterOpenRequest);
+      this.envelopeCanvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        handleLetterOpenRequest();
+      });
     }
     if (this.unsealBtn) {
       this.unsealBtn.addEventListener('click', handleLetterOpenRequest);
@@ -544,21 +578,36 @@ class PigeonTeddyApp {
   }
 
   transitionToBalloonStage() {
-    if (this.isTransitioning || this.currentScreen === 'balloon') return;
-    this.isTransitioning = true;
+    if (this.currentScreen === 'balloon') return;
     this.currentScreen = 'balloon';
+    this.isTransitioning = false;
+    clearTimeout(this._unsealFallbackTimer);
 
     try {
       this.audioManager.init();
       this.audioManager.playBloomChime();
     } catch (e) {}
 
-    // Hide delivery screen & teddy screen
+    if (this.pigeonRenderer) this.pigeonRenderer.stop();
+    if (this.envelopeRenderer) this.envelopeRenderer.stop();
+
+    // Hide delivery screen & envelope CTA
     if (this.deliveryScreen) {
       this.deliveryScreen.classList.remove('active');
+      this.deliveryScreen.style.display = 'none';
     }
+    if (this.envelopeHint) {
+      this.envelopeHint.classList.remove('visible');
+      this.envelopeHint.style.display = 'none';
+    }
+    if (this.envelopeCanvas) {
+      this.envelopeCanvas.classList.remove('visible');
+    }
+
+    // Hide teddy screen if returning from teddy screen
     if (this.teddyScreen) {
       this.teddyScreen.classList.remove('active');
+      this.teddyScreen.style.display = 'none';
     }
     if (this.teddySelectorBar) {
       this.teddySelectorBar.classList.remove('visible');
@@ -570,32 +619,23 @@ class PigeonTeddyApp {
       this.btnCardPill.classList.remove('visible');
     }
 
-    setTimeout(() => {
-      if (this.pigeonRenderer) this.pigeonRenderer.stop();
-      if (this.envelopeRenderer) this.envelopeRenderer.stop();
-      if (this.deliveryScreen) this.deliveryScreen.style.display = 'none';
-      if (this.teddyScreen) this.teddyScreen.style.display = 'none';
+    // Reset all 4 balloons to pristine floating state
+    if (this.balloonGrid) {
+      const balloons = this.balloonGrid.querySelectorAll('.balloon-item');
+      balloons.forEach((b) => {
+        b.classList.remove('popping', 'floating-away');
+        b.style.pointerEvents = 'auto';
+        b.style.opacity = '1';
+        b.style.transform = '';
+      });
+    }
 
-      // Reset all 4 balloons to pristine floating state
-      if (this.balloonGrid) {
-        const balloons = this.balloonGrid.querySelectorAll('.balloon-item');
-        balloons.forEach((b) => {
-          b.classList.remove('popping', 'floating-away');
-          b.style.pointerEvents = 'auto';
-          b.style.opacity = '1';
-          b.style.transform = '';
-        });
-      }
-
-      // Show Balloon Screen
-      if (this.balloonScreen) {
-        this.balloonScreen.style.display = 'flex';
-        void this.balloonScreen.offsetHeight; // force reflow
-        this.balloonScreen.classList.add('active');
-      }
-
-      this.isTransitioning = false;
-    }, 420);
+    // Immediately show Balloon Screen
+    if (this.balloonScreen) {
+      this.balloonScreen.style.display = 'flex';
+      void this.balloonScreen.offsetHeight; // force reflow
+      this.balloonScreen.classList.add('active');
+    }
   }
 
   popAndRevealTeddy(balloonIndex, balloonElement) {
@@ -817,7 +857,9 @@ class PigeonTeddyApp {
       this.refreshDisplays();
     }
 
-    if (urlParams.get('scene') === 'teddy' || urlParams.get('screen') === 'teddy' || urlParams.get('testScene') === 'reveal') {
+    if (urlParams.get('scene') === 'balloon' || urlParams.get('screen') === 'balloon') {
+      this.transitionToBalloonStage();
+    } else if (urlParams.get('scene') === 'teddy' || urlParams.get('screen') === 'teddy' || urlParams.get('testScene') === 'reveal') {
       this.currentScreen = 'teddy';
       if (this.deliveryScreen) {
         this.deliveryScreen.classList.remove('active');

@@ -499,10 +499,10 @@ export class AsciiEnvelope {
     if (!this.canvas || !this.ctx || !this.simCanvas || !this.simCtx) return;
 
     const unsealT = this.isUnsealing ? (tNow - this.unsealStartTime) : 0;
-    const unsealProgress = this.isUnsealing ? Math.min(1.0, unsealT / 2.3) : 0;
+    const unsealProgress = this.isUnsealing ? Math.min(1.0, unsealT / 1.3) : 0;
 
     // Trigger complete callback once unsealing ceremony dissolves
-    if (this.isUnsealing && unsealT > 2.4 && !this.hasTriggeredComplete) {
+    if (this.isUnsealing && unsealT > 1.35 && !this.hasTriggeredComplete) {
       this.hasTriggeredComplete = true;
       if (this.onBurnComplete) {
         this.onBurnComplete();
