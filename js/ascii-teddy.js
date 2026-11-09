@@ -49,7 +49,7 @@ export class AsciiTeddy {
       {
         id: 'love-balloon',
         title: 'Love Balloon',
-        src: 'assets/teddy-4-standing-clean.png?v=35.0'
+        src: 'assets/teddy-4-standing-clean.png?v=41.0'
       }
     ];
 

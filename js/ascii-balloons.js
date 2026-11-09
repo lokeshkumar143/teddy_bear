@@ -46,7 +46,7 @@ export class AsciiBalloons {
       'assets/teddy-1-clean.png?v=40.0',
       'assets/teddy-2-clean.png?v=40.0',
       'assets/teddy-3-clean.png?v=40.0',
-      'assets/teddy-4-standing-clean.png?v=40.0'
+      'assets/teddy-4-standing-clean.png?v=41.0'
     ];
     this.teddyImages = [];
     this.imagesLoaded = [false, false, false, false];
