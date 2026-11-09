@@ -628,14 +628,22 @@ body {
     font-size: 11px;
   }
   .balloon-grid {
+    position: absolute;
+    top: 135px;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    height: calc(100vh - 160px);
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 14px 10px;
-    max-width: 340px;
-    padding-bottom: 16px;
+    gap: 14px 14px;
+    max-width: 350px;
+    padding: 0 12px;
+    align-items: end;
   }
   .balloon-hit-zone {
-    height: clamp(85px, 15vh, 115px);
+    height: clamp(140px, 21vh, 190px);
   }
   .balloon-caption {
     padding: 5px 12px;

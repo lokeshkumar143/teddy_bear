@@ -220,10 +220,10 @@ export class AsciiBalloons {
     if (isMobile) {
       // 2x2 Grid on Mobile
       const colCenters = [Math.round(cols * 0.28), Math.round(cols * 0.72)];
-      const rowCenters = [Math.round(rows * 0.32), Math.round(rows * 0.66)];
+      const rowCenters = [Math.round(rows * 0.27), Math.round(rows * 0.68)];
 
       // Sized comfortably to fill mobile viewport
-      const radY = Math.min(Math.round(rows * 0.15), 20);
+      const radY = Math.min(Math.round(rows * 0.13), 16);
       const radX = Math.round((radY * 0.82) / this.charAspect);
 
       this.balloons[0].col = colCenters[0];
@@ -241,12 +241,12 @@ export class AsciiBalloons {
       });
     } else {
       // 4 Horizontal Row on Desktop / Tablets
-      const cy = Math.round(rows * 0.44);
+      const cy = Math.round(rows * 0.48);
       const spacing = cols / 5;
 
       // Generous, majestic balloon sizing: ~22-26 rows tall, ~32-38 cols wide
-      const radY = Math.min(Math.round(rows * 0.21), 26);
-      const radX = Math.round((radY * 0.80) / this.charAspect);
+      const radY = Math.min(Math.round(rows * 0.20), 24);
+    const radX = Math.round((radY * 0.72) / this.charAspect);
 
       for (let i = 0; i < 4; i++) {
         this.balloons[i].col = Math.round(spacing * (i + 1));
@@ -397,9 +397,13 @@ export class AsciiBalloons {
               ctx.closePath();
               ctx.fill();
 
-              // 3. 3D Spherical Balloon Body with High-Luminance Radial Gradient
+              // 3. 3D Spherical Balloon Body with Natural Balloon Silhouette
               ctx.beginPath();
-              ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+              ctx.moveTo(cx, cy - ry);
+              ctx.bezierCurveTo(cx + rx * 1.06, cy - ry * 0.95, cx + rx * 1.04, cy + ry * 0.40, cx + rx * 0.26, cy + ry);
+              ctx.lineTo(cx - rx * 0.26, cy + ry);
+              ctx.bezierCurveTo(cx - rx * 1.04, cy + ry * 0.40, cx - rx * 1.06, cy - ry * 0.95, cx, cy - ry);
+              ctx.closePath();
 
               const [br, bg, bb] = balloon.baseColor;
               const [sr, sg, sb] = balloon.shineColor;
@@ -424,7 +428,7 @@ export class AsciiBalloons {
               ctx.save();
               ctx.beginPath();
               ctx.ellipse(cx - rx * 0.35, cy - ry * 0.35, rx * 0.28, ry * 0.36, -0.6, 0, Math.PI * 2);
-              ctx.fillStyle = 'rgba(255, 255, 255, 0.78)';
+              ctx.fillStyle = 'rgba(255, 255, 255, 0.38)';
               ctx.fill();
               ctx.restore();
 
