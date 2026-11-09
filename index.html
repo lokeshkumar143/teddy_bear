@@ -16,7 +16,7 @@
     href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=28.0">
+  <link rel="stylesheet" href="css/style.css?v=29.0">
 </head>
 
 <body class="theme-aurora">
@@ -105,6 +105,10 @@
 
       <!-- 3. Interactive Frosted Glass Action Card -->
       <div id="gift-action-card" class="gift-action-card">
+        <button id="btn-toggle-card" class="card-toggle-btn" type="button" aria-label="Minimize or maximize card" title="Minimize card">
+          <span class="toggle-icon">✕</span>
+        </button>
+
         <div class="card-sparkle-pill">✦ &nbsp;HEARTFELT DEDICATION &nbsp;✦</div>
 
         <h2 id="gift-card-title" class="gift-card-title">Hey, <span id="card-name">Lokesh Kumar</span>! ✨</h2>
@@ -129,104 +133,24 @@
             <span class="btn-text">PULSE HEART</span>
             <span class="btn-icon">💖</span>
           </button>
-
-          <button id="btn-explore-world" class="act-btn act-btn-explore" type="button"
-            title="Explore Developer Portfolio">
-            <span class="btn-text">EXPLORE MY WORLD</span>
-            <span class="btn-icon">✨</span>
-          </button>
         </div>
 
         <!-- Replay Action -->
         <button id="btn-replay" class="note-replay" type="button">Watch Again ↺</button>
-
-        <!-- 5. Pure ASCII Key Design Signature of Lokesh Kumar -->
-        <div id="corner-signature" class="corner-signature" aria-label="ASCII Key Signature of Lokesh Kumar">
-          <div class="ascii-sig-box">
-            <div class="ascii-sig-head">
-              <span class="sig-prompt">&gt;</span> <span class="sig-label">with love</span> <span class="sig-colon">:</span>
-            </div>
-            <div class="ascii-key-cluster" aria-label="Lokesh Kumar">
-              <div class="ascii-key-word">
-                <span class="ascii-key">L</span>
-                <span class="ascii-key">O</span>
-                <span class="ascii-key">K</span>
-                <span class="ascii-key">E</span>
-                <span class="ascii-key">S</span>
-                <span class="ascii-key">H</span>
-              </div>
-              <div class="ascii-key-word">
-                <span class="ascii-key">K</span>
-                <span class="ascii-key">U</span>
-                <span class="ascii-key">M</span>
-                <span class="ascii-key">A</span>
-                <span class="ascii-key">R</span>
-              </div>
-            </div>
-            <div class="ascii-sig-bytes">
-              <span class="ascii-code">ASCII_KEY:</span> 77 69 74 68 &bull; 6C 6F 76 65 <span class="sig-star">✦</span>
-            </div>
-            <div class="ascii-sig-rule">+-------------------------------+</div>
-          </div>
-        </div>
       </div>
+
+      <!-- Collapsed Card Reopen Pill -->
+      <button id="btn-card-pill" class="card-reopen-pill" type="button" aria-label="Open heartfelt dedication card" title="Show dedication card">
+        <span>💌 Dedication Card</span>
+      </button>
     </div>
 
   </main>
 
-  <!-- Interactive Creative Portfolio Modal ("Explore My World") -->
-  <div id="world-modal" class="world-modal" role="dialog" aria-modal="true" aria-hidden="true" inert>
-    <div class="world-modal-backdrop"></div>
-    <div class="world-modal-content">
-      <button id="btn-close-world" class="btn-close-modal" aria-label="Close modal">&times;</button>
-
-      <div class="world-badge">🌌 &nbsp;CREATIVE DEVELOPER PORTFOLIO &nbsp;🌌</div>
-      <h2 class="world-title">Welcome to My Universe ✨</h2>
-      <p class="world-subtitle">Crafted with mathematics, passion, and creative code by <strong>Lokesh Kumar</strong>.
-      </p>
-
-      <div class="world-cards-grid">
-        <div class="world-card">
-          <div class="world-card-icon">🧸</div>
-          <h3>Procedural Living ASCII</h3>
-          <p>Real-time 60 FPS rasterization of transparent watercolors into glowing 24-bit RGB ASCII characters with
-            physical breathing and wave kinematics.</p>
-        </div>
-
-        <div class="world-card">
-          <div class="world-card-icon">🕊️</div>
-          <h3>Carrier Pigeon Dove Physics</h3>
-          <p>Kinematic sine-wave wing flapping (13 Hz) with cubic Bezier trajectory descent and feather stardust
-            particle dissipation.</p>
-        </div>
-
-        <div class="world-card">
-          <div class="world-card-icon">✨</div>
-          <h3>Synthesized Web Audio</h3>
-          <p>Zero external MP3 dependencies. 100% procedurally synthesized music box chimes, love chords, and tactile
-            acoustic clicks.</p>
-        </div>
-
-        <div class="world-card">
-          <div class="world-card-icon">🌌</div>
-          <h3>Multi-Theme Starlight Engine</h3>
-          <p>Seamless real-time switching between Cosmic Aurora, Cyber Rose, Golden Honey, and Dreamy Lavender
-            atmospheres.</p>
-        </div>
-      </div>
-
-      <div class="world-modal-footer">
-        <a href="https://github.com/lokeshkumar143" target="_blank" rel="noopener noreferrer" class="world-github-btn">
-          <span>View on GitHub ↗</span>
-        </a>
-      </div>
-    </div>
-  </div>
-
   <!-- Toast Notification Feedback -->
   <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=28.0"></script>
+  <script type="module" src="js/app.js?v=29.0"></script>
 </body>
 
 </html>

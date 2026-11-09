@@ -64,14 +64,14 @@ class PigeonTeddyApp {
 
     this.giftActionCard = document.getElementById('gift-action-card');
     this.cardName = document.getElementById('card-name');
+    this.btnToggleCard = document.getElementById('btn-toggle-card');
+    this.btnCardPill = document.getElementById('btn-card-pill');
 
     this.btnSaveGift = document.getElementById('btn-save-gift');
     this.btnMakeWave = document.getElementById('btn-make-wave');
     this.btnPulseHeart = document.getElementById('btn-pulse-heart');
-    this.btnExploreWorld = document.getElementById('btn-explore-world');
     this.replayBtn = document.getElementById('btn-replay');
 
-    this.cornerSignature = document.getElementById('corner-signature');
     this.themeToggleBtn = document.getElementById('theme-toggle-btn');
     this.themeLabel = document.getElementById('theme-label');
     this.themeIcon = document.getElementById('theme-icon');
@@ -79,8 +79,6 @@ class PigeonTeddyApp {
     this.soundIcon = document.getElementById('sound-icon');
     this.soundLabel = document.getElementById('sound-label');
 
-    this.worldModal = document.getElementById('world-modal');
-    this.btnCloseWorld = document.getElementById('btn-close-world');
     this.toastMsg = document.getElementById('toast-msg');
   }
 
