@@ -234,6 +234,7 @@ class PigeonTeddyApp {
       this.heartBlessingModal = document.getElementById('heart-blessing-modal');
     }
     if (!this.heartBlessingModal) return;
+    this.heartBlessingModal.style.display = 'flex';
     this.heartBlessingModal.removeAttribute('inert');
     this.heartBlessingModal.classList.add('visible');
     this.heartBlessingModal.removeAttribute('aria-hidden');
@@ -250,6 +251,11 @@ class PigeonTeddyApp {
     this.heartBlessingModal.classList.remove('visible');
     this.heartBlessingModal.setAttribute('aria-hidden', 'true');
     this.heartBlessingModal.setAttribute('inert', '');
+    setTimeout(() => {
+      if (this.heartBlessingModal && !this.heartBlessingModal.classList.contains('visible')) {
+        this.heartBlessingModal.style.display = 'none';
+      }
+    }, 400);
   }
 
   initInteractions() {
