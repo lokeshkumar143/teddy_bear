@@ -35,7 +35,8 @@ export class AsciiEnvelope {
     this.stageCtx = this.stageCanvas ? this.stageCanvas.getContext('2d') : null;
 
     // Interactive mouse / touch state
-    this.mouseX = 0.5;
+    this.mouseX = 0;
+    this.mouseY = 0;
     this.mouseY = 0.5;
     this.currTiltX = 0;
     this.currTiltY = 0;
@@ -529,7 +530,7 @@ export class AsciiEnvelope {
 
     // Scale envelope to fit comfortably in viewport
     const isMobile = this.cssW < 768;
-    const targetScale = isMobile ? 0.88 : (this.cssW > 1200 ? 0.68 : 0.74);
+    const targetScale = isMobile ? 0.78 : (this.cssW > 1200 ? 0.68 : 0.74);
     const drawW = Math.round(cols * targetScale);
     const drawH = Math.round(drawW * (sH / sW) * this.charAspect);
 

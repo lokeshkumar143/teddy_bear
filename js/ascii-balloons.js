@@ -220,11 +220,11 @@ export class AsciiBalloons {
     if (isMobile) {
       // 2x2 Grid on Mobile
       const colCenters = [Math.round(cols * 0.28), Math.round(cols * 0.72)];
-      const rowCenters = [Math.round(rows * 0.27), Math.round(rows * 0.68)];
+      const rowCenters = [Math.round(rows * 0.28), Math.round(rows * 0.65)];
 
       // Sized comfortably to fill mobile viewport
-      const radY = Math.min(Math.round(rows * 0.13), 16);
-      const radX = Math.round((radY * 0.82) / this.charAspect);
+      const radY = Math.min(Math.round(rows * 0.12), 15);
+      const radX = Math.round((radY * 0.70) / this.charAspect);
 
       this.balloons[0].col = colCenters[0];
       this.balloons[0].row = rowCenters[0];

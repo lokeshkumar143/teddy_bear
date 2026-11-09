@@ -71,8 +71,13 @@ html,
 body {
   width: 100%;
   height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
   background-color: var(--bg-color);
-  overflow: hidden;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  position: fixed;
+  inset: 0;
 }
 
 body {
@@ -222,9 +227,9 @@ body {
 }
 
 .scene.active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 /* ==========================================================================
@@ -614,45 +619,101 @@ body {
 
 /* Mobile & Compact Screen Responsiveness for 4 ASCII Balloons */
 @media (max-width: 680px) {
+  .top-nav-bar {
+    top: 10px !important;
+    right: 12px !important;
+    gap: 6px !important;
+    z-index: 100 !important;
+  }
+  .top-pill-btn {
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    min-width: 34px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+  }
+  #theme-label,
+  #sound-label,
+  .top-pill-label {
+    display: none !important;
+  }
+  #theme-icon,
+  #sound-icon,
+  .top-pill-icon {
+    font-size: 16px !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+  }
   .balloon-screen {
-    padding: 16px 12px;
+    padding: 10px 10px;
   }
   .balloon-header-wrapper {
-    margin-top: 24px;
-    margin-bottom: 8px;
+    margin-top: 50px;
+    margin-bottom: 2px;
+    padding: 0 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .balloon-sparkle-badge {
+    font-size: 9px;
+    padding: 3px 10px;
+    letter-spacing: 1px;
+    margin-bottom: 3px;
   }
   .balloon-title {
-    font-size: 21px;
+    font-size: 16px;
+    line-height: 1.25;
+    margin: 2px 0 3px;
+    white-space: normal;
   }
   .balloon-subtitle {
-    font-size: 11px;
+    font-size: 10px;
+    line-height: 1.35;
+    max-width: 290px;
+    margin: 0 auto;
+    padding: 0 4px;
   }
   .balloon-grid {
     position: absolute;
-    top: 135px;
-    bottom: 24px;
+    top: 125px;
+    bottom: 20px;
     left: 0;
     right: 0;
     margin: 0 auto;
-    height: calc(100vh - 160px);
+    height: calc(100vh - 150px);
     grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 14px 14px;
-    max-width: 350px;
-    padding: 0 12px;
-    align-items: end;
+    grid-template-rows: 1fr 1fr;
+    gap: 12px 10px;
+    max-width: 330px;
+    padding: 0 6px;
+    align-items: start;
+    box-sizing: border-box;
+  }
+  .balloon-item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
   }
   .balloon-hit-zone {
-    height: clamp(140px, 21vh, 190px);
+    width: 100%;
+    height: clamp(140px, 20vh, 180px);
   }
   .balloon-caption {
-    padding: 5px 12px;
+    padding: 4px 10px;
+    margin-top: 4px;
+    border-radius: 999px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
   }
   .balloon-name {
-    font-size: 11.5px;
+    font-size: 10.5px;
   }
   .balloon-desc {
-    font-size: 9.5px;
+    font-size: 8.5px;
   }
 }
 
@@ -1247,13 +1308,15 @@ body {
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 16px var(--accent-glow);
       z-index: 200;
       opacity: 0;
+      visibility: hidden;
       pointer-events: none;
-      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
       white-space: nowrap;
     }
 
     .toast-msg.show {
       opacity: 1;
+      visibility: visible;
       transform: translateX(-50%) translateY(0);
     }
 
@@ -1298,7 +1361,7 @@ body {
         font-size: 8.5px;
         padding: 4px 10px;
         letter-spacing: 1.2px;
-        max-width: 60vw;
+        max-width: calc(100vw - 94px);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -1307,25 +1370,46 @@ body {
       }
 
       .top-nav-bar {
-        top: 8px;
-        right: 8px;
-        gap: 4px;
+        top: 10px;
+        right: 10px;
+        gap: 6px;
         z-index: 50;
       }
 
       .top-pill-btn {
-        padding: 4px 9px;
-        font-size: 9.5px;
-        border-radius: 999px;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        min-width: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+      }
+
+      #theme-label,
+      #sound-label,
+      .top-pill-label {
+        display: none !important;
+      }
+
+      #theme-icon,
+      #sound-icon,
+      .top-pill-icon {
+        font-size: 16px;
+        margin: 0;
+        line-height: 1;
       }
 
       .teddy-selector-bar {
-        top: 48px;
+        top: 46px;
         left: 50%;
-        transform: translateX(-50%) translateY(-10px) scale(0.95);
-        padding: 2px 4px;
+        transform: translateX(-50%) translateY(0) scale(1);
+        padding: 3px 5px;
         gap: 2px;
-        max-width: 98vw;
+        width: max-content;
+        max-width: calc(100vw - 12px);
+        box-sizing: border-box;
         overflow-x: auto;
         scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
@@ -1341,11 +1425,17 @@ body {
       }
 
       .teddy-tab-btn {
-        padding: 3px 6px;
+        padding: 4px 6px;
         font-size: 8.5px;
+        letter-spacing: 0.1px;
         gap: 3px;
         white-space: nowrap;
         flex-shrink: 0;
+      }
+
+      .teddy-tab-btn .tab-icon {
+        font-size: 11px;
+        line-height: 1;
       }
 
       /* Gift action card on mobile: docked neatly at bottom, clean & compact */
