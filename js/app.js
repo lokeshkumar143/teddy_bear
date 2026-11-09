@@ -10,12 +10,12 @@
  * - v14.0: Multilingual name grid in final dedication card.
  */
 
-import { AmbientParticles } from './ambient-particles.js?v=36.0';
-import { AsciiPigeon } from './ascii-pigeon.js?v=36.0';
-import { AsciiEnvelope } from './ascii-envelope.js?v=36.0';
-import { AsciiTeddy } from './ascii-teddy.js?v=36.0';
-import { AudioManager } from './audio-fx.js?v=36.0';
-import { MultiLangNameProfile } from './name-multilang.js?v=36.0';
+import { AmbientParticles } from './ambient-particles.js?v=37.0';
+import { AsciiPigeon } from './ascii-pigeon.js?v=37.0';
+import { AsciiEnvelope } from './ascii-envelope.js?v=37.0';
+import { AsciiTeddy } from './ascii-teddy.js?v=37.0';
+import { AudioManager } from './audio-fx.js?v=37.0';
+import { MultiLangNameProfile } from './name-multilang.js?v=37.0';
 
 class PigeonTeddyApp {
   constructor() {

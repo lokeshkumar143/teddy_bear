@@ -16,7 +16,7 @@
     href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Caveat:wght@600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Sans+Telugu:wght@400;600;700&display=swap"
     rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=36.0">
+  <link rel="stylesheet" href="css/style.css?v=37.0">
 </head>
 
 <body class="theme-aurora">
@@ -72,15 +72,17 @@
         <p class="balloon-subtitle">Each floating balloon holds a surprise teddy bear. Tap one to pop &amp; reveal! ✨</p>
       </div>
 
-      <!-- 4 Floating Balloons Grid -->
+      <!-- 4 Floating Balloons Grid (Each containing that specific Teddy Bear inside) -->
       <div class="balloon-grid" id="balloon-grid">
         <!-- Balloon 0: Hugging Heart -->
-        <button class="balloon-item balloon-gold" data-balloon="0" type="button" aria-label="Pop gold balloon for Hugging Heart Teddy">
+        <button class="balloon-item balloon-gold" data-balloon="0" type="button" aria-label="Pop gold balloon to reveal Hugging Heart Teddy">
           <div class="balloon-wrapper">
             <div class="balloon-body">
               <div class="balloon-shine"></div>
               <div class="balloon-inner-glow"></div>
-              <span class="balloon-glyph">🧸</span>
+              <div class="balloon-teddy-container">
+                <img src="assets/teddy-1-clean.png?v=37.0" alt="Hugging Heart Teddy" class="balloon-teddy-img" loading="eager" draggable="false">
+              </div>
             </div>
             <div class="balloon-knot"></div>
             <div class="balloon-string"></div>
@@ -92,12 +94,14 @@
         </button>
 
         <!-- Balloon 1: Sweet Dreams -->
-        <button class="balloon-item balloon-purple" data-balloon="1" type="button" aria-label="Pop lavender balloon for Sweet Dreams Teddy">
+        <button class="balloon-item balloon-purple" data-balloon="1" type="button" aria-label="Pop lavender balloon to reveal Sweet Dreams Teddy">
           <div class="balloon-wrapper">
             <div class="balloon-body">
               <div class="balloon-shine"></div>
               <div class="balloon-inner-glow"></div>
-              <span class="balloon-glyph">🌙</span>
+              <div class="balloon-teddy-container">
+                <img src="assets/teddy-2-clean.png?v=37.0" alt="Sweet Dreams Teddy" class="balloon-teddy-img" loading="eager" draggable="false">
+              </div>
             </div>
             <div class="balloon-knot"></div>
             <div class="balloon-string"></div>
@@ -109,12 +113,14 @@
         </button>
 
         <!-- Balloon 2: Heart Balloon -->
-        <button class="balloon-item balloon-pink" data-balloon="2" type="button" aria-label="Pop pink balloon for Heart Balloon Teddy">
+        <button class="balloon-item balloon-pink" data-balloon="2" type="button" aria-label="Pop pink balloon to reveal Heart Balloon Teddy">
           <div class="balloon-wrapper">
             <div class="balloon-body">
               <div class="balloon-shine"></div>
               <div class="balloon-inner-glow"></div>
-              <span class="balloon-glyph">🎈</span>
+              <div class="balloon-teddy-container">
+                <img src="assets/teddy-3-clean.png?v=37.0" alt="Heart Balloon Teddy" class="balloon-teddy-img" loading="eager" draggable="false">
+              </div>
             </div>
             <div class="balloon-knot"></div>
             <div class="balloon-string"></div>
@@ -126,12 +132,14 @@
         </button>
 
         <!-- Balloon 3: Love Balloon -->
-        <button class="balloon-item balloon-crimson" data-balloon="3" type="button" aria-label="Pop crimson balloon for Love Balloon Teddy">
+        <button class="balloon-item balloon-crimson" data-balloon="3" type="button" aria-label="Pop crimson balloon to reveal Love Balloon Teddy">
           <div class="balloon-wrapper">
             <div class="balloon-body">
               <div class="balloon-shine"></div>
               <div class="balloon-inner-glow"></div>
-              <span class="balloon-glyph">❤️</span>
+              <div class="balloon-teddy-container">
+                <img src="assets/teddy-4-standing-clean.png?v=37.0" alt="Love Balloon Teddy" class="balloon-teddy-img" loading="eager" draggable="false">
+              </div>
             </div>
             <div class="balloon-knot"></div>
             <div class="balloon-string"></div>
@@ -274,7 +282,7 @@
   <!-- Toast Notification Feedback -->
   <div id="toast-msg" class="toast-msg" aria-live="polite"></div>
 
-  <script type="module" src="js/app.js?v=36.0"></script>
+  <script type="module" src="js/app.js?v=37.0"></script>
 </body>
 
 </html>
